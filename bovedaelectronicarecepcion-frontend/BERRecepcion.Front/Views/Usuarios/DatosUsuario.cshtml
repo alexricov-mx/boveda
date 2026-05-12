@@ -1,0 +1,209 @@
+﻿@model DataResult<IEnumerable<BERRecepcion.Front.Models.Dto.UsuariosSearchResponseDto>>
+
+@{
+    string typeEdit = "";
+    bool isSuper = Model.Data.Count()>0 ? Model.Data.FirstOrDefault().IsSuperUsuario : false;
+}
+
+<div class="col-md-12" style="font-family: Verdana,Arial, Helvetica, sans-serif; font-size: 12px; font-weight: bold;">
+
+@if (Model.Status == System.Net.HttpStatusCode.OK)
+{
+
+    <div class="row">
+        @foreach (var x in Model.Data)
+        {
+
+        @*<div>*@
+            <div class="card cardDataDisplay col-lg-6 col-md-12 col-sm-12">
+                <div class="card-body">
+                    <div class="card-title col-sm-12" style="background-color:#3f6791!important;padding:10px;">
+                        @if (!String.IsNullOrEmpty(x.Ficha))
+                        {
+                            typeEdit = "EditarUsuario('" + x.UserId + "', '" + x.ProfileId + "', '" + x.Ficha + "', '" + x.Usuario + "', '" + x.Nombre + "', '" + x.Email + "', '" + x.Centro + "', '" + x.RFC + "', '" + x.ValidoDesde.ToString("yyyy-MM-dd'T'HH:mm") + "', '" + x.ValidoHasta.ToString("yyyy-MM-dd'T'HH:mm") + "','" + x.OrganismosId + "')";
+                        }
+                        else
+                        {
+                            if (x.Perfil == "AuditorPpi")
+                            {
+                                typeEdit = "EditarUsuarioAuditorPpi('" + x.UserId + "','" + x.Nombre + "','" + x.Company + "','" + x.CreditorNumber + "','" + x.Email + "','Auditor','" + x.TipoUsuario + "','" + x.CreditorRFC + "','" + x.OrganismosId + "')";
+                            }
+                            else
+                            {
+                                typeEdit = "EditarUsuarioP('" + x.Perfil + "','" + x.UserId + "','" + x.ProfileId + "','" + x.OrganismosId + "','" + x.Nombre + "','" + x.Company + "','" + x.RFC + "','" + x.CreditorNumber + "','" + x.Email + "','Proveedor','" + x.PhoneNumber + "','" + x.ValidoDesde.ToString("yyyy-MM-dd'T'HH: mm") + "','" + x.ValidoHasta.ToString("yyyy-MM-dd'T'HH: mm") + "','" + x.CreditorRFC + "')";
+                            }
+                        }
+                        <a href="" onclick="@typeEdit; return false;" data-toggle="tooltip" title="Editar">
+                            <i class="fa fa-pen" style="color:white;"></i>
+                            @if (!String.IsNullOrEmpty(x.Ficha))
+                            {
+                                <span style="color:white!important;">
+                                    &nbsp;&nbsp;Ficha &nbsp;@x.Ficha
+                                </span>
+                            }
+                            else
+                            {
+                                if (!String.IsNullOrEmpty(x.CreditorNumber))
+                                {
+                                    <span style="color:white!important;">
+                                        &nbsp;&nbsp;No. Acreedor&nbsp;@x.CreditorNumber
+                                    </span>
+                                }
+                                else
+                                {
+                                    <span style="color:white!important;">
+                                        &nbsp;&nbsp;Proveedor
+                                    </span>
+                                }
+                            }
+
+                        </a>
+                    </div>
+                    <div class="card-text col-sm-12">
+                        <div class="row" style="display:none;">
+                            <div class="form-group">
+                                <small class="form-text text-muted">No. Acreedor</small>
+                                <label>@x.CreditorNumber</label>
+                            </div>
+                        </div>
+                        <div class="row" style="display:none;">
+                            <div class="form-group">
+                                <small class="form-text text-muted">Usuario</small>
+                                <label>@x.Usuario</label>
+                            </div>
+                        </div>
+                        <div class="row" class="margin-top:10px;">
+                            <div class="form-group col-sm-12">
+                                <small class="form-text text-muted">Nombre</small>
+                                <label>@x.Nombre</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <small class="form-text text-muted">Email</small>
+                                <label>@x.Email</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <small class="form-text text-muted">Tipo de Usuario</small>
+                                <label>@x.Perfil</label>
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <small class="form-text text-muted">Perfil</small>
+                                <label>@x.ProfileName</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            @if (!String.IsNullOrEmpty(x.Ficha))
+                            {
+                                <div class="form-group col-sm-6">
+                                    <small class="form-text text-muted">Centro</small>
+                                    <label>@x.Centro</label>
+                                </div>
+                            }
+                            else
+                            {
+                                @if (!String.IsNullOrEmpty(x.Company))
+                                {
+                                    <div class="form-group col-sm-6">
+                                        <small class="form-text text-muted">Compañia</small>
+                                        <label>@x.Company</label>
+                                    </div>
+                                }
+                            }
+                            <div class="form-group col-sm-6">
+                                <small class="form-text text-muted">RFC</small>
+                                <label>@x.RFC</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-4">
+                                <small class="form-text text-muted">Válido desde</small>
+                                <label>@x.ValidoDesde.ToString("dd/MM/yyyy HH:mm")</label>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <small class="form-text text-muted">Válido hasta</small>
+                                <label>@x.ValidoHasta.ToString("dd/MM/yyyy HH:mm")</label>
+                            </div>
+                            <div class="form-group col-sm-4">
+                                <small class="form-text text-muted">último acceso</small>
+                                @{ 
+                                    string ultimoAcceso = "";
+                                    if (@x.UltimoAcceso != null)
+                                    {
+                                        ultimoAcceso = Convert.ToDateTime(x.UltimoAcceso).ToString("dd/MM/yyyy HH:mm");
+                                    }
+                                    else
+
+                                }
+                                <label>@ultimoAcceso</label>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-4">
+                                <small class="form-text text-muted">Bloqueado</small>&nbsp;&nbsp;
+                                @if (x.IsBlocked == true)
+                                {
+                                    <a href="" onclick="EstatusUsuario('@x.Usuario', '@x.Nombre','@x.Email','@x.UserId'); return false;" data-toggle="tooltip" title="Click para desbloquear">
+                                        <span class="dot-active mt-2"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="" onclick="EstatusUsuario('@x.Usuario', '@x.Nombre','@x.Email','@x.UserId'); return false;" data-toggle="tooltip" title="Click para bloquear">
+                                        <span class="dot mt-2"></span>
+                                    </a>
+                                }
+                            </div>
+                            @if (!String.IsNullOrEmpty(x.Ficha) && isSuper == true)
+                            {
+                                <div class="form-group col-sm-4">
+                                    <small class="form-text text-muted">Administrador</small>&nbsp;&nbsp;
+                                    @if (x.TipoUsuario == "UserTypeA" || x.TipoUsuario == "Administrador")
+                                    {
+                                        <a href="" onclick="Admin('@x.UserId'); return false;" data-toggle="tooltip" title="Click para desactivar">
+                                            <span class="dot-active mt-2"></span>
+                                        </a>
+                                    }
+                                    else
+                                    {
+                                        <a href="" onclick="Admin('@x.UserId'); return false;" data-toggle="tooltip" title="Click para activar">
+                                            <span class="dot mt-2"></span>
+                                        </a>
+                                    }
+                                </div>
+                            <div class="form-group col-sm-4">
+                                <small class="form-text text-muted">Super Admin.</small>&nbsp;&nbsp;
+                                @if (x.TipoUsuario == "UserTypeS" || x.TipoUsuario == "Super Administrador")
+                                {
+                                    <a href="" onclick="SuperAdmin('@x.UserId'); return false;" data-toggle="tooltip" title="Click para desactivar">
+                                        <span class="dot-active mt-2"></span>
+                                    </a>
+                                }
+                                else
+                                {
+                                    <a href="" onclick="SuperAdmin('@x.UserId'); return false;" data-toggle="tooltip" title="Click para activar">
+                                        <span class="dot mt-2"></span>
+                                    </a>
+                                }
+                            </div>
+                            }
+                        </div>
+                        <div class="row">
+                            <div class="form-group">
+                                <small class="form-text text-muted">Fecha Creación</small>
+                                <label>@x.FechaCreacion.ToString("dd/MM/yyyy HH:mm")</label>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        @*</div>*@
+
+        }
+    </div>
+}
+
+</div>

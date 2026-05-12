@@ -1,0 +1,115 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model AltaContratosDto
+
+
+    <div class="card card-olive card-outline">
+        <div class="card-header">
+            <h4>Editar Contrato</h4>
+        </div>
+        <div class="card-body">
+            <div hidden class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label" AltaContratoID: </label>
+                    <div class="col-3">
+                        <input type="text" class="form-control" id="AltaContratoID" disabled="disabled" value="@Model.AltaContratoID">
+                    </div>
+                </div>
+            </div>
+            <div hidden class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Contract: </label>
+                    <div class="col-3">
+                        <input type="text" class="form-control" id="Contract" disabled="disabled" value="@Model.Contract">
+                    </div>
+                </div>
+            </div>
+
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Contrato: </label>
+                    <div class="col-3">
+                        @Html.LabelForModel(Model.Contract)
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Firmante 1:</label>
+                    <div class="col-3">
+                        <input class="form-control" type="text" id="txtF1Edit" value="@Model.Firma1">
+                        @*<input class="form-control" type="text" id="txtF1Edit" maxlength="6" value="@Model.Firma1" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Firmante1Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Suplente 1:</label>
+                    <div class="col-3">
+                        <input class="form-control" type="text" id="txtS1Edit" value="@Model.Suplente1">
+                        @*<input class="form-control" type="text" id="txtS1Edit" maxlength="6" value="@Model.Suplente1" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Suplente1Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Firmante 2:</label>
+                    <div class="col-3">
+                        <input class="form-control" type="text" id="txtF2Edit" value="@Model.Firma2">
+                        @*<input class="form-control" type="text" id="txtF2Edit" maxlength="6" value="@Model.Firma2" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Firmante2Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label for="fec_fin" class="col-4 col-form-label">Suplente 2:</label>
+                    <div class="col-3">
+                        <input class="form-control" type="text" id="txtS2Edit" value="@Model.Suplente2">
+                        @*<input class="form-control" type="text" id="txtS2Edit" value="@Model.Suplente2" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Suplente2Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-info" name="ac-edit" id="ac-edit">
+                <i class="fas fa-save mr-1"></i>
+                Actualizar
+            </button>
+            <button class="btn btn-sm btn-outline-danger" name="cancel" id="cancelar">
+                <i class="fas fa-times mr-1"></i>
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#txtF1Edit").keyup(function (event) {
+                var ficha = $("#txtF1Edit").val();
+                var indice = 1;
+                Busqueda_Usuario(ficha, indice);
+
+            });
+            $("#txtS1Edit").keyup(function (event) {
+                var ficha = $("#txtS1Edit").val();
+                var indice = 2;
+                Busqueda_Usuario(ficha, indice);
+            });
+            $("#txtF2Edit").keyup(function (event) {
+                var ficha = $("#txtF2Edit").val();
+                var indice = 3;
+                Busqueda_Usuario(ficha, indice);
+            });
+            $("#txtS2Edit").keyup(function (event) {
+                var ficha = $("#txtS2Edit").val();
+                var indice = 4;
+                Busqueda_Usuario(ficha, indice);
+            });
+        });
+    </script>

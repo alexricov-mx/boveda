@@ -1,0 +1,10 @@
+﻿@model IEnumerable<BERRecepcion.Front.Models.ValidationError>
+
+<div class="alert alert-default-danger alert-dismissible datos-factura">
+    <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+    <h5><i class="icon fas fa-ban"></i> Existen errores de validación.</h5>
+    @foreach (var item in Model)
+     {
+        <label class="text-muted">@item.descripcion</label> <br />
+     }
+</div>

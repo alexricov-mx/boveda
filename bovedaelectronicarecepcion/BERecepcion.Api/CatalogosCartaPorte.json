@@ -1,0 +1,222 @@
+{
+    "c_CveTransporte": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_TipoEstacion": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "D",
+            "FinVigencia": "E"
+        }
+    },
+    "c_Estaciones ": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "G",
+            "FinVigencia": "H"
+        }
+    },
+    "c_ClaveUnidadPeso": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "E",
+            "FinVigencia": "F"
+        }
+    },
+    "c_ClaveProdServCP": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "E",
+            "FinVigencia": "F"
+        }
+    },
+    "c_MaterialPeligroso": {
+        "InicioDatos": 7,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "F",
+            "FinVigencia": "G"
+        }
+    },
+    "c_TipoEmbalaje": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_TipoPermiso": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "D",
+            "FinVigencia": "E"
+        }
+    },
+    "c_Colonia_1": {
+        "InicioDatos": 6,
+        "Datos": {
+            "c_Colonia": "A",
+            "c_CodigoPostal": "B",
+            "NombreAsentamiento": "C"
+        }
+    },
+    "c_Colonia_2": {
+        "InicioDatos": 6,
+        "Datos": {
+            "c_Colonia": "A",
+            "c_CodigoPostal": "B",
+            "NombreAsentamiento": "C"
+        }
+    },
+    "c_Colonia_3": {
+        "InicioDatos": 6,
+        "Datos": {
+            "c_Colonia": "A",
+            "c_CodigoPostal": "B",
+            "NombreAsentamiento": "C"
+        }
+    },
+    "c_Localidad": {
+        "InicioDatos": 6,
+        "Datos": {
+            "c_Localidad": "A",
+            "c_Estado": "B",
+            "Descripcion": "C",
+            "FechaInicioVigencia": "D",
+            "FechaFinVigencia": "E"
+        }
+    },
+    "c_Municipio": {
+        "InicioDatos": 6,
+        "Datos": {
+            "c_Municipio": "A",
+            "c_Estado": "B",
+            "Descripcion": "C",
+            "FechaInicioVigencia": "D",
+            "FechaFinVigencia": "E"
+        }
+    },
+    "c_ParteTransporte": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_FiguraTransporte": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_ConfigAutotransporte": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "F",
+            "FinVigencia": "G"
+        }
+    },
+    " c_SubTipoRem": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_ConfigMaritima": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_ClaveTipoCarga": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_ContenedorMaritimo": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    },
+    "c_NumAutorizacionNaviero": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "B",
+            "FinVigencia": "C"
+        }
+    },
+    "c_CodigoTransporteAereo": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "E",
+            "FinVigencia": "F"
+        }
+    },
+    "c_TipoDeServicio": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "D",
+            "FinVigencia": "E"
+        }
+    },
+    "c_DerechosDePaso": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "G",
+            "FinVigencia": "H"
+        }
+    },
+    "c_TipoCarro": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "D",
+            "FinVigencia": "E"
+        }
+    },
+    "c_Contenedor": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "D",
+            "FinVigencia": "E"
+        }
+    },
+    "c_TipoDeTrafico": {
+        "InicioDatos": 6,
+        "Datos": {
+            "value": "A",
+            "InicioVigencia": "C",
+            "FinVigencia": "D"
+        }
+    }
+}

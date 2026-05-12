@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Recepción Entrada de Mercancías";
+}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 class="m-0">Recepción Entrada de Mercancías</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="reception-card">
+
+            </div>
+        </div>
+    </div>
+</section>
+<sign-widget data-reloadTableName="ReceptionCard"
+             data-urlFirmar="ReceptionAlmacen/Firmar"
+             data-urlCompletarFirma="ReceptionAlmacen/CompletarFirma">
+</sign-widget>
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/ReceptionAlmacen/index.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/sign-widget.js")"></script>
+}
+<partial name="_ModalDocumentoPDF" />

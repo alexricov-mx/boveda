@@ -1,0 +1,144 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<PreFacturaDto>>
+
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+
+    <table class="table table-hover" id="pre-factura-table" style="font-size:14px;">
+        <thead>
+            <tr class="text-center">
+                <th>Organismo</th>
+                <th>Pedido</th>
+                <th> Copade</th>
+                <th>Nombre  Acreedor </th>
+                <th>No. Acreedor</th>
+                <th>Ejercicio</th>
+                <th>Centro Gestor</th>
+                <th>Fecha de recepción de Copade</th>
+                <th>Fecha firma funcioario 1</th>
+                <th>Fecha firma funcioario 2</th>
+                <th>Fecha de envio correo al proveedor</th>
+                <th>Campo check</th>
+                <th> Copade (PDF)</th>
+                <th>Pre-Factura (XML)</th>
+                <th>Nota Crédito (XML)</th>
+                @*<th></th>
+            <th>PDF </th>
+            <th>Pre-Factura </th>
+            <th>Nota-Credito </th>
+            <th>Organismo</th>
+            <th>Centro Gestor</th>
+            <th class="text-center">Orden SAP</th>
+            <th>Copade</th>
+            <th class="text-center">Ejercicio</th>
+            <th class="text-center">No. Acredor</th>
+            <th class="text-center">Fecha</th>
+            <th class="text-center">RFC</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>@item.OrganismID</td>
+                    <td>@item.SapOrder</td>
+                    <td>@item.CopadeID</td>
+                    <td>@item.Creditor</td>
+                    <td>@item.CreditorNumber</td>
+                    <td>@item.Exercise</td>
+                    <td>@item.Center</td>
+                    <td>@item.ReceptionDate</td>
+                    <td>@item.functionary1signdate</td>
+                    <td>@item.functionary2signdate</td>
+                    <td>@item.ProviderEmailSendDate</td>
+                    <td scope="row" class="text-center">
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkPDF" id="@item.CopadeID" data-rol="@item.CopadeID" />
+                            <label class="custom-control-label" for="@item.CopadeID"></label>
+                        </div>
+                    </td>
+                    <td scope="row" class="text-center">
+                        <i class="fas fa-file-pdf image-pdf pdf-red-color" style="cursor:pointer;" data-id="@item.CopadeID" onclick="pdfPreview('@item.SapOrder', '@item.clave')"></i>
+                    </td>
+                    <td scope="row" class="text-center">
+                        <i class="fas fa-file-code image-pdf pdf-black-color" data-id="@item.CopadeID" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = @item.CopadeID, tipo = true } )'"></i>
+                    </td>
+                    <td scope="row" class="text-center">
+                        @if (item.NotaCreditoXML != null)
+                        {
+                            <i class="far fa-file-code image-pdf pdf-black-color" data-id="@item.CopadeID" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = @item.CopadeID, tipo = false } )'"></i>
+                        }
+                    </td>
+                </tr>
+                @*<tr class="text-center">
+        <td scope="row" class="text-center">
+
+        <div class="custom-control custom-checkbox">
+        <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkPDF" id="@item.CopadeID" data-rol="@item.CopadeID" />
+        <label class="custom-control-label" for="@item.CopadeID"></label>
+        </div>
+        </td>
+
+        <td scope="row" class="text-center">
+        <i class="fas fa-file-pdf image-pdf pdf-red-color" style="cursor:pointer;" data-id="@item.CopadeID" onclick="pdfPreview('@item.SapOrder', '@item.clave')"></i>
+        </td>
+        <td scope="row" class="text-center">
+        <i class="fas fa-file-code image-pdf pdf-black-color" data-id="@item.CopadeID" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = @item.CopadeID, tipo = true } )'"></i>
+        </td>
+        <td scope="row" class="text-center">
+        @if (item.NotaCreditoXML != null)
+        {
+        <i class="far fa-file-code image-pdf pdf-black-color" data-id="@item.CopadeID" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = @item.CopadeID, tipo = false } )'"></i>
+        }
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.clave)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.Ficha)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.SapOrder)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.Reception)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.Exercise)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.CreditorNumber)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.ReceptionDate)
+        </td>
+        <td>
+        @Html.DisplayFor(modelItem => item.CreditorRfc)
+        </td>
+
+        </tr>*@
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("pre-factura-table");
+        });
+    </script>
+
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No tiene Pre Facturas.</p>
+    </div>
+}
+
+

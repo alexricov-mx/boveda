@@ -1,0 +1,271 @@
+﻿@model BERRecepcion.Front.Models.ExpedienteEViewModel
+@{
+    ViewData["Title"] = "Detalle de Seguimiento de Copade";
+    bool showInformation = true;
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>
+                    Detalle de copade
+                </h3>
+                <button class="btn btn-sm btn-secondary float-right" data-redirect="@Model.RedirectAction" style="width:135px;" id="btnRegresar">
+                    <i class="fas fa-arrow-left mr-1"></i> Regresar
+                </button>
+                <button class="btn btn-sm btn-dark float-right mr-2" id="btnExpedienteSeguimiento" data-copadeid="@Model.Copade.CopadeID" data-saporder="@Model.Copade.SapOrder" data->
+                    <i class="fas fa-folder mr-1"></i> Expediente electrónico
+                </button>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            @if (Model.SupplyOrder != null)
+            {
+                var dates = Model.SupplyOrder.Seguimiento.GroupBy(x => x.Date.Value.ToString("dd/MM/yyyy")).ToList();
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="timeline">
+                                @foreach (var item in dates)
+                                {
+                                    <div class="time-label">
+                                        <span class="bg-olive">
+                                            @item.Key @(showInformation ? " - Orden de surtimiento" : "")
+                                        </span>
+                                    </div>
+                                    showInformation = false;
+                                    @foreach (var action in item)
+                                    {
+                                        <div>
+                                            <i class="fas fa-angle-right bg-info"></i>
+                                            <div class="timeline-item">
+                                                <span class="time"><i class="fas fa-clock"></i> @action.Date.Value.ToString("HH:mm:ss")</span>
+                                                <h3 class="timeline-header">
+                                                    <label class="mb-0">@action.Title</label>
+                                                </h3>
+                                                <div class="timeline-body">
+                                                    <label class="text-muted" style="word-break: break-word;">@action.Description</label>
+                                                    <strong style="word-break: break-word;">
+                                                        @action.Info
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div>
+                                    <i class="fas fa-clock bg-gray"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.SOEstimation != null)
+            {
+                var dates = Model.SOEstimation.Seguimiento.GroupBy(x => x.Date.Value.ToString("dd/MM/yyyy")).ToList();
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="timeline">
+                                @foreach (var item in dates)
+                                {
+                                    <div class="time-label">
+                                        <span class="bg-olive">
+                                            @item.Key @(showInformation ? " - Estimación de obra" : "")
+                                        </span>
+                                    </div>
+                                    showInformation = false;
+                                    @foreach (var action in item)
+                                    {
+                                        <div>
+                                            <i class="fas fa-angle-right bg-info"></i>
+                                            <div class="timeline-item">
+                                                <span class="time"><i class="fas fa-clock"></i> @action.Date.Value.ToString("HH:mm:ss")</span>
+                                                <h3 class="timeline-header">
+                                                    <label class="mb-0">@action.Title</label>
+                                                </h3>
+                                                <div class="timeline-body">
+                                                    <label class="text-muted" style="word-break: break-word;">@action.Description</label>
+                                                    <strong style="word-break: break-word;">
+                                                        @action.Info
+                                                    </strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div>
+                                    <i class="fas fa-clock bg-gray"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Copade != null)
+            {
+                var dates = Model.Copade.Seguimiento.GroupBy(x => x.Date.Value.ToString("dd/MM/yyyy")).ToList();
+                showInformation = true;
+
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="timeline">
+                                @foreach (var item in dates)
+                                {
+                                    <div class="time-label">
+                                        <span class="bg-olive">@item.Key  @(showInformation ? " - Copade" : "")</span>
+                                    </div>
+                                    showInformation = false;
+                                    @foreach (var action in item)
+                                    {
+                                        <div>
+                                            <i class="fas fa-angle-right bg-info"></i>
+                                            <div class="timeline-item">
+                                                <span class="time"><i class="fas fa-clock"></i> @action.Date.Value.ToString("HH:mm:ss")</span>
+                                                <h3 class="timeline-header">
+                                                    <label class="mb-0">@action.Title</label>
+                                                </h3>
+                                                <div class="timeline-body">
+                                                    <label class="text-muted" style="word-break: break-word;">@action.Description</label>
+                                                    <strong style="word-break: break-word;">@action.Info</strong>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    }
+                                }
+                                <div>
+                                    <i class="fas fa-clock bg-gray"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+
+            @if (Model.Invoice != null)
+            {
+                <div class="col-12">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="timeline">
+                                <div class="time-label">
+                                    <span class="bg-olive">@Model.Invoice.ReceptionDate.ToString("dd/MM/yyyy") Facturación</span>
+                                </div>
+                                <div>
+                                    <i class="fas fa-angle-right bg-info"></i>
+                                    <div class="timeline-item">
+                                        <span class="time"><i class="fas fa-clock"></i> @Model.Invoice.ReceptionDate.ToString("HH:mm:ss")</span>
+                                        <h3 class="timeline-header">
+                                            <label class="mb-0">Recepción de factura</label>
+                                        </h3>
+                                        <div class="timeline-body">
+                                            @*================Factura=================0*@
+                                            <div class="col-12">
+                                                <div class="callout callout-success">
+                                                    <div class="form-group row m-0">
+                                                        <h3 class="col-12 card-title">
+                                                            <i class="fas fa-file-invoice mr-2"></i>Información
+                                                        </h3>
+                                                    </div>
+                                                    <div class="table-responsive">
+                                                        <table class="table table-striped table-hover m-0" id="invoice-table" style="font-size:14px;">
+                                                            <thead>
+                                                                <tr>
+                                                                    <th>UUID</th>
+                                                                    <th>Serie</th>
+                                                                    <th>Folio</th>
+                                                                    <th>Fecha factura</th>
+                                                                    <th>VU/Asignación</th>
+                                                                    <th class="text-right">IVA</th>
+                                                                    <th class="text-right">Total</th>
+                                                                </tr>
+                                                            </thead>
+                                                            <tbody>
+                                                                <tr>
+                                                                    <td>@(Model.Invoice.Uuid != Guid.Empty ? Model.Invoice.Uuid.ToString().ToUpper() : "")</td>
+                                                                    <td>@Model.Invoice.Serie</td>
+                                                                    <td>@Model.Invoice.Folio</td>
+                                                                    <td>@Model.Invoice.InvoiceDate.ToString("dd/MM/yyyy")</td>
+                                                                    <td>@Model.Invoice.Assignment</td>
+                                                                    <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(Model.Invoice.TotalImpuestosTrasladados))</td>
+                                                                    <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(Model.Invoice.Total))</td>
+                                                                </tr>
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            @*=================Notas de credito=================0*@
+                                            @if (Model.NotasCredito != null && Model.NotasCredito.Count() > 0)
+                                            {
+                                                <div class="col-12">
+                                                    <div class="callout callout-success">
+                                                        <div class="form-group row m-0">
+                                                            <h3 class="col-12 card-title m-auto">
+                                                                <i class="fas fa-file-invoice mr-2"></i>Notas de crédito
+                                                            </h3>
+                                                        </div>
+                                                        <div class="table-responsive">
+                                                            <table class="table table-striped table-hover m-0" style="font-size:14px;" id="notas-credito-table">
+                                                                <thead>
+                                                                    <tr>
+                                                                        <th>UUID</th>
+                                                                        <th>Serie</th>
+                                                                        <th>Folio</th>
+                                                                        <th>Cantidad</th>
+                                                                        <th class="text-right">Iva</th>
+                                                                        <th class="text-right">Total</th>
+                                                                    </tr>
+                                                                </thead>
+                                                                <tbody>
+                                                                    @foreach (var item in Model.NotasCredito)
+                                                                    {
+                                                                        <tr>
+                                                                            <td>@(item.Uuid != Guid.Empty ? item.Uuid.ToString().ToUpper() : "")</td>
+                                                                            <td>@item.Serie</td>
+                                                                            <td>@item.Folio</td>
+                                                                            <td>@item.Amount</td>
+                                                                            <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.Iva))</td>
+                                                                            <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.Total))</td>
+                                                                        </tr>
+                                                                    }
+                                                                </tbody>
+                                                            </table>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <i class="fas fa-clock bg-gray"></i>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    </div>
+</section>
+@section scripts{
+    <script type="text/javascript">
+        var search = '@ViewBag.Search';
+        var fechaInicial = '@ViewBag.FechaInicial';
+        var fechaFinal = '@ViewBag.FechaFinal';
+    </script>
+    <script type="text/javascript" src="@Url.Content("~/js/Consultas/SeguimientoCopade/detalle.js")"></script>
+}

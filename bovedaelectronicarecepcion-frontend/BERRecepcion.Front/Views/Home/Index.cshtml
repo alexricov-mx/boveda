@@ -1,0 +1,31 @@
+﻿@using Newtonsoft.Json
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor httpContextAccessor
+@{
+    var infoApp = httpContextAccessor.HttpContext.Session.GetString("InfoAplicativo") != null ? JsonConvert.DeserializeObject<InfoAplicativoModel>(httpContextAccessor.HttpContext.Session.GetString("InfoAplicativo")) : null;
+}
+<div class="card card-solid">
+    <div class="card-body mt-5 mb-5 pt-5 pb-5">
+        <div class="row">
+            <div class="col-md-4 col-sm-12 d-flex align-items-center justify-content-center">
+                <h1><strong>Bóveda Electrónica Recepción On Premise</strong></h1>
+            </div>
+            <div class="col-md-8 col-sm-12 d-flex align-items-center justify-content-center">
+                <img class="img-fluid w-100" src="~/images/berHome.jpg" alt="Bóveda Electrónica Recepción" />
+            </div>
+        </div>
+    </div>
+</div>
+<footer class="main-footer" style="z-index: 10;">
+    <div class="float-right d-none d-sm-block">
+        @if (infoApp != null)
+        {
+            <b>Versión </b>@infoApp.Version
+        }
+    </div>
+    <strong>&copy; Petróleos Mexicanos.</strong>
+    <p class="text-muted mb-0">
+        Avenida Marina Nacional 329, Colonia Verónica Anzures, C.P. 11311<br />
+        Miguel Hidalgo, Ciudad de México, CDMX (+52) 55 1944 2500.
+    </p>
+</footer>

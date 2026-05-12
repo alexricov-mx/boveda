@@ -1,0 +1,93 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model AdefasDto
+@{
+    bool isEdit = ViewBag.IsEdit;
+    var organismos = (IEnumerable<OrganismDto>)ViewBag.Organismos;
+    var fechas = (List<DataDroplist>)ViewBag.Fechas;
+}
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">@(isEdit ? "Editar Adefa" : "Agregar Adefa")</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-5 col-lg-5 col-xl-5">
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="OrganismID" class="col-md-12 col-form-label">Organismo</label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        <select class="form-control form-control-sm" id="OrganismID" @(isEdit ? "disabled" : "")>
+                            @foreach (var item in organismos)
+                            {
+                                if (item.OrganismID == Model?.OrganismID && isEdit)
+                                {
+                                    <option value="@item.OrganismID" selected>@item.Clave</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.OrganismID"> @item.Clave</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group">
+                    <label for="AnhioFactura" class="col-md-12 col-form-label">Año Factura: </label>
+                    <div class="col-12 col-sm-12 col-md-9 col-lg-9">
+                        @{
+                            if (isEdit && fechas.Where(x => x.nombre == Model.AnhioFactura).FirstOrDefault() == null)
+                            {
+                                fechas.Add(new DataDroplist { id = fechas.Max(x => x.id) + 1, nombre = Model.AnhioFactura });
+                            }
+                        }
+                        <select class="form-control form-control-sm" @(isEdit ? "disabled" : "") id="AnhioFactura">
+                            @foreach (var item in fechas)
+                            {
+                                if (isEdit && item.id.ToString() == Model.AnhioFactura)
+                                {
+                                    <option value="@item.id" selected>@item.nombre</option>
+                                }
+                                else if (!isEdit && (DateTime.Now.Year + 1) == item.id)
+                                {
+                                    <option value="@item.id" selected> @item.nombre</option>
+                                }
+                                else
+                                {
+                                    <option value="@item.id"> @item.nombre</option>
+                                }
+                            }
+                        </select>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-7 col-lg-7 col-xl-7">
+            <div class="col-12">
+                <div class="form-group row">
+                    <label for="InicioVentana" class="col-12 col-form-label">Inicio de ventana</label>
+                    <div class="col-12">
+                        <input class="form-control form-control-sm" type="datetime-local" id="InicioVentana" value="@(isEdit ? Convert.ToDateTime(Model?.InicioVentana).ToString("yyyy-MM-ddThh:mm") : "")">
+                    </div>
+                </div>
+            </div>
+            <div class="col-12">
+                <div class="form-group row">
+                    <label for="FinVentana" class="col-12 col-form-label">Fin de ventana</label>
+                    <div class="col-12">
+                        <input class="form-control form-control-sm" type="datetime-local" id="FinVentana" value="@(isEdit ? Convert.ToDateTime(Model?.FinVentana).ToString("yyyy-MM-ddThh:mm") : "")">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="modal" style="width:135px;">
+        <i class="fas fa-times mr-2"></i> Cerrar
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-adefaid="@Model?.AdefaID" id="btnSave" style="width:135px;">
+        <i class="fas fa-save mr-2"></i> Guardar
+    </button>
+</div>

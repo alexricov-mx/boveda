@@ -1,0 +1,69 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<PaymentListDto>>
+
+    @if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+    {
+        <div class="card-body">
+            <table class="table table-hover" id="cancelacion-ListaPago-table" style="font-size:14px;">
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th>
+                        </th>
+                        <th>Organismo</th>
+                        <th>Lista de Pago</th>
+                        <th>Fecha</th>
+                        <th>Fecha de Recepción</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                    <tr class="text-center">
+                        <td scope="row" class="text-center">
+                            <div class="custom-control custom-checkbox">
+                                <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkCancelCopade" id="@item.PaymentListID" data-rol="@item.PaymentListID" data-lista="@item.ListaPago_Id"/>
+                                <label class="custom-control-label" for="@item.PaymentListID"></label>
+                            </div>
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.OrganismClave)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ListaPago_Id)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.Date)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(modelItem => item.ReceptionDate)
+                        </td>                    
+                    </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="row mt-2">
+                <div class="col-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 mt-1 mb-2">
+                    <button class="btn btn-sm btn-outline-danger w-100" id="btnCancelar" style="width:100px;">
+                        Cancelar<i class="fas fa-window-close float-right mt-1"></i>
+                    </button>
+                </div>
+                <div class="col-12 col-sm-9 col-md-10 col-lg-10 col-xl-10">
+                    <partial name="_Pagination" model="@Model.Pager" />
+                </div>
+            </div>
+            <script>
+        $(function () {
+            DataTableInitialize("cancelacion-ListaPago-table");
+        });
+            </script>
+        </div>
+    }
+    else
+    {
+        <div class="callout callout-info">
+            <p>No tiene datos para cancelar</p>
+        </div>
+    }
+
+

@@ -1,0 +1,52 @@
+﻿@{
+    ViewData["Title"] = "Error de Autenticación";
+    Layout = "_LayoutError";
+}
+
+<div class="lockscreen-item">
+    <div class="lockscreen-image">
+        <i class="fas fa-exclamation-triangle fa-3x text-warning"></i>
+    </div>
+    <div class="lockscreen-credentials">
+        <h4 class="text-center text-danger mt-3">No pudo iniciar sesión</h4>
+        <p class="text-center">Hubo un problema al autenticarse con Azure AD.</p>
+        <p class="text-center text-muted">Por favor, intente una de las siguientes opciones:</p>
+        <div class="text-center mt-3">
+            <a href="/" class="btn btn-primary mb-2">
+                <i class="fas fa-sign-in-alt"></i> Intentar nuevamente
+            </a>
+            <br />
+            <a href="javascript:void(0)" onclick="clearCookiesAndRetry()" class="btn btn-warning mb-2">
+                <i class="fas fa-trash-alt"></i> Limpiar sesión y reintentar
+            </a>
+            <br />
+            <a href="/Home/Logout" class="btn btn-secondary">
+                <i class="fas fa-sign-out-alt"></i> Cerrar sesión
+            </a>
+        </div>
+    </div>
+</div>
+
+@if (!string.IsNullOrEmpty(ViewBag.RequestId))
+{
+    <div class="mt-4 text-center">
+        <small class="text-muted">
+            ID de Solicitud: <code>@ViewBag.RequestId</code>
+        </small>
+    </div>
+}
+
+<script>
+    function clearCookiesAndRetry() {
+        // Limpiar cookies manualmente desde JavaScript
+        document.cookie.split(";").forEach(function(c) {
+            document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/");
+        });
+
+        // Mostrar mensaje
+        alert('Cookies limpiadas. Redirigiendo al login...');
+
+        // Redirigir después de limpiar
+        window.location.href = '/?retry=1';
+    }
+</script>

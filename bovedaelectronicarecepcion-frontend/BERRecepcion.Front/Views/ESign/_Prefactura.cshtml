@@ -1,0 +1,12 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<CopadeDto>>
+
+
+<div class="form-row">
+    <div class="form-group col-md-12">
+        <label class="col-form-label col-form-label-sm">Prefactura</label>
+        <textarea class="form-control" id="cont" name="cont"  disabled="disabled" rows="26" style="resize: none;">@Model.Data.ElementAt(0).PreFacturaXML</textarea>
+        <div class="grippie bbr-sm" style="margin-right: 0px;"></div>
+    </div>
+</div>

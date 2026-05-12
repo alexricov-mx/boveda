@@ -1,0 +1,281 @@
+﻿﻿@{
+    ViewData["Title"] = "Usuarios";
+}
+
+@model IEnumerable<BERRecepcion.Front.Models.Dto.OrganismDto>
+
+@Html.Hidden("urlBuscar", Url.Action("Buscar"))
+@Html.Hidden("urlAgregar", Url.Action("Agregar"))
+@Html.Hidden("urlAgregarProveedor", Url.Action("AgregarP"))
+@Html.Hidden("urlAgregarAuditorPpi", Url.Action("AgregarAuditorPpi"))
+@Html.Hidden("urlEditar", Url.Action("Editar"))
+@Html.Hidden("urlEditarProveedor", Url.Action("EditarP"))
+@Html.Hidden("urlEditarAuditorPpi", Url.Action("EditarAuditorPpi"))
+@Html.Hidden("urlEstatusPemex", Url.Action("StatusUsuarioPemex"))
+@Html.Hidden("urlSuperAdmin", Url.Action("SuperUsuario"))
+@Html.Hidden("urlAdmin", Url.Action("AdminUsuario"))
+@Html.Hidden("urlBuscarSIO", Url.Action("UsuarioSIO"))
+
+@section scripts
+    {
+    <script type="text/javascript" src="@Url.Content("~/js/User/User.js" )"></script>
+}
+
+<style>
+    .has-search .form-control {
+        padding-left: 2.375rem;
+    }
+
+    .has-search .form-control-feedback {
+        position: absolute;
+        z-index: 2;
+        display: block;
+        width: 2.375rem;
+        height: 2.375rem;
+        line-height: 2.375rem;
+        text-align: center;
+        pointer-events: none;
+    }
+
+    .fixedTop {
+        position: fixed;
+        top: 70px;
+        z-index: 500;
+    }
+
+    .fixedTop120 {
+        position: fixed;
+        top: 190px;
+        z-index: 200;
+        overflow-y: scroll;
+    }
+
+    .topBase {
+        margin-top: 120px;
+    }
+
+</style>
+
+<div class="container-fluid">
+    <div class="row col-lg-12 col-md-12 col-sm-12">
+
+
+        <div class="row col-lg-12 col-md-12 col-sm-12 topBase" id="cardBase">
+
+            <div class="col-lg-6 col-md-12 col-sm-12 mt-3" id="usuario-card">
+
+                <div id="topBar" class="fixedTop">
+                    <div class="row col-lg-12 col-md-12 col-sm-12">
+                        <h2 class="m-0">Administración de Usuarios</h2>
+                    </div>
+                    <div class="row col-lg-12 col-md-12 col-sm-12">
+                        <div class="btn-group mt-2 col-md-8">
+                            <input type="text" class="form-control form-control-sm" autocomplete="off" placeholder="Buscar" id="textFilter" maxlength="50" onkeydown="onKeyDownHandler(event);">
+                            <div class="input-group-append">
+                                <button class="btn  btn-sm btn-outline-secondary" type="button" id="filter" name="filter">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="btn-group mt-2 col-md-4">
+                            <button type="button" class="btn  btn-sm btn-outline-info dropdown-toggle dropdown-icon w-100" data-toggle="dropdown" id="newUser">
+                                Nuevo
+                            </button>
+                            <div class="dropdown-menu w-100" role="menu" id="selectorUser" style="cursor:pointer;">
+                                <a class="dropdown-item" onclick="newUserDisplay(0);">Usuario interno</a>
+                                <a class="dropdown-item" onclick="newUserDisplay(1);">Proveedor</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                @* Usuario Pemex *@
+
+                <div class="card col-lg-4 col-md-12 col-sm-12 fixedTop120" id="userPemex" style="display:none;">
+                    <div class="card-header">
+                        <div class="row">
+                            <div style="display:none;">
+                                <input type="text" class="form-control" id="txtUserIdI" name="UserIdI" />
+                            </div>
+                            <div class="col-sm-12 mt-2">
+                                <label class="card-title" id="myModalLabelAgre"><b>Información del Usuario</b></label>
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-6 mt-2">
+                                <input type="text" class="form-control form-control-sm" id="txtTipoUsuario" name="Usuario" value="Funcionario" placeholder="Funcionario" disabled />
+                            </div>
+                            <div class="col-sm-12 col-md-6 col-lg-6 input-group mt-2">
+                                <input type="text" class="form-control form-control-sm" placeholder="Número de Ficha" id="txtFicha" name="txtFicha" autocomplete="off" />
+                                <div class="input-group-append">
+                                    <button class="btn btn-sm btn-outline-secondary" type="button" id="BuscarFichaWCF" name="BuscarFichaWCF">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body" id="userPemexBody" style="display:none;">
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="UsuarioEnabledI" style="display:none;">
+                                <label for="txtUsuario"><b class="text-danger">*</b><b>Usuario:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtUsuario" name="Usuario" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Perfil:</b></label>
+                                @Html.DropDownList("ddPerfilesI", null, new { @class = "form-control form-control-sm select2" })
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="NombreDivI">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Nombre:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtNombreI" name="txtNombreI" maxlength="50" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsdropdown"><b class="text-danger">*</b><b>email:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtEmailI" name="txtEmailI" maxlength="100" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row" id="EmailCenterI">
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsdropdown"><b class="text-danger">*</b><b>centro:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtCentroI" name="txtCentroI" maxlength="50" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsdropdown"><b class="text-danger">*</b><b>RFC:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtRFCI" name="txtRFCI" maxlength="13" autocomplete="off" />
+                            </div>
+                        </div>
+                        <div class="row" id="FechasI">
+                            <div class="form-group col-sm-6">
+                                <label for="fec_iniAgre" class="col-form-label"><b class="text-danger">*</b><b>Válido Desde:</b></label>
+                                <input class="form-control form-control-sm" type="datetime-local" id="fec_iniAgre">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="fec_finAgre" class="col-form-label"><b class="text-danger">*</b><b>Válido Hasta:</b>:</label>
+                                <input class="form-control form-control-sm" type="datetime-local" id="fec_finAgre">
+                            </div>
+                        </div>
+                        <br />
+                        <div class="row col-sm-12" style="text-align:center;">
+                            <label for="fec_finAgre" class="col-form-label" id="LabelOrgansimI"><b class="text-danger">*</b><b>Organismos:</b></label>
+                        </div>
+                        <div class="row col-sm-12" id="OrganismosPemexI">
+
+                            @foreach (var org in Model)
+                            {
+                                <div class="form-check icheck-danger col-sm-6">
+                                    <input type="checkbox" name="SelectOrganismI" value="@org.OrganismID" id="@org.OrganismID">
+                                    &nbsp;&nbsp;<label for="@org.OrganismID">@org.Clave</label>
+                                </div>
+                            }
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-outline-success col-sm-12 col-md-3 col-lg-3" onclick="hidePemex(); return false;">Cerrar</button>
+                            <button type="button" class="btn btn-sm btn-outline-success col-sm-12 col-md-3 col-lg-3" id="btnAgregarUpemex" onclick="saveUser(); return false;">Guardar</button>
+                        </div>
+                    </div>
+
+                </div>
+
+                @* Usuario Proveedor *@
+
+                <div class="card col-lg-4 col-md-12 col-sm-12 fixedTop120" id="userProveedor" style="display:none;">
+                    <div style="display:none;">
+                        <input type="text" class="form-control form-control-sm" id="txtUserIdPP" name="UserIdPP" style="display:none;" />
+                    </div>
+                    <div class="card-header">
+                        <label class="card-title" id="myModalLabelAgre"><b>Información del Usuario&nbsp;&nbsp;</b></label><input type="text" class="form-control" id="txtTipoUsuarioP" name="Usuario" value="Proveedor" placeholder="Proveedor" disabled />
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="form-group col-sm-6">
+                                <label>Tipo de Usuario: </label>
+                                @Html.DropDownList("ddUsuarios", null, new { @class = "form-control form-control-sm select2" })
+                            </div>
+                        </div>
+
+                        <div class="row" id="TipoNombreProv">
+                            <div class="form-group col-sm-6" style="display:none;">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Usuario:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtUsuarioP" name="UsuarioP" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Nombre:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtNombrePP" maxlength="50" name="Compania" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6" id="UsuarioTelProv">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Teléfono:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtTelefono" name="Telefono" maxlength="30" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="row" id="PerfilOrganismProv">
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Perfil:</b></label>
+                                @Html.DropDownList("ddPerfilesP", null, new { @class = "form-control form-control-sm select2" })
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Organismo:</b></label>
+                                @Html.DropDownList("ddOrganismos", null, new { @class = "form-control form-control-sm select2" })
+                            </div>
+                        </div>
+
+                        <div class="row" id="CompRFCProv">
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Compañia:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtCompania" maxlength="30" name="Compania" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>Email:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtEmailP" name="EmailP" maxlength="100" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="form-group col-sm-6" id="AcreedorEmailProv">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>No.Acreedor:</b></label>
+                                <input type="text" class="form-control" id="txtAcreedorP" name="Acreedor" maxlength="30" autocomplete="off" />
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b class="text-danger">*</b><b>RFC:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtRFC" name="RFC" maxlength="13" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="row" id="CreditorRFCProv">
+                            <div class="form-group col-sm-6">
+                                <label for="departmentsDropdown"><b>Creditor RFC:</b></label>
+                                <input type="text" class="form-control form-control-sm" id="txtCreditorRFC" name="CreditorRFC" maxlength="13" autocomplete="off" />
+                            </div>
+                        </div>
+
+                        <div class="row" id="FechasProveedor">
+                            <div class="form-group col-sm-6">
+                                <label for="fec_iniAgreP" class="col-form-label"><b class="text-danger">*</b><b>Válido Desde:</b></label>
+                                <input class="form-control form-control-sm" type="datetime-local" id="fec_iniAgreP">
+                            </div>
+                            <div class="form-group col-sm-6">
+                                <label for="fec_finAgreP" class="col-form-label"><b class="text-danger">*</b><b>Válido Hasta:</b>:</label>
+                                <input class="form-control form-control-sm" type="datetime-local" id="fec_finAgreP">
+                            </div>
+                        </div>
+
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-sm btn-outline-success col-sm-12 col-md-3 col-lg-3" onclick="hideProveedor(); return false;">Cerrar</button>
+                            <button type="button" class="btn btn-sm btn-outline-success col-sm-12 col-md-3 col-lg-3" id="btnAgregarUproveedor" onclick="saveUser(); return false;">Guardar</button>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="col-lg-6 col-md-12 col-sm-12 mt-3 overflow-auto" id="usuarios-list-card">
+                <div id="DatosUsuario">
+                </div>
+            </div>
+        </div>
+    </div>
+
+</div>
+

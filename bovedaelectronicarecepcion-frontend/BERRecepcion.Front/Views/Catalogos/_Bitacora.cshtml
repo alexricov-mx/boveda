@@ -1,0 +1,41 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<CatalogosCartaPorteDto>>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-hover" id="catalogos-cartaporte-bitacora-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th>Usuario</th>
+                <th>Descirpcion</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>@item.Name</td>
+                    <td>@item.Descripcion</td>
+                    <td>@item.Fecha?.ToString("g")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("catalogos-cartaporte-bitacora-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No existen registros.</p>
+    </div>
+}

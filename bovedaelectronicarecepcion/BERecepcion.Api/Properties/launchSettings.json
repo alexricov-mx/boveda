@@ -1,0 +1,25 @@
+{
+  "profiles": {
+    "BERecpcion.API": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development"
+      },
+      "applicationUrl": "https://localhost:6001;http://localhost:6000"
+    },
+    "Quality": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Quality"
+      },
+      "applicationUrl": "https://Boveda-cal.pemex.com;"
+    },
+    "Production": {
+      "commandName": "Project",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Production"
+      },
+      "applicationUrl": "https://Boveda.pemex.com;"
+    }
+  }
+}

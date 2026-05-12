@@ -1,0 +1,104 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<CancelacionesCopadeDto>>
+
+
+    @if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+    {
+        <div class="card-body">
+            <table class="table table-hover" id="cancelacion-copade-table" style="font-size:14px;">
+                <thead class="thead-light">
+                    <tr class="text-center">
+                        <th>
+                        </th>
+                        <th>
+                            Copade
+                        </th>
+                        <th>
+                            Ficha
+                        </th>
+                        <th class="text-center">
+                            OS
+                        </th>
+                        <th>
+                            Contrato
+                        </th>
+                        <th class="text-center">
+                            Ejercicio
+                        </th>
+                        <th class="text-center">
+                            Organismo
+                        </th>
+                        <th class="text-center">
+                            Fecha
+                        </th>
+                        <th class="text-center">
+                            RFC Acredor
+                        </th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr class="text-center">
+                            <td scope="row" class="text-center">
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkCancelCopade" id="@item.CopadeID" data-rol="@item.CopadeID" data-reception="@item.Reception" data-clave="@item.clave"/>
+                                    <label class="custom-control-label" for="@item.CopadeID"></label>
+                                </div>
+                            </td>                         
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Reception)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Ficha)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.SapOrder)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Contract)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.Exercise)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.clave)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.ReceptionDate)
+                            </td>
+                            <td>
+                                @Html.DisplayFor(modelItem => item.CreditorRfc)
+                            </td>
+
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="row mt-2">
+                <div class="col-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 mt-1 mb-2">
+                    <button class="btn btn-sm btn-outline-danger w-100" id="btnCancelar" style="width:100px;">
+                        Cancelar<i class="fas fa-window-close float-right mt-1"></i>
+                    </button>
+                </div>
+                <div class="col-12 col-sm-9 col-md-10 col-lg-10 col-xl-10">
+                    <partial name="_Pagination" model="@Model.Pager" />
+                </div>
+            </div>
+            <script>
+        $(function () {
+            DataTableInitialize("cancelacion-copade-table");
+        });
+            </script>
+        </div>
+    }
+    else
+    {
+        <div class="callout callout-info">
+            <p>No tiene Copades para cancelar</p>
+        </div>
+    }
+
+

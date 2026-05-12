@@ -1,0 +1,82 @@
+﻿@{
+    string Search = ViewBag.Search;
+    DateTime? FechaInicial = ViewBag.FechaInicial;
+    DateTime? FechaFinal = ViewBag.FechaFinal;
+}
+@{
+    ViewData["Title"] = "Analitico de Pago";
+}
+
+<div class="content-header" id="titulo">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1 class="m-0"> Consulta Analítico de Pago</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-olive">
+                            <i class="fa fa-filter"></i> Filtro
+                            <button class="btn btn-sm btn-outline-success float-right" style="width:135px;" id="Excel"><span class="fas fa-download"></span> Excel</button>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <form id="consulta-form-search">
+                            <div class="form-row">
+                                <div class="form-group col-md-3">
+                                    <label class="col-form-label col-form-label-sm" for="FechaInicial">Fecha Inicial</label>
+                                    @if (FechaInicial != null)
+                                    {
+                                        <input type="date" class="form-control form-control-sm" id="FechaInicial" value="@FechaInicial.Value.ToString("yyyy-MM-dd")">
+                                    }
+                                    else
+                                    {
+                                        <input type="date" class="form-control form-control-sm" id="FechaInicial">
+                                    }
+                                </div>
+                                <div class="form-group col-md-3">
+                                    <label class="col-form-label col-form-label-sm" for="FechaFinal">Fecha Final</label>
+                                    @if (FechaFinal != null)
+                                    {
+                                        <input type="date" class="form-control form-control-sm" id="FechaFinal" value="@FechaFinal.Value.ToString("yyyy-MM-dd")">
+                                    }
+                                    else
+                                    {
+                                        <input type="date" class="form-control form-control-sm" id="FechaFinal">
+                                    }
+                                </div>
+                                <div class="form-group col-md-5">
+                                    <label class="col-form-label col-form-label-sm" for="search">Texto</label>
+                                    <input type="text" class="form-control form-control-sm" id="search" value="@Search" placeholder="Opcional">
+                                </div>
+                                <div class="form-group col-md-1">
+                                    <label class="col-form-label col-form-label-sm" for="btnBuscar" style="visibility:hidden;">.</label>
+                                    <button type="submit" class="btn btn-sm btn-default w-100" id="btnBuscar">
+                                        <i class="fa fa-search"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </form>
+                        <div id="consulta-table">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Consultas/AnaliticoPago/index.js" )"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />

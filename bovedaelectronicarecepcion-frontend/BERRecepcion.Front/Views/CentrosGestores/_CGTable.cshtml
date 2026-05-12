@@ -1,0 +1,71 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<ManagementCentersDto>>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-hover" id="centro-gestor-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th></th>
+                <th class="text-center">Organismo</th>
+                <th>Centro</th>
+                <th>Tipo</th>
+                <th>Descripción</th>
+                <th>1er Firmante</th>
+                <th>1er Suplente</th>
+                <th>2do Firmante </th>
+                <th>2do Suplente</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td>
+                        <span class="info-box-text text-wrap">
+                            <small>
+                                <button type="button" class="btn btn-sm btn-outline-secondary float-right" data-toggle="dropdown">
+                                    <span class="fas fa-cog">
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li><button class="dropdown-item text-muted text-info w-100" name="edit" style="cursor:pointer;" data-managementcenterid="@item.ManagementCenterID">Editar</button></li>
+                                    <li><button class="dropdown-item text-muted text-danger w-100" name="delete" style="cursor:pointer;" data-managementcenterid="@item.ManagementCenterID" data-centro="@item.Number">Eliminar</button></li>
+                                </ul>
+                            </small>
+                        </span>
+                    </td>
+                    <td>@item.OrganismClave</td>
+                    <td>@item.Number</td>
+                    <td>@item.Type</td>
+                    <td>@item.Description</td>
+                    <td>@item.Signer1</td>
+                    <td>@item.Alternate1</td>
+                    <td>@item.Signer2</td>
+                    <td>@item.Alternate2</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("centro-gestor-table");
+        });
+    </script>
+
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No tiene Centros Gesores.</p>
+    </div>
+}
+
+
+

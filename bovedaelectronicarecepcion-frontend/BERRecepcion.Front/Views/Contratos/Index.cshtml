@@ -1,0 +1,35 @@
+﻿@{
+    ViewData["Title"] = "Firma de Contratos";
+}
+
+<div class="content-header" id="titulo">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Alta de Contratos</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="contratos-table">
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Contratos/index.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />
+<partial name="_Modal" />

@@ -1,0 +1,160 @@
+﻿@model BERRecepcion.Front.Models.Dto.DesvioPendientesDto
+@*@Html.Hidden("urlConsultaFirmante", Url.Action("GetFirmante"))*@
+@*@Html.Hidden("urlRealizaDesvio", Url.Action("Create"))*@
+
+
+@*@if (Model.Contrato != null)
+{
+    <table class="table table-hover" id="contract-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th style="width=25%">No. Contrato</th>
+                <th style="width=25%">No. Firmante</th>
+                <th style="width=25%">Firmante</th>
+                <th style="width=25%"></th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td style="width=25%">@Model.Contrato.Contract</td>
+                <td style="width=25%">@Model.Contrato.Ficha</td>
+                <td style="width=25%"> @Model.Contrato.Nombre</td>
+                <td style="width=25%" class="text-center">
+                    <div class="custom-control custom-checkbox">
+                        <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" id="@Model.Contrato.Contract" value="@Model.Contrato.Contract, @Model.Contrato.Ficha, @Model.Contrato.Nombre, CO -" />
+                        <label class="custom-control-label text-muted" for="@Model.Contrato.Contract"></label>
+                    </div>
+                </td>
+            </tr>
+        </tbody>
+    </table>
+    <script>
+        $(function () {
+            DataTableInitialize("contract-table");
+        });
+    </script>
+}*@
+
+@if (Model.OrdenSurtimiento.Count() > 0)
+{
+    <h4 class="text-muted">Órdenes de Surtimiento</h4>
+    <table class="table table-hover" id="supply-order-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th style="width:25%"></th>
+                <th style="width:25%">Orden de Surtimiento</th>
+                <th style="width:25%">No. Firmante</th>
+                <th style="width:25%">Firmante</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.OrdenSurtimiento)
+            {
+                <tr>
+                    <td style="width:25%" class="text-center">
+                        @*<input type="checkbox" name="SelectOrdenS" value="@item.Contract, @item.SapOrder, @item.Ficha, @item.Nombre, OS -" />*@
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" id="SO_@item.SapOrder" data-contract="@item.Contract" data-saporder="@item.SapOrder" data-ficha="@item.Ficha" name="OSCheck" />
+                            <label class="custom-control-label text-muted" for="SO_@item.SapOrder"></label>
+                        </div>
+                    </td>
+                    <td style="width:25%">@item.SapOrder</td>
+                    <td style="width:25%">@item.Ficha</td>
+                    <td style="width:25%">@item.Nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <script>
+        $(function () {
+            DataTableInitialize("supply-order-table");
+        });
+    </script>
+}
+
+@if (Model.EstimacionObra.Count() > 0)
+{
+    <h4 class="text-muted">Estimaciones</h4>
+    <table class="table table-hover" id="estimacion-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th style="width:25%"></th>
+                <th style="width:25%">Estimaciones</th>
+                <th style="width:25%">No. Firmante</th>
+                <th style="width:25%">Firmante</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.EstimacionObra)
+            {
+                <tr>
+                    <td style="width:25%" class="text-center">
+                        @*<input type="checkbox" name="SelectOrdenS" value="@item.Contract, @item.SapOrder, @item.Ficha, @item.Nombre, OS -" />*@
+                        <div class="custom-control custom-checkbox">
+                            <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" id="ES_@item.SapOrder" data-contract="@item.Contract" data-saporder="@item.SapOrder" data-ficha="@item.Ficha" name="ESCheck" />
+                            <label class="custom-control-label text-muted" for="ES_@item.SapOrder"></label>
+                        </div>
+                    </td>
+                    <td style="width:25%">@item.SapOrder</td>
+                    <td style="width:25%">@item.Ficha</td>
+                    <td style="width:25%">@item.Nombre</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <script>
+        $(function () {
+            DataTableInitialize("estimacion-table");
+        });
+    </script>
+    }
+
+
+<div class="row">
+    <div class="col-md-6 col-sm-12">
+        <div class="card card-olive card-outline">
+            <div class="card-header">
+                <h5 class="text-muted">Ficha del nuevo firmante</h5>
+            </div>
+            <div class="card-body">
+                <div class="col-12">
+                    <form id="nuevo-firmante-form-search">
+                        <div class="input-group">
+                            <input type="search" class="form-control form-control-sm" id="txtficha" autocomplete="off" placeholder="Ficha del nuevo firmante">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-sm btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6 col-sm-12 d-none" id="card-nuevo-firmante">
+        <div class="card card-olive card-outline">
+            <div class="card-header">
+                <h5 class="text-muted">Detalles</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="text-muted" id="signerName"></h6>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        <h6 class="text-muted">Motivo del desvio:</h6>
+        <textarea class="form-control" cols="10" id="Motivo" name="Motivo" rows="3" maxlength="200" style="resize: none;"></textarea>
+    </div>
+    <div class="col-md-6 mt-1">
+    </div>
+
+    <div class="col-md-2 col-sm-12 mt-2">
+        <button type="button" class="btn btn-sm btn-outline-success" id="btnDesviarFirma">Desviar firma</button>
+    </div>
+</div>
+
+

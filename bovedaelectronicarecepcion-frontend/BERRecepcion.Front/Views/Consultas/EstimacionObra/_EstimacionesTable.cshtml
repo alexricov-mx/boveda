@@ -1,0 +1,58 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<SOEstimationDto>>
+@{ bool hasData = Model != null && Model.Data != null && Model.Data.Count() > 0;}
+@if (hasData)
+{
+    <table class="table table-hover" id="es-consulta-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th class="text-center">Expediente</th>
+                <th>OS</th>
+                <th>Contrato</th>
+                <th>Organismo</th>
+                <th>Tipo</th>
+                <th>Acreedor</th>
+                <th class="text-right">Total</th>
+                <th>Moneda</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td class="text-center">
+                        <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-saporder="@item.SapOrder"></i>
+                    </td>
+                    <td scope="row">@item.SapOrder</td>
+                    <td scope="row">@item.Contract</td>
+                    <td scope="row">@item.OrganismClave</td>
+                    <td scope="row">@(item.DocumentType == "M" ? "Medicamentos" : "Obras")</td>
+                    <td scope="row">@item.CreditorNumber</td>
+                    <td scope="row" class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.Total))</td>
+                    <td scope="row">@item.Currency</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+
+    <script>
+        $(function () {
+            DataTableInitialize("es-consulta-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se ha encontrado información.</p>
+    </div>
+}
+<script>
+    var _hasData = @(hasData ? "true" : "false");
+</script>

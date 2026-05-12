@@ -1,0 +1,65 @@
+﻿@{
+    ViewData["Title"] = "Administración de Adefas";
+}
+
+<div class="content-header" id="titulo">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h1 class="m-0">Administración de Adefas</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-6 col-lg-8 col-xl-8">
+                                <h5 class="mb-0 text-olive">
+                                    <i class="fa fa-filter"></i> Filtro
+                                </h5>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+                                <button class="btn btn-sm btn-outline-info float-right w-100 mt-2 mt-sm-1 mt-md-0 mt-lg-o mt-xl-0" id="btnAgregar" style="width:135px;"><i class="fas fa-plus mr-1"></i> Nuevo</button>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-3 col-lg-2 col-xl-2">
+                                <button class="btn btn-sm btn-outline-success float-right w-100 mt-2 mt-sm-1 mt-md-0 mt-lg-o mt-xl-0" style="width:135px;" id="Excel"><span class="fas fa-download"></span> Excel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8">
+                                <form id="adefas-form-search">
+                                    <div class="input-group mb-3">
+                                        <input type="search" class="form-control form-control-sm" value="@ViewBag.Search" id="search" autocomplete="off" placeholder="Buscar periodo de adefas">
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-sm btn-default">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                        <div id="div-adefas">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Adefas/index.js" )"></script>
+}
+
+<partial name="_ModalAddEdit" />

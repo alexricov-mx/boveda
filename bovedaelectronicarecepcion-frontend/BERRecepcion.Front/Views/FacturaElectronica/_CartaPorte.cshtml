@@ -1,0 +1,180 @@
+﻿@model CartaPorte
+@{
+    var origen = Model.Ubicaciones.Where(x => x.TipoUbicacion == "Origen").FirstOrDefault();
+    var destino = Model.Ubicaciones.Where(x => x.TipoUbicacion == "Destino").FirstOrDefault();
+}
+
+
+<div class="card card-outline card-olive">
+    <div class="card-header">
+        <h4 class="card-title">
+            <i class="fas fa-info mr-2"></i>Detalle del complemento Carta Porte
+        </h4>
+    </div>
+</div>
+<div class="row">
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="callout callout-info">
+                    <h5>
+                        <i class="fas fa-dot-circle mr-2"></i>
+                        Origen
+                    </h5>
+                    <hr />
+                    <h6>
+                        <label>Fecha y hora de salida:</label> @origen.FechaHoraSalidaLlegada.ToString("dd/MM/yyyy HH:mm:ss")  @origen.RFCRemitenteDestinatario  @origen.NombreRemitenteDestinatario
+                    </h6>
+                    <h6>
+                        @origen.Domicilio.Calle @origen.Domicilio.NumeroExterior @origen.Domicilio.NumeroInterior
+                    </h6>
+                    <h6>
+                        @origen.Domicilio.DomicilioCompleto
+                    </h6>
+                </div>
+            </div>
+            <div class="col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6">
+                <div class="callout callout-info">
+                    <h5>
+                        <i class="fas fa-flag-checkered mr-2"></i>
+                        Destino
+                    </h5>
+                    <hr />
+                    <h6>
+                        <label>Fecha y hora de prog. llegada:</label> @destino.FechaHoraSalidaLlegada.ToString("dd/MM/yyyy HH:mm:ss") @destino.RFCRemitenteDestinatario @destino.NombreRemitenteDestinatario
+                    </h6>
+                    <h6>
+                        @destino.Domicilio.Calle @destino.Domicilio.NumeroExterior @destino.Domicilio.NumeroInterior
+                    </h6>
+                    <h6>
+                        @destino.Domicilio.DomicilioCompleto
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="callout callout-info">
+                    <h5 class="mb-3">
+                        <i class="fas fa-cubes mr-2"></i> Detalle de mercancías
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th>Bienes transportados</th>
+                                    <th>Cve Unidad</th>
+                                    <th>Cantidad</th>
+                                    <th>Tipo Material Peligroso</th>
+                                    <th>Fracción Arancelaria</th>
+                                    <th>Peso</th>
+                                    <th>Valor</th>
+                                    <th>Moneda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.Mercancias.Mercancia.ToList())
+                                {
+                                    <tr>
+                                        <td>@item.BienesTransp @item.Descripcion</td>
+                                        <td>@item.ClaveUnidad</td>
+                                        <td>@item.Cantidad</td>
+                                        <td>@item.CveMaterialPeligroso</td>
+                                        <td>????</td>
+                                        <td>@item.PesoEnKg</td>
+                                        <td>@item.ValorMercancia</td>
+                                        <td>@item.Moneda</td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="callout callout-info">
+                    <h5 class="mb-3">
+                        <i class="fas fa-truck-moving mr-2"></i> Autotransporte federal
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th>Tipo Permiso SCT</th>
+                                    <th>Permiso SCT</th>
+                                    <th>Aseguradora</th>
+                                    <th>Poliza Seguro</th>
+                                    <th>Config Vehicular</th>
+                                    <th>Placas</th>
+                                    <th>Año Modelo</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.Mercancias.Autotransporte.NumPermisoSCT</td>
+                                    <td>@Model.Mercancias.Autotransporte.PermSCT</td>
+                                    <td>@Model.Mercancias.Autotransporte.Seguros.AseguraRespCivil</td>
+                                    <td>@Model.Mercancias.Autotransporte.Seguros.PolizaRespCivil</td>
+                                    <td>@Model.Mercancias.Autotransporte.IdentificacionVehicular.ConfigVehicular</td>
+                                    <td>@Model.Mercancias.Autotransporte.IdentificacionVehicular.PlacaVM</td>
+                                    <td>@Model.Mercancias.Autotransporte.IdentificacionVehicular.AnioModeloVM</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th>Remolque 1</th>
+                                    <th>Placa</th>
+                                    <th>Remolque 2</th>
+                                    <th>Placa</th>
+                                    <th>Contenedor 1</th>
+                                    <th>Contenedor 2</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.Mercancias.Autotransporte.Remolques[0].SubTipoRem</td>
+                                    <td>@Model.Mercancias.Autotransporte.Remolques[0].Placa</td>
+                                     <td>@Model.Mercancias.Autotransporte.Remolques[1].SubTipoRem</td>
+                                    <td>@Model.Mercancias.Autotransporte.Remolques[1].Placa</td>
+                                    <td>????</td>
+                                    <td>????</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="callout callout-info">
+                    <h5 class="mb-3">
+                        <i class="fas fa-truck-moving mr-2"></i> Figuras de transporte
+                    </h5>
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover m-0">
+                            <thead>
+                                <tr>
+                                    <th>RFC</th>
+                                    <th>Nombre</th>
+                                    <th>Licencia</th>
+                                    <th>Domicilio</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.FiguraTransporte.FirstOrDefault()?.RFCFigura</td>
+                                    <td>@Model.FiguraTransporte.FirstOrDefault()?.NombreFigura</td>
+                                    <td>@Model.FiguraTransporte.FirstOrDefault()?.NumLicencia</td>
+                                    <td>@Model.FiguraTransporte.FirstOrDefault()?.Domicilio</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>

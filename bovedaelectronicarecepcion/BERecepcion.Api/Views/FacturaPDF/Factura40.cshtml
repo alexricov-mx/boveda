@@ -1,0 +1,662 @@
+﻿@using BERecepcion.Core.Facturas.Dto
+@model ComprobanteBE40
+@{
+    Layout = null;
+    bool existsUnidad = false;
+    bool existsClaveProducto = false;
+    bool existsIdentificacion = false;
+    @foreach (var factura in Model.Conceptos)
+    {
+        if (!String.IsNullOrEmpty(factura.Unidad) || !String.IsNullOrEmpty(factura.ClaveUnidad)) existsUnidad = true;
+        if (!String.IsNullOrEmpty(factura.NoIdentificacion)) existsIdentificacion = true;
+        if (!String.IsNullOrEmpty(factura.ClaveProdServ)) existsClaveProducto = true;
+    }
+}
+
+<style>
+    p {
+        font-family: sans-serif;
+    }
+
+    center {
+        margin: 16px 0;
+        font-family: 'Arial Unicode MS';
+        font-size: 25px;
+    }
+
+    right {
+        text-align: right;
+    }
+</style>
+
+<div style="width: 100%; font-weight:lighter;">
+    <div style="border:2px solid black; background-color:white">
+        <div align="left">
+            <p style="font-weight: bold; font-size: 11px; padding-left: 1em;">Datos del Emisor</p>
+            <b style="font-weight: bold; font-size: 11px; font-family: 'Arial Unicode MS'; padding-left: 1em; ">Nombre: <b style="font-weight: lighter; font-size: 11px; font-family: 'Arial Unicode MS'">@Model.Emisor.Nombre</b></b><br />
+            <b style="font-weight: bold; font-size: 11px; font-family: 'Arial Unicode MS'; padding-left: 1em; ">RFC: <b style="font-weight: lighter; font-size: 11px; font-family: 'Arial Unicode MS' ">@Model.Emisor.Rfc</b></b>
+            @if (!String.IsNullOrEmpty(Model.Emisor.FacAtrAdquirente))
+            {
+                <b style="font-weight: bold; font-size: 11px; font-family: 'Arial Unicode MS'; padding-left: 1em; ">Número de operación: <b style="font-weight: lighter; font-size: 11px; font-family: 'Arial Unicode MS' ">@Model.Emisor.FacAtrAdquirente</b></b>
+            }
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 11px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            @if (!String.IsNullOrEmpty(Model.Emisor.RegimenFiscal))
+                            {
+                            <td width="20%" align="left"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Régimen Fiscal: <b style="font-weight: lighter; font-size:11px;">@Model.Emisor.RegimenFiscal</b></b><br /></td>
+                            }
+                            @if (!String.IsNullOrEmpty(Model.LugarExpedicion))
+                            {
+                            <td width="20%" align="right"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Lugar de expedición: <b style="font-weight:lighter; font-size:11px; padding-right:1em;">@Model.LugarExpedicion</b></b></td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <br />
+    </div>
+    <br />
+
+    <div style="border:2px solid black; background-color:white">
+        <div align="left">
+            <p style="font-weight: bold; font-size: 11px; padding-left: 1em;">Datos del Receptor</p>
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 11px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="20%" align="left"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Razón Social: <b style="font-weight: lighter; font-size:11px;">@Model.Receptor.Nombre</b></b><br /></td>
+                            <td width="20%" align="right">
+                                <b style="font-weight: bold; font-size: 11px; padding-left: 1em;">
+                                    @if (!String.IsNullOrEmpty(Model.Receptor.DomicilioFiscalReceptor))
+                                    {
+                                        <b>Domicilio Fiscal: </b><b style="font-weight:lighter; font-size:11px;">@Model.Receptor.DomicilioFiscalReceptor</b>
+                                    }
+                                    @if (Model.Receptor.ResidenciaFiscalSpecified)
+                                    {
+                                        <b style="font-weight: bold; font-size: 11px;">&nbsp; Residencia Fiscal: <b style=" font-weight: lighter; font-size: 11px; padding-right: 1em;">@Model.Receptor.ResidenciaFiscal</b></b>
+                                    }
+                                </b>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td width="20%" align="left"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Régimen Fiscal: <b style="font-weight: lighter; font-size:11px;">@Model.Receptor.RegimenFiscalReceptor</b></b><br /></td>
+                            <td width="20%" align="right"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Serie: <b style="font-weight:lighter; font-size:11px;">@Model.Serie</b><b style="font-weight: bold; font-size: 11px;">&nbsp; Folio: <b style=" font-weight: lighter; font-size: 11px; padding-right: 1em;">@Model.Folio</b></b></b></td>
+                        </tr>
+                        <tr>
+                            @if (!String.IsNullOrEmpty(Model.Receptor.NumRegIdTrib))
+                            {
+                                <td width="20%" align="left"><b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Registro de Identidad Fiscal: <b style="font-weight: lighter; font-size:11px;">@Model.Receptor.NumRegIdTrib</b></b><br /></td>
+                            }
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <br />
+            <b style="font-weight: bold; font-size: 11px; font-family: 'Arial Unicode MS';padding-left: 1em; ">RFC:<b style="font-weight: lighter; font-size: 11px; font-family: 'Arial Unicode MS'; padding-left: 1em; ">@Model.Receptor.Rfc</b></b>
+        </div>
+
+        <table class="table" color="black" style="width: 100%;" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr style="background-color:#c2c2c2; font-family:Arial; font-size:11px;text-align:center;border-top-width:0px;border-left-width:0px;">
+                    @if (existsClaveProducto)
+                    {
+                        <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Clave del <br />Producto o <br />Servicio</th>
+                    }
+                    @if (existsIdentificacion)
+                    {
+                        <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">No<br />Identificación</th>
+                    }
+                    <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Cantidad</th>
+                    @if (existsUnidad)
+                    {
+                        <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Clave <br />Unidad</th>
+                        <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Unidad</th>
+                    }
+                    <th colspan="2" class="text-center" scope="col" style="font-weight:lighter;">Descripción</th>
+                    <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Valor Unitario</th>
+                    <th colspan="1" class="text-center" scope="col" style="font-weight:lighter;">Importe</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var factura in Model.Conceptos)
+                {
+                    <tr border="1">
+                        @if (existsClaveProducto)
+                        {
+                            <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.ClaveProdServ</center></td>
+                        }
+                        @if (existsIdentificacion)
+                        {
+                            <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.NoIdentificacion</center></td>
+                        }
+                        <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.Cantidad</center></td>
+                        @if (existsClaveProducto)
+                        {
+                            <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.ClaveUnidad</center></td>
+                            <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.Unidad</center></td>
+                        }
+                        <td colspan="2"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@factura.Descripcion</center></td>
+                        <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@String.Format("{0,6:C2}", Convert.ToDecimal(factura.ValorUnitario))</center></td>
+                        <td colspan="1"><center style="font-size:11px; font-family: 'Arial Unicode MS'; ">@String.Format("{0,6:C2}", Convert.ToDecimal(factura.Importe))</center></td>
+                    </tr>
+                    @if (factura.Parte != null)
+                    {
+                        <tr>
+                            <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Parte</b></center></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="text-align:center;">
+                                <table cellpadding="0" cellspacing="0" style="margin: auto; width: 50%; border-collapse: collapse; border:none;">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Cant</center></td>
+                                            <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">V. Unit.</center></td>
+                                            <td colspan="2"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Descripcion</center></td>
+                                            <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Impte.</center></td>
+                                            <td colspan="2"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Aduan.</center></td>
+                                        </tr>
+                                        @foreach (var it in factura.Parte)
+                                        {
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.Cantidad</center></td>
+                                                <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.ValorUnitario</center></td>
+                                                <td colspan="2"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.Descripcion</center></td>
+                                                <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.Importe</center></td>
+                                                <td colspan="2"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.InformacionAduanera</center></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+
+
+                    @if (factura.Impuestos != null)
+                    {
+                        @if (factura.Impuestos.Traslados != null)
+                        {
+                            <tr>
+                                <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Traslados</b></center></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9" style="text-align:center;">
+                                    <table cellpadding="0" cellspacing="0" style="margin: auto; width: 50%; border-collapse: collapse; border:none;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Base</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Importe</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Tasa o cuota</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Tipo Factor</center></td>
+                                            </tr>
+
+                                            @foreach (var it in factura.Impuestos.Traslados)
+                                            {
+                                                <tr>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@String.Format("{0,6:C2}", Convert.ToDecimal(it.Base))</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@String.Format("{0,6:C2}", Convert.ToDecimal(it.Importe))</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.TasaOCuota</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.TipoFactor</center></td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+
+                        }
+
+                        @if (factura.Impuestos.Retenciones != null)
+                        {
+                            <tr>
+                                <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Retenciones</b></center></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9" style="text-align:center;">
+                                    <table cellpadding="0" cellspacing="0" style="margin: auto; width: 50%; border-collapse: collapse; border:none;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Base</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Importe</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Tasa o cuota</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Tipo Factor</center></td>
+                                            </tr>
+
+                                            @foreach (var it in factura.Impuestos.Retenciones)
+                                            {
+                                                <tr>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@String.Format("{0,6:C2}", Convert.ToDecimal(it.Base))</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@String.Format("{0,6:C2}", Convert.ToDecimal(it.Importe))</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.TasaOCuota</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.TipoFactor</center></td>
+                                                </tr>
+                                            }
+
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                    }
+
+                    @if (factura.InformacionAduanera != null)
+                    {
+                        <tr>
+                            <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Información Aduanera</b></center></td>
+                        </tr>
+                        <tr>
+                            <td colspan="9" style="text-align:center;">
+                                <table cellpadding="0" cellspacing="0" style="margin: auto; width: 50%; border-collapse: collapse; border:none;">
+                                    <tbody>
+                                        <tr>
+                                            <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Pedimento</center></td>
+                                        </tr>
+                                        @foreach (var it in factura.InformacionAduanera)
+                                        {
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.NumeroPedimento</center></td>
+                                            </tr>
+                                        }
+                                    </tbody>
+                                </table>
+                            </td>
+                        </tr>
+                    }
+                }
+            </tbody>
+        </table>
+
+        @if (Model.Complemento != null)
+        {
+            if (Model.Complemento.CartaPorte != null)
+            {
+                <table class="table" color="black" style="width: 100%;" cellpadding="0" cellspacing="0">
+                    <tbody>
+                        <tr>
+                            <td>
+                                <p style="font-weight: bold; font-size: 11px; padding-left: 1em;">CartaPorte Version: @Model.Complemento.CartaPorte.Version</p>
+                            </td>
+                        </tr>
+                        @if (Model.Complemento.CartaPorte.Ubicaciones != null)
+                        {
+                            <tr>
+                                <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Ubicaciones</b></center></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9" style="text-align:center;">
+                                    <table cellpadding="0" cellspacing="0" style="margin: auto; width: 90%; border-collapse: collapse; border:none;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Tipo</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Id Ubic.</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Salida / Llegada</center></td>
+                                            </tr>
+                                            @foreach (var it in Model.Complemento.CartaPorte.Ubicaciones)
+                                            {
+                                                if (it.Domicilio != null)
+                                                {
+                                                    <tr style="text-align:left;">
+                                                        <td colspan="3" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important">@it.Domicilio.Calle @it.Domicilio.NumeroExterior @it.Domicilio.Estado @it.Domicilio.CodigoPostal</td>
+                                                    </tr>
+                                                }
+                                                <tr>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.TipoUbicacion</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.IDUbicacion</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.FechaHoraSalidaLlegada</center></td>
+                                                </tr>
+
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+                        @if (Model.Complemento.CartaPorte.Mercancias != null)
+                        {
+                            <tr>
+                                <td colspan="9"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Mercancias</b></center></td>
+                            </tr>
+                            <tr>
+                                <td colspan="9" style="text-align:center;">
+                                    <table cellpadding="0" cellspacing="0" style="margin: auto; width: 90%; border-collapse: collapse; border:none;">
+                                        <tbody>
+                                            <tr>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Cant</center></td>
+                                                <td colspan="2"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Descripcion</center></td>
+                                                <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">BienesTransp</center></td>
+                                                <td colspan="2"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important; background-color: #c2c2c2;">Unidad</center></td>
+                                            </tr>
+                                            @foreach (var it in Model.Complemento.CartaPorte.Mercancias.Mercancia)
+                                            {
+                                                <tr>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.Cantidad</center></td>
+                                                    <td colspan="2"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.Descripcion</center></td>
+                                                    <td colspan="1"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.BienesTransp</center></td>
+                                                    <td colspan="2"><center style="font-size: 11px; font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">@it.ClaveUnidad</center></td>
+                                                </tr>
+                                                if (it.CantidadTransporta != null)
+                                                {
+                                                    foreach (var ct in it.CantidadTransporta)
+                                                    {
+                                                        <tr>
+                                                            <td colspan="1"></td>
+                                                            <td colspan="2"></td>
+                                                            <td colspan="1"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">IDOrigen: @ct.IDOrigen</center></td>
+                                                            <td colspan="2"><center style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">IDDestino: @ct.IDDestino</center></td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+                                            @if (Model.Complemento.CartaPorte.Mercancias.Autotransporte != null)
+                                            {
+                                                <tr>
+                                                    <td colspan="6"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Autotransporte</b></center></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">
+                                                        Id. Veh.: @Model.Complemento.CartaPorte.Mercancias.Autotransporte.IdentificacionVehicular.PlacaVM
+                                                        &nbsp;&nbsp;Permiso SCT: @Model.Complemento.CartaPorte.Mercancias.Autotransporte.NumPermisoSCT
+                                                    </td>
+                                                </tr>
+                                                @if (Model.Complemento.CartaPorte.Mercancias.Autotransporte.Remolques != null)
+                                                {
+                                                    @foreach (var r in Model.Complemento.CartaPorte.Mercancias.Autotransporte.Remolques)
+                                                    {
+                                                        <tr>
+                                                            <td colspan="6" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">
+                                                                Placa: @r.Placa Subtipo: @r.SubTipoRem
+                                                            </td>
+                                                        </tr>
+                                                    }
+                                                }
+                                            }
+                                            @if (Model.Complemento.CartaPorte.Mercancias.TransporteAereo != null)
+                                            {
+                                                <tr>
+                                                    <td colspan="6"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Transporte Aereo</b></center></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">
+                                                        Transportista: @Model.Complemento.CartaPorte.Mercancias.TransporteAereo.CodigoTransportista
+                                                        &nbsp;&nbsp;Matricula: @Model.Complemento.CartaPorte.Mercancias.TransporteAereo.MatriculaAeronave
+                                                        &nbsp;&nbsp;Guia: @Model.Complemento.CartaPorte.Mercancias.TransporteAereo.NumeroGuia
+                                                    </td>
+                                                </tr>
+                                            }
+                                            @if (Model.Complemento.CartaPorte.Mercancias.TransporteFerroviario != null)
+                                            {
+                                                <tr>
+                                                    <td colspan="6"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Transporte Ferroviario</b></center></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">
+                                                        Servicio: @Model.Complemento.CartaPorte.Mercancias.TransporteFerroviario.TipoDeServicio
+                                                        &nbsp;&nbsp;Tipo traf: @Model.Complemento.CartaPorte.Mercancias.TransporteFerroviario.TipoDeTrafico
+                                                        &nbsp;&nbsp;Carro: @Model.Complemento.CartaPorte.Mercancias.TransporteFerroviario.Carro
+                                                    </td>
+                                                </tr>
+                                            }
+                                            @if (Model.Complemento.CartaPorte.Mercancias.TransporteMaritimo != null)
+                                            {
+                                                <tr>
+                                                    <td colspan="6"><center style="font-size: 11px; font-family: 'Arial Unicode MS';margin: 2px 0 !important;"><b>Transporte Maritimo</b></center></td>
+                                                </tr>
+                                                <tr>
+                                                    <td colspan="6" style="font-size: 11px;font-family: 'Arial Unicode MS'; margin: 2px 0 !important;">
+                                                        Matricula: @Model.Complemento.CartaPorte.Mercancias.TransporteMaritimo.Matricula
+                                                        &nbsp;&nbsp;Linea: @Model.Complemento.CartaPorte.Mercancias.TransporteMaritimo.LineaNaviera
+                                                        &nbsp;&nbsp;No. Viaje: @Model.Complemento.CartaPorte.Mercancias.TransporteMaritimo.NumViaje
+                                                    </td>
+                                                </tr>
+                                            }
+                                        </tbody>
+                                    </table>
+                                </td>
+                            </tr>
+                        }
+
+
+                    </tbody>
+                </table>
+            }
+         }
+
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="25%" align="right">
+                            <b style="font-weight: bold; font-size:11px;">SubTotal: &nbsp;<b style="font-weight:lighter; font-size:11px; padding-right: 1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(Model.SubTotal))</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">IVA Transladado Tasa 0.16000: &nbsp;<b style="font-weight: lighter; font-size:11px; padding-right: 1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(Model.Impuestos.TotalImpuestosTrasladados))</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Total: &nbsp;<b style=" font-weight: lighter; font-size:11px; padding-right: 1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(Model.Total)) </b></b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+    </div>
+
+    <b style="font-size:11px; font-weight:bold; padding-left: 4em; ">Uso CFDI: <b style=" font-weight:lighter;">@Model.Receptor.UsoCFDI</b>
+    @if (!String.IsNullOrEmpty(Model.MetodoPago))
+    {
+    <b style="font-size:11px; font-weight:bold; padding-left: 8em; ">Método de Pago: <b style=" font-weight:lighter;">@Model.MetodoPago</b></b>
+    }
+    <b style="font-size:11px; font-weight:bold; padding-left: 8em; ">Moneda: <b style=" font-weight:lighter;">@Model.Moneda</b></b>
+    @if (!String.IsNullOrEmpty(Model.FormaPago))
+    {
+    <b style="font-size:11px; font-weight:bold; padding-left: 9em; ">Forma de Pago:<b style=" font-weight:lighter;">@Model.FormaPago</b></b>
+    }
+    </b>
+    <hr style="color: black; background-color: black; border: 1px solid black">
+
+    <div class="col-lg-12 col-md-12 col-sm-12">
+        <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 11px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td width="20%" align="left">
+                        <b style="font-weight: bold; font-size: 11px;">Versión CFDI: <b style="font-weight: lighter; font-size:11px;">@Model.Version</b></b><br />
+                        @if (Model.Complemento != null)
+                        {
+                            @if (Model.Complemento.TimbreFiscalDigital != null)
+                            {
+                                @if (Model.Complemento.TimbreFiscalDigital.UUID != null)
+                                {
+                                    <b style="font-weight: bold; font-size: 11px;">Folio Fiscal: <b style="font-weight: lighter; font-size:11px;">@Model.Complemento.TimbreFiscalDigital.UUID</b></b><br />
+                                }
+                            }
+                        }
+                        @if (!String.IsNullOrEmpty(Model.NoCertificado))
+                        {
+                        <b style="font-weight: bold; font-size: 11px;">Número de Certificado emisor: <b style="font-weight: lighter; font-size:11px;">@Model.NoCertificado</b></b>
+                        }
+                    </td>
+                    <td width="20%" align="justify">
+                        <b style="font-weight: bold; font-size: 11px;"><b style="font-weight:lighter; font-size:11px;"></b></b><br />
+                        @if (Model.Complemento != null)
+                        {
+                            @if (Model.Complemento.TimbreFiscalDigital != null)
+                            {
+                                @if (Model.Complemento.TimbreFiscalDigital.FechaTimbrado != null)
+                                {
+                                    <b style="font-weight: bold; font-size: 11px; padding-left: 1em;">Fecha Timbrado: <b style="font-weight:lighter; font-size:11px;">@Model.Complemento.TimbreFiscalDigital.FechaTimbrado</b></b><br />
+                                }
+                            }
+                        }
+                        @if (Model.Complemento != null)
+                        {
+                            @if (Model.Complemento.TimbreFiscalDigital != null)
+                            {
+                                @if (Model.Complemento.TimbreFiscalDigital.NoCertificadoSAT != null)
+                                {
+                                    <b style="font-weight: bold; font-size: 11px; padding-left: 1em;">No. Certificado SAT: <b style="font-weight:lighter; font-size:11px;">@Model.Complemento.TimbreFiscalDigital.NoCertificadoSAT</b></b>
+                                }
+                            }
+                        }
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+    <div>
+        @if (Model.Complemento != null)
+        {
+            <div class="row" style="width: 100%; font-weight:lighter;">
+
+                @if (Model.Complemento.TimbreFiscalDigital != null)
+                {
+                    <b style="font-weight:bold; font-size:11px; font-family: 'Arial Unicode MS';">Sello SAT:</b>
+                    <b style="font-weight:lighter; font-size:11px; font-family: 'Arial Unicode MS';">
+                        @*reemplazar diagonales con vacio para poder contar caracteres y darle salto de linea*@
+                        @*@Model.Complemento.TimbreFiscalDigital.SelloSAT.Split(" ");*@
+                        @{
+                            var valor = Model.Complemento.TimbreFiscalDigital.SelloSAT.Length / 4;
+                            int a = 0;
+                            var selloSAT1 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                            var selloSAT2 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                            var selloSAT3 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                            var selloSAT = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor);
+                        }
+                        @selloSAT1
+                        @selloSAT2
+                        @selloSAT3
+                        @selloSAT
+                        @*@Model.comprobante.Complemento.TimbreFiscalDigital.SelloSAT*@
+                    </b><br />
+                }
+
+                @if (Model.Complemento.TimbreFiscalDigital != null)
+                {
+                    <b style="font-weight:bold; font-size:11px; font-family: 'Arial Unicode MS';">Sello CFDI:</b>
+                    <b style="font-weight:lighter; font-size:11px; font-family: 'Arial Unicode MS';">
+                        @*reemplazar diagonales con vacio para poder contar caracteres y darle salto de linea*@
+                        @*@Model.Complemento.TimbreFiscalDigital.SelloCFD.Split(" ");*@
+                        @{
+                            var valor1 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Length / 4;
+                            int a1 = 0;
+                            var selloCFD1 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                            var selloCFD2 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                            var selloCFD3 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                            var selloCFD = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1);
+                        }
+                        @selloCFD1
+                        @selloCFD2
+                        @selloCFD3
+                        @selloCFD
+                        @*@Model.comprobante.Complemento.TimbreFiscalDigital.SelloCFD*@
+                    </b><br />
+                }
+
+                <b style="font-weight:bold; font-size:11px; font-family: 'Arial Unicode MS';">Tipo de comprobante:</b>
+                <b style=" font-weight:lighter; font-size:11px; font-family: 'Arial Unicode MS';">@Model.TipoDeComprobante</b>
+            </div>
+
+            <br />
+        }
+        else
+        {
+            <div class="row" style="width: 100%; font-weight:lighter;">
+                <b style="font-weight:bold; font-size:11px; font-family: 'Arial Unicode MS';">Tipo de comprobante:</b>
+                <b style=" font-weight:lighter; font-size:11px; font-family: 'Arial Unicode MS';">@Model.TipoDeComprobante</b>
+            </div>
+            <br />
+        }
+        @if (Model.Addenda != null && Model.Addenda.Addenda_Pemex != null)
+        {
+            <table style="margin-top:20px;">
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <p style="font-weight: bold; font-size: 11px; padding-left: 1em;">Addenda</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td width="20%" align="left" style="font-family: 'Arial Unicode MS';">
+                            <b style="font-weight: bold; font-size:11px;">Contrato: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.CONTRATO )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Órden de Surtimiento: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.O_SURTIMIENTO ) </b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Número de estimación: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.N_ESTIMACION )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Número de acreedor: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.N_ACREEDOR )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Entrada: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.ENTRADA )</b></b>
+                        </td>
+                        <td width="20%" align="left" style="font-family: 'Arial Unicode MS';">
+                            <b style="font-weight: bold; font-size:11px;">Región / VU: <b style="font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.VUREGION )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ficha firma COPADE: <b style=" font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.FICHAE )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ficha funcionario COPADE: <b style=" font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.FICHAF )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Moneda: <b style=" font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.MONEDA )</b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ejercicio: <b style=" font-weight: lighter; font-size:11px;">@(Model.Addenda == null ? "" : Model.Addenda.Addenda_Pemex.EJERCICIO )</b></b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <table>
+                <thead>
+                    <tr>
+                        <th></th>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="20%" align="left" style="font-family: 'Arial Unicode MS';">
+                            <b style="font-weight: bold; font-size:11px;">Contrato: <b style="font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Órden de Surtimiento: <b style="font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Número de estimación: <b style="font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Número de acreedor: <b style="font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Entrada: <b style="font-weight: lighter; font-size:11px;"></b></b>
+                        </td>
+                        <td width="20%" align="left" style="font-family: 'Arial Unicode MS';">
+                            <b style="font-weight: bold; font-size:11px;">ADDENDA</b><br />
+                            <b style="font-weight: bold; font-size:11px;">Región / VU: <b style="font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ficha firma COPADE: <b style=" font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ficha funcionario COPADE: <b style=" font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Moneda: <b style=" font-weight: lighter; font-size:11px;"></b></b><br />
+                            <b style="font-weight: bold; font-size:11px;">Ejercicio: <b style=" font-weight: lighter; font-size:11px;"></b></b>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        }
+    </div>
+        </div>
+
+
+
+
+
+
+
+
+
+
+

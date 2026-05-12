@@ -1,0 +1,91 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<AdmonGRMDto>>
+    
+
+@{
+    Layout = null;
+}
+
+
+<form id="formid" action="#" method="post">
+    <fieldset>
+        <legend>Historial de acciones del administrador GRM</legend>
+
+        <table class="table" style="">
+            <thead>
+                <tr>
+                    <th>
+                        Contrato
+                    </th>
+                    <th>
+                        Ord. Surt.
+                    </th>
+                    <th>
+                        Recepción
+                    </th>
+                    <th>
+                        Num. Acreedor
+                    </th>
+                    <th>
+                        Tipo
+                    </th>
+                    <th>
+                        Ficha
+                    </th>
+                    <th>
+                        Fecha de Firmado
+                    </th>
+                </tr>
+
+
+                @foreach (var item in Model.Data)
+                {
+                    <tr>
+                        <td>
+                            @Html.DisplayFor(model => item.Contract)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.SapOrder)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.Reception)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.CreditorNumber)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.DocumentType)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.AdministratorToken)
+                        </td>
+                        <td>
+                            @Html.DisplayFor(model => item.AdministratorSignDate)
+                        </td>
+                    </tr>
+                }
+            </thead>
+            <tbody>
+            </tbody>
+        </table>
+        @if (Model.Pager.EndPage > 1)
+        {
+            <nav aria-label="Page navigation example" id="grm-nav">
+                <ul class="pagination justify-content-center">
+                    <li class="page-item @(Model.Pager.CurrentPage == 1 ? "disabled" : "")" style="cursor:pointer;">
+                        <a class="page-link" href="#" tabindex="-1" data-page_num="@(Model.Pager.CurrentPage - 1)">Anterior</a>
+                    </li>
+                    @for (var p = Model.Pager.StartPage; p <= Model.Pager.EndPage; p++)
+                    {
+                        <li class="page-item @(p == Model.Pager.CurrentPage ? "active" : "")" style="cursor:pointer;">
+                            <a class="page-link" data-page_num="@p">@p</a>
+                        </li>
+                    }
+                    <li class="page-item @(Model.Pager.CurrentPage == Model.Pager.TotalPages ? "disabled" : "")" style="cursor:pointer;">
+                        <a class="page-link" data-page_num="@(Model.Pager.CurrentPage + 1)">Siguiente</a>
+                    </li>
+                </ul>
+            </nav>
+        }
+    </fieldset>
+</form>

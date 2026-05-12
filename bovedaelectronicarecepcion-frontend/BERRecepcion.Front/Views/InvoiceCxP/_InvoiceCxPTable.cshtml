@@ -1,0 +1,162 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<InvoiceCxPList>>
+
+
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <div class="card">
+        <div class="card-header">
+            <br />
+            <div class="row">
+                <div class="col-md-4 offset-md-8 col-sm-12 col-lg-4 offset-lg-8">
+                    <form id="cg-form-search">
+                        <div class="input-group mb-3">
+                            <input type="search" class="form-control form-control-sm" value="@ViewBag.Search" id="search" autocomplete="off" placeholder="Buscar Documento">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-sm btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <table class="table table-hover" id="invoice-Cxp-table" style="font-size:14px;">
+                <thead class="thead-light">
+                    <tr>
+                        <th>CxP</th>
+                        <th>Entrada</th>
+                        <th>Ultimo Envio</th>
+                        <th>Resultado</th>
+                        <th>Organismo</th>
+                        <th>Ejercicio</th>
+                        <th style="max-width:40px;">Ord. Surt.</th>
+                        <th>Serie</th>
+                        <th>Folio</th>
+                        <th>UUID</th>
+                        <th>VU Region</th>
+                        <th>Fecha Factura</th>
+                        <th>Fecha Recepción</th>
+                        <th>Proveedor</th>
+
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                    <tr>
+                        <td>
+                            <span class="info-box-text text-wrap">
+                                <small>
+                                    <button type="button" class="btn btn-sm btn-outline-secondary float-right" href="" onclick="SaveInvoiceCxP('@item.InvoiceId',
+                                            '@item.Reception', '@item.CxpSendDate', '@item.res', '@item.clave', '@item.Exercise', '@item.SapOrder', '@item.Serie',
+                                            '@item.Folio', '@item.Usuario', '@item.Uuid', '@item.Assignment', '@item.InvoiceDate', '@item.ReceptionDate', '@item.Creditor', '@item.Total');">
+                                        <span class="fas fa-sync">
+                                        </span>
+                                    </button>
+
+                                </small>
+                            </span>
+                        </td>
+                        <td scope="row" class="text-center">@item.Reception</td>
+                        <td scope="row">@item.CxpSendDate</td>
+                        <td scope="row">@item.res</td>
+                        <td scope="row">@item.clave</td>
+                        <td scope="row">@item.Exercise</td>
+                        <td scope="row">@item.SapOrder</td>
+                        <td scope="row">@item.Serie</td>
+                        <td scope="row">@item.Folio</td>
+                        <td scope="row">@item.Uuid.ToString().ToUpper()</td>
+                        <td scope="row">@item.Assignment</td>
+                        <td scope="row">@item.InvoiceDate</td>
+                        <td scope="row">@item.ReceptionDate</td>
+                        <td scope="row">@item.Creditor</td>
+
+
+                    </tr>
+                    }
+                </tbody>
+                @if (Model.Pager.EndPage > 1)
+                {
+                    <tfoot>
+                        <tr>
+                            <td>
+                                <button class="btn btn-sm btn-success w-100" id="btnValidarInfo">
+                                    <i class="fas fa-pencil-alt mr-1"></i>Firmar
+                                </button>
+                            </td>
+                            <td colspan="9">
+                                <nav aria-label="Page navigation example" id="bitacora-nav">
+                                    <ul class="pagination justify-content-center">
+                                        <li class="page-item @(Model.Pager.CurrentPage == 1 ? "disabled" : "")" style="cursor:pointer;">
+                                            <a class="page-link" href="#" tabindex="-1" data-page_num="@(Model.Pager.CurrentPage - 1)">Anterior</a>
+                                        </li>
+                                        @for (var p = Model.Pager.StartPage; p <= Model.Pager.EndPage; p++)
+                                        {
+                                            <li class="page-item @(p == Model.Pager.CurrentPage ? "active" : "")" style="cursor:pointer;">
+                                                <a class="page-link" data-page_num="@p">@p</a>
+                                            </li>
+                                        }
+                                        <li class="page-item @(Model.Pager.CurrentPage == Model.Pager.TotalPages ? "disabled" : "")" style="cursor:pointer;">
+                                            <a class="page-link" data-page_num="@(Model.Pager.CurrentPage + 1)">Siguiente</a>
+                                        </li>
+                                    </ul>
+                                </nav>
+                            </td>
+                        </tr>
+                    </tfoot>
+                }
+            </table>
+            @*@if (Model.Pager.EndPage == 1)
+            {
+                <div class="row">
+                    <div class="col-md-12">
+                        <button class="btn btn-sm btn-success" id="btnValidarInfo">
+                            <i class="fas fa-pencil-alt mr-1"></i>Firmar
+                        </button>
+                    </div>
+                </div>
+            }*@
+
+        </div>
+        <!-- /.card-body -->
+    </div>
+
+    <script>
+        $(function () {
+            DataTableInitialize("invoice-Cxp-table");
+        });
+    </script>
+
+}
+else
+{
+    <div class="card">
+        <div class="card-header">
+            <br />
+            <div class="row">
+                <div class="col-md-4 offset-md-8 col-sm-12 col-lg-4 offset-lg-8">
+                    <form id="cg-form-search">
+                        <div class="input-group mb-3">
+                            <input type="search" class="form-control form-control-sm" value="@ViewBag.Search" id="search" autocomplete="off" placeholder="Buscar Documento">
+                            <div class="input-group-append">
+                                <button type="submit" class="btn btn-sm btn-default">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+        <div class="card-body">
+            <div class="callout callout-info">
+                <p>No se han encontrado Cuentas por Pagar.</p>
+            </div>
+        </div>
+        <!-- /.card-body -->
+    </div>
+}

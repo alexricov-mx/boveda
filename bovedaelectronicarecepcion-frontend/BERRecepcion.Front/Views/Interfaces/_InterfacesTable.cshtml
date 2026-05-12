@@ -1,0 +1,47 @@
+﻿@model DataResult<IEnumerable<BERRecepcion.Front.Models.Dto.ControlInterfacesDto>>
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    @foreach (var item in Model.Data)
+    {
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4 col-xl-4">
+            <div class="card card-widget widget-user shadow">
+                <div class="widget-user-header text-white"
+                     style="background: url('../images/lines.png') center center, #3f6791;">
+                    <h3 class="widget-user-desc text-right">Interfaz @item.SAP</h3>
+                    <h5 class="widget-user-username text-right">@(item.StatusB == 0 ? "Bloqueada" : item.StatusB == 1 ? "Activa" : "Pendientes")</h5>
+                </div>
+                <div class="widget-user-image">
+                    <img class="img-circle elevation-2 border-0 @(item.StatusB == 0 ? "bg-danger" : item.StatusB == 1 ? "bg-success" : "bg-warning")" src="~/images/lines.png" alt="img" style="height:90px; width:90px;">
+                </div>
+                <div class="card-footer">
+                    <div class="row">
+                        <div class="col-sm-4 border-right">
+                            <div class="description-block">
+                                <h5 class="description-header">Activar</h5>
+                                <i class="fas fa-unlock text-secondary mt-2 p-1" name="activar" data-sapid="@item.SAPID" style="font-size: 1.2em; cursor:pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="col-sm-4 border-right">
+                            <div class="description-block">
+                                <h5 class="description-header">Editar</h5>
+                                <i class="fas fa-pen text-secondary mt-2 p-1" name="editar" data-sapid="@item.SAPID" style="font-size: 1.2em; cursor:pointer;"></i>
+                            </div>
+                        </div>
+                        <div class="col-sm-4">
+                            <div class="description-block">
+                                <h5 class="description-header">Bloquear</h5>
+                                <i class="fas fa-lock text-secondary mt-2 p-1" name="bloquear" data-sapid="@item.SAPID" style="font-size: 1.2em; cursor:pointer;"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se ha encontrado información.</p>
+    </div>
+}

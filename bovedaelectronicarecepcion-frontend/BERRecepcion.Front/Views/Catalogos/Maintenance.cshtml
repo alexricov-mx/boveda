@@ -1,0 +1,75 @@
+﻿@{
+    ViewData["Title"] = "Mantenimiento de Catálogos Carta Porte";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="m-0">Mantenimiento de Catálogos Carta Porte</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-8 col-xl-8">
+                                <select id="idCatalogo" class="form-control form-control-sm" )>
+                                    <option value="c_CveTransporte_Paso" selected>Catálogo de la clave del transporte.</option>
+                                    <option value="c_TipoEstacion_Paso">Catálogo de tipo de estación.</option>
+                                    <option value="c_Estaciones_Paso">Catálogo de puertos marítimos, estaciones aeroportuarias y estaciones férreas.</option>
+                                    <option value="c_ClaveUnidadPeso_Paso">Catálogo de unidades de medida y embalaje.</option>
+                                    <option value="c_ClaveProdServCP_Paso">Catálogo de productos Carta Porte.</option>
+                                    <option value="c_MaterialPeligroso_Paso">Catálogo de materiales peligrosos.</option>
+                                    <option value="c_TipoEmbalaje_Paso">Catálogo de tipo de embalaje.</option>
+                                    <option value="c_TipoPermiso_Paso">Catálogo tipo permiso.</option>
+                                    <option value="c_Colonia_Paso">Catálogo de colonias.</option>
+                                    <option value="c_Localidad_Paso">Catálogo de localidades. </option>
+                                    <option value="c_Municipio_Paso">Catálogo de municipios.</option>
+                                    <option value="c_ParteTransporte_Paso">Catálogo de partes del transporte rentadas o prestadas.</option>
+                                    <option value="c_FiguraTransporte_Paso">Catálogo de figura transporte.</option>
+                                    <option value="c_ConfigAutotransporte_Paso">Catálogo de configuración autotransporte federal.</option>
+                                    <option value="c_SubTipoRem_Paso">Catálogo de tipo de remolque.</option>
+                                    <option value="c_ConfigMaritima_Paso">Catálogo de configuración marítima.</option>
+                                    <option value="c_ClaveTipoCarga_Paso">Catálogo del tipo de carga.</option>
+                                    <option value="c_ContenedorMaritimo_Paso">Catálogo de contenedores marítimos.</option>
+                                    <option value="c_NumAutorizacionNaviero_Paso">Catálogo de número autorización agente naviero consignatario. </option>
+                                    <option value="c_CodigoTransporteAereo_Paso">Catálogo código transporte aéreo.</option>
+                                    <option value="c_TipoDeServicio_Paso">Catálogo de tipo servicio.</option>
+                                    <option value="c_DerechosDePaso_Paso">Catálogo derechos de paso.</option>
+                                    <option value="c_TipoCarro_Paso">Catálogo de tipo de carro.</option>
+                                    <option value="c_Contenedor_Paso">Catálogo de tipo de contenedor.</option>
+                                    <option value="c_TipoDeTrafico_Paso">Catálogo de tipo de tráfico ferroviario.</option>
+                                </select>
+                            </div>
+                            <div class="col-12 col-sm-6 col-md-6 col-lg-2 col-xl-2">
+                                <button type="button" class="btn btn-sm btn-outline-primary w-100 mt-2 mt-sm-2 mt-md-2 mt-lg-0 mt-xl-0" id="btnAceptar"><i class="fas fa-plus mr-1"></i> Aceptar</button>
+                            </div>
+                            @*<div class="col-12 col-sm-4 col-md-4 col-lg-2 col-xl-2">
+                                <button type="button" class="btn btn-sm btn-outline-danger w-100 mt-2 mt-sm-2 mt-md-2 mt-lg-0 mt-xl-0" id="btnCancelar"><i class="fas fa-times mr-1"></i> Cancelar</button>
+                            </div>*@
+                            <div class="col-12 col-sm-6 col-md-6 col-lg-2 col-xl-2">
+                                <button type="button" class="btn btn-sm btn-outline-success w-100 mt-2 mt-sm-2 mt-md-2 mt-lg-0 mt-xl-0" id="btnModalCargar"><span class="fas fa-upload mr-1"></span>Cargar</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="divCatalogo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Catalogos/CartaPorte/jquery.form.min.js" )"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/Catalogos/CartaPorte/maintenance.js" )"></script>
+}
+
+<partial name="_ModalCargar" />

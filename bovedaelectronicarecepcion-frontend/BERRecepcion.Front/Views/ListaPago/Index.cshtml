@@ -1,0 +1,42 @@
+﻿
+@{
+    ViewData["Title"] = "Lista de pago";
+}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3 class="m-0">Lista de pago</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="lista-pago-card">
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<sign-widget data-reloadTableName="ListaPagoCard"
+             data-urlFirmar="ListaPago/Firmar"
+             data-urlCompletarFirma="ListaPago/CompletarFirma">
+</sign-widget>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/ListaPago/index.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/sign-widget.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />
+
+

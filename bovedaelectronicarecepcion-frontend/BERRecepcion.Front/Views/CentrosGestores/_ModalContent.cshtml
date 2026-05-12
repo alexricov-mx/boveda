@@ -1,0 +1,93 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model ManagementCentersDto
+@{
+    bool isEdit = ViewBag.IsEdit;
+    var organismos = (IEnumerable<OrganismDto>)ViewBag.Organismos;
+}
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">@(isEdit ? "Editar centro gestor" : "Agregar centro gestor")</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="OrganismID" class="col-form-label">Organismo</label>
+                <select class="form-control form-control-sm" id="OrganismID" @(isEdit ? "disabled" : "")>
+                    @foreach (var item in organismos)
+                    {
+                        if (isEdit && item.OrganismID == Model.OrganismID)
+                        {
+                            <option value="@item.OrganismID" selected>@item.Clave</option>
+                        }
+                        else
+                        {
+                            <option value="@item.OrganismID"> @item.Clave</option>
+                        }
+                    }
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Number" class="col-form-label">Centro gestor</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Number" @(isEdit ? "disabled" : "") value="@Model?.Number" autocomplete="off" maxlength="15">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Type" class="col-form-label">Tipo de documento</label>
+                @{
+                    string type = Model?.Type?.Substring(0, 1);
+                }
+                <select class="form-control form-control-sm" id="Type" @(isEdit ? "disabled" : "")>
+                    <option value="B">Bienes</option>
+                    <option value="S">Servicios</option>
+                    <option value="O">Obra</option>
+                    <option value="A">Analitico</option>
+                </select>
+                <script>
+                    $("#Type").val('@type');
+                </script>
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Description" class="col-form-label">Descripción</label>
+                <input class="form-control form-control-sm" type="text" id="Description" value="@Model?.Description" autocomplete="off" maxlength="100">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Signer1" class="col-form-label">Firmante 1</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Signer1" value="@Model?.Signer1" autocomplete="off" maxlength="15">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Alternate1" class="col-form-label">Suplente 1</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Alternate1" value="@Model?.Alternate1" autocomplete="off" maxlength="15">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Signer2" class="col-form-label">Firmante 2</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Signer2" value="@Model?.Signer2" autocomplete="off" maxlength="15">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Alternate2" class="col-form-label">Suplente 2</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Alternate2" value="@Model?.Alternate2" autocomplete="off" maxlength="15">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="modal" style="width:135px;">
+        <i class="fas fa-times mr-2"></i> Cerrar
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-managementcenterid="@Model?.ManagementCenterID" id="btnSave" style="width:135px;">
+        <i class="fas fa-save mr-2"></i> Guardar
+    </button>
+</div>

@@ -1,0 +1,101 @@
+﻿@using Newtonsoft.Json
+@using BERRecepcion.Front.Models.Dto
+@model IEnumerable<OrganismDto>
+@{
+    ViewData["Title"] = "Recepción de Factura Documental sin CFDI (COPADE)";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-12">
+                <h3 class="m-0">Recepción de Factura Documental sin CFDI (COPADE)</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <!-- Datos generales -->
+                <div class="card card-outline card-olive">
+                    <div class="card-header">
+                        <h4 class="card-title">
+                            <i class="fas fa-info mr-2"></i>Datos generales
+                        </h4>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="callout callout-info">
+                                    <h6 class="text-muted m-0 mr-1">
+                                        <select id="selectOrganismo" class="custom-select form-control-border border-width-2">
+                                            <option value="" selected disabled>Organismo</option>
+                                            @foreach (var item in Model)
+                                            {
+                                                <option value="@item.Clave" data-item="@JsonConvert.SerializeObject(item)">@item.Clave</option>
+                                            }
+                                        </select>
+                                    </h6>
+                                </div>
+                            </div>
+                            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                                <div class="callout callout-info">
+                                    <h6 class="text-muted m-0 mr-1">
+                                        RFC: <strong class="ml-1" id="organismoRfc"></strong>
+                                    </h6>
+                                </div>
+                            </div>
+                            <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                                <div class="callout callout-info">
+                                    <h6 class="text-muted m-0 mr-1">
+                                        Factura expedida a favor de: <strong class="ml-1" id="organismoNombre"></strong>
+                                    </h6>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="row">
+                            <div class="col-12">
+                                <div class="callout callout-info">
+                                    <h6 class="text-muted m-0">Dirección: <strong class="ml-1" id="organismoDireccion"></strong></h6>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card card-outline card-olive">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8">
+                                <form id="copade-form-search">
+                                    <div class="input-group">
+                                        <input type="text" class="form-control form-control-sm select-on-focus col-md-6" id="copade" autocomplete="off" placeholder="Buscar Copade" maxlength="20" style="float:left;margin-right:10px;" autofocus>
+                                        <input type="text" class="form-control form-control-sm col-md-3" id="factura-Ejercicio" autocomplete="off" placeholder="Ejercicio" maxlength="4" style="float:right;margin-right:10px;" />
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" id="btnValidarFactura">
+                                                <i class="fas fa-check mr-1"></i><span>Validar</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="div-datos-factura"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/FacturaDocumentalsinCFDI/index.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />

@@ -1,0 +1,473 @@
+﻿@using BERecepcion.Core.Facturas.Dto
+@model             ComprobanteBE
+@using Humanizer;
+@{
+    Layout = null;
+}
+
+<style>
+    p {
+        font-family: sans-serif;
+    }
+
+    center {
+        margin: 16px 0;
+        font-family: 'Arial Unicode MS';
+        font-size: 25px;
+    }
+
+    right {
+        text-align: right;
+    }
+</style>
+
+<div class="row" @*style="width: 100%; height:150px; font-weight:lighter;"*@>
+    @*<div style="border:2px solid white; background-color:white">*@
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="border: 1px solid white; background-color: rgb(193, 194, 193);">Emisor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="20%" align="left">
+                            </td>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px; font-family: 'Arial Unicode MS' " aling="left">@Model.Emisor.Rfc-@Model.Emisor.Nombre</b><br />
+                                <b style="font-weight: bold; font-size: 13px;" aling="left">Régimen Fiscal: <b style="font-weight: lighter; font-size:13px;">@Model.Emisor.RegimenFiscal</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">
+                                Información fiscal
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="20%" align="left">
+                            </td>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">No. Certificado SAT : <b style="font-weight: lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.NoCertificadoSAT</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha de certificación : <b style="font-weight:lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.FechaTimbrado</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">No. Certificado Emisor: <b style="font-weight:lighter; font-size:13px;">@Model.NoCertificado</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp; Fecha de emisión: <b style="font-weight:lighter; font-size:13px;">@Model.Fecha</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Folio fiscal: <b style="font-weight:lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.UUID</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Lugar de expedición: <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@Model.LugarExpedicion</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">Receptor</th>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">
+                                Información comercial
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="60%" align="left">
+                                <b style="font-weight: bold; font-size: 13px; font-family: 'Arial Unicode MS' " aling="left">@Model.Receptor.Rfc-@Model.Receptor.Nombre</b><br />
+                                <b style="font-weight: bold; font-size: 13px;" aling="left">Régimen Fiscal: <b style="font-weight: lighter; font-size:13px;">@Model.Receptor.UsoCFDI</b></b><br /><br />
+                            </td>
+                            <td width="40%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">Serie y Folio : <b style="font-weight: lighter; font-size:13px; padding-left:5em">@Model.Serie&nbsp;@Model.Folio</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Tipo de comprobante : <b style="font-weight:lighter; font-size:13px;padding-left:1em">@Model.TipoDeComprobante</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Moneda: <b style="font-weight:lighter; font-size:13px; padding-left:7em"> @Model.Moneda</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 13px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr style="border:1px solid white; background-color:rgb(193, 194, 193);">
+                        <th>Clave</th>
+                        <th>Cantidad</th>
+                        <th>Unidad de medida</th>
+                        <th>Descripción</th>
+                        <th>Precio Unitario</th>
+                        <th>Importe</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Model.Conceptos.Concepto != null)
+                    {
+                        foreach (var adquisicion in Model.Conceptos.Concepto)
+                        {
+                            <tr>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:2em">@adquisicion.ClaveProdServ</td>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:3em">@adquisicion.Cantidad</td>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:5em">@adquisicion.ClaveUnidad</td>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:3em">@adquisicion.Descripcion</td>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:4em">@String.Format("{0,6:C2}",Convert.ToDecimal(adquisicion.ValorUnitario))</td>
+                                <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:2em">@String.Format("{0,6:C2}", Convert.ToDecimal(adquisicion.Importe))</td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td width="10%" align="right">
+                        <b style="font-weight: bold; font-size:13px;">SubTotal: &nbsp;<b style="font-weight:lighter; font-size:13px; padding-right: 1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(Model.SubTotal))</b></b><br />
+                        <b style="font-weight: bold; font-size:13px; border:1px solid white; background-color:rgb(193, 194, 193);">Total: &nbsp;<b style=" font-weight: lighter; font-size:13px; padding-right: 1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(Model.Total)) </b></b><br />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <div style="border:1px solid white; background-color:rgb(193, 194, 193); text-align:center">
+                <b style="font-size:16px; font-family:Arial;font-weight:bold;">
+                    Información de recepción de pagos
+                </b>
+            </div>
+            <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 13px; font-weight: lighter;" align="center" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th>Fecha de Pago</th>
+                        <th>Forma de Pago</th>
+                        <th>Moneda</th>
+                        <th>Tipo de Cambio</th>
+                        <th>Monto</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr align="rigth">
+                        <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:4em">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.FechaPago )</td>
+                        <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:5em">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.FormaDePagoP )</td>
+                        <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:2em">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.MonedaP )</td>
+                        <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:2em"></td>
+                        <td style="font-family: 'Arial Unicode MS' ; font-size: 13px; padding-left:2em">@(Model.Complemento.Pagos == null ? "" : String.Format("{0,6:C2}", Convert.ToDecimal(Model.Complemento.Pagos.Pago.Monto)) )</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <div align="left">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <div style="width: 40%; border: 1px solid white; background-color: rgb(193, 194, 193); text-align: center">
+                    <b style="font-size:16px; font-family:Arial;font-weight:bold;">
+                        Datos del Ordenante
+                    </b>
+                </div>
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">RFC de la entidad emisora: <b style="font-weight: lighter; font-size:13px;">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.RfcEmisorCtaOrd )</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp;&nbsp;&nbsp; Nombre del banco: <b style="font-weight:lighter; font-size:13px;">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.NomBancoOrdExt )</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Número de Operación: <b style="font-weight:lighter; font-size:13px;">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.NumOperacion )</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Número de la cuenta con la que se realizó el pago: <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@(Model.Complemento.Pagos == null ? "" : Model.Complemento.Pagos.Pago.CtaOrdenante )</b></b><br /><br />
+                            </td>
+                            <td width="20%" align="left">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="left">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th>
+                                <div style="width: 50%; border: 1px solid white; background-color: rgb(193, 194, 193); text-align: center">
+                                    <b style="font-size:16px; font-family:Arial;font-weight:bold;">
+                                        Datos del Beneficiario
+                                    </b>
+                                </div>
+                            </th>
+                            @*<th style="border: 1px solid white; background-color: rgb(193, 194, 193);" align="left">Datos del Beneficiario</th>*@
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">RFC de la entidad destino: <b style="font-weight: lighter; font-size:13px;">@Model.Complemento.Pagos.Pago.RfcEmisorCtaOrd</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp;&nbsp;&nbsp; Número de cuenta:  <b style="font-weight:lighter; font-size:13px;">@Model.Complemento.Pagos.Pago.NomBancoOrdExt</b></b><br /><br />
+                            </td>
+                            <td width="20%" align="left">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="left">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th><div style="width: 40%; border: 1px solid white; background-color: rgb(193, 194, 193); text-align: center">
+                                    <b style="font-size:16px; font-family:Arial;font-weight:bold;">
+                                        Documentos Relacionados
+                                    </b>
+                                </div>
+                            </th>
+                            @*<th style="width: 40%; border: 1px solid white; background-color: rgb(193, 194, 193);">Documentos Relacionados</th>*@
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (Model.Complemento.Pagos.Pago.DoctoRelacionado != null)
+                        {
+                            foreach (var pago in Model.Complemento.Pagos.Pago.DoctoRelacionado)
+                            {
+                                <tr>
+                                    <td>
+                                        <b style="font-weight: bold; font-size: 13px;">ID Documento: <b style="font-weight: lighter; font-size:13px;">@pago.IdDocumento</b></b>
+                                        <b style="font-weight: bold; font-size: 13px; padding-left:3em">Folio: <b style="font-weight:lighter; font-size:13px;">@pago.Folio</b></b><br />
+                                        <b style="font-weight: bold; font-size: 13px;">Moneda: <b style="font-weight:lighter; font-size:13px;">@pago.MonedaDR</b></b>
+                                        <b style="font-weight: bold; font-size: 13px; padding-left:10em">&nbsp;&nbsp;Método de pago:  <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@pago.MetodoDePagoDR</b></b>
+                                        <b style="font-weight: bold; font-size: 13px; padding-left:13em">Parcialidad:  <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@pago.NumParcialidad</b></b><br />
+                                        <b style="font-weight: bold; font-size: 13px;">Importe pagado:  <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(pago.ImpPagado))</b></b><br />
+                                        <b style="font-weight: bold; font-size: 13px;">Saldo anterior:  <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(pago.ImpSaldoAnt))</b></b>
+                                        <b style="font-weight: bold; font-size: 13px; padding-left:17em">&nbsp;&nbsp;Saldo insoluto:   <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@String.Format("{0,6:C2}", Convert.ToDecimal(pago.ImpSaldoInsoluto))</b></b><br /><br />
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div style="text-align:center">
+            <b style="font-size:13px; font-family:Arial;font-weight:bold;">
+                IMPORTE CON LETRA
+            </b><br />
+            <b style="font-size:13px; font-family:Arial;font-weight:bold;">
+                @{
+                var dato = Convert.ToInt32(Model.Total).ToWords();
+                }
+                @dato.ToUpper() @Model.Total/100 @Model.Moneda
+            </b>
+        </div>
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 13px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="70%" align="right">Este documento es una representación impresa de un CFDI</td>
+                        <td width="40%" align="right">Página: 1 de 2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+        <br />
+        <br />
+        <br />
+</div>
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="border: 1px solid white; background-color: rgb(193, 194, 193);">Emisor</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="20%" align="left">
+                            </td>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px; font-family: 'Arial Unicode MS' " aling="left">@Model.Emisor.Rfc-@Model.Emisor.Nombre</b><br />
+                                <b style="font-weight: bold; font-size: 13px;" aling="left">Régimen Fiscal: <b style="font-weight: lighter; font-size:13px;">@Model.Emisor.RegimenFiscal</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">
+                                Información fiscal
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="20%" align="left">
+                            </td>
+                            <td width="80%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">No. Certificado SAT : <b style="font-weight: lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.NoCertificadoSAT</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Fecha de certificación : <b style="font-weight:lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.FechaTimbrado</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">No. Certificado Emisor: <b style="font-weight:lighter; font-size:13px;">@Model.NoCertificado</b></b>
+                                <b style="font-weight: bold; font-size: 13px;">&nbsp;&nbsp; Fecha de emisión: <b style="font-weight:lighter; font-size:13px;">@Model.Fecha</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Folio fiscal: <b style="font-weight:lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.UUID</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Lugar de expedición: <b style="font-weight:lighter; font-size:13px; padding-right:1em;">@Model.LugarExpedicion</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div align="right">
+            <div class="col-lg-12 col-md-12 col-sm-12">
+                <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 16px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                    <thead>
+                        <tr>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">Receptor</th>
+                            <th style="border:1px solid white; background-color:rgb(193, 194, 193);">
+                                Información comercial
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td width="60%" align="left">
+                                <b style="font-weight: bold; font-size: 13px; font-family: 'Arial Unicode MS' " aling="left">@Model.Receptor.Rfc-@Model.Receptor.Nombre</b><br />
+                                <b style="font-weight: bold; font-size: 13px;" aling="left">Régimen Fiscal: <b style="font-weight: lighter; font-size:13px;">@Model.Receptor.UsoCFDI</b></b><br /><br />
+                            </td>
+                            <td width="40%" align="left">
+                                <b style="font-weight: bold; font-size: 13px;">Serie y Folio : <b style="font-weight: lighter; font-size:13px; padding-left:5em">@Model.Serie&nbsp;@Model.Folio</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Tipo de comprobante : <b style="font-weight:lighter; font-size:13px;padding-left:1em">@Model.TipoDeComprobante</b></b><br />
+                                <b style="font-weight: bold; font-size: 13px;">Moneda: <b style="font-weight:lighter; font-size:13px; padding-left:7em"> @Model.Moneda</b></b><br /><br />
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>
+                        @{ string imagen = @ViewBag.QR;}
+                        <img src="data:image/jpg;base64,@imagen" alt="logo" width="150" height="150" />
+                    </td>
+                    <td width="70%" align="left">
+                        <b style="font-weight: bold; font-size: 13px; font-family: 'Arial Unicode MS' " aling="left">RFC del proveedor que certifica:<br /><b style="font-weight: lighter; font-size:13px;">@Model.Complemento.TimbreFiscalDigital.RfcProvCertif</b></b><br />
+                        <b style="font-weight: bold; font-size: 13px;" aling="left">
+                            Sello Digital SAT:  <br /><b style="font-weight: lighter; font-size:13px;">
+                                @*@Model.Complemento.TimbreFiscalDigital.SelloCFD.Split(" ");*@
+                                @{
+                                    var valor1 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Length / 5;
+                                    int a1 = 0;
+                                    var selloCFD1 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                                    var selloCFD2 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                                    var selloCFD3 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                                    var selloCFD4 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                                    //var selloCFD5 = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1); a1 = a1 + valor1;
+                                    var selloCFD = Model.Complemento.TimbreFiscalDigital.SelloCFD.Substring(a1, valor1);
+                                }
+                                @selloCFD1<br />
+                                @selloCFD2<br />
+                                @selloCFD3<br />
+                                @selloCFD4<br />
+                                @*@selloCFD5<br />*@
+                                @selloCFD
+                            </b>
+                        </b><br />
+                        <b style="font-weight: bold; font-size: 13px;" aling="left">
+                            Sello Digital: <br /><b style="font-weight: lighter; font-size:13px;">
+                                @{
+                                    var valor = Model.Complemento.TimbreFiscalDigital.SelloSAT.Length / 5;
+                                    int a = 0;
+                                    var selloSAT1 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                                    var selloSAT2 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                                    var selloSAT3 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                                    var selloSAT4 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                                    //var selloSAT5 = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor); a = a + valor;
+                                    var selloSAT = Model.Complemento.TimbreFiscalDigital.SelloSAT.Substring(a, valor);
+                                }
+                                @selloSAT1<br />
+                                @selloSAT2<br />
+                                @selloSAT3<br />
+                                @selloSAT4<br />
+                                @*@selloSAT5<br />*@
+                                @selloSAT
+                            </b>
+                        </b><br /><br />
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <br />
+        <div class="col-lg-12 col-md-12 col-sm-12">
+            <table style="width: 100%; font-family: 'Arial Unicode MS' ; font-size: 13px; font-weight: lighter;" align="left" cellpadding="0" cellspacing="0">
+                <thead>
+                    <tr>
+                        <th></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td width="70%" align="right">Este documento es una representación impresa de un CFDI</td>
+                        <td width="40%" align="right">Página: 2 de 2</td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,121 @@
+﻿<style>
+    input.small-custom, select.small-custom,
+    select.small-custom, input.small-custom::placeholder {
+        font: 14px/3 sans-serif;
+    }
+</style>
+
+<div class="row mt-3">
+    <div class="col-12 col-md-6">
+        <div class="form-group">
+            <label for="TipoUsuario" class="col-form-label text-sm text-secondary">Tipo de Usuario</label>
+            <select class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" type="text" id="TipoUsuario" autocomplete="off">
+                <option id="1">Proveedor</option>
+            </select>
+        </div>
+    </div>
+</div>
+<hr>
+<div class="row">
+    <div class="col-12 col-md-6">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-dark">Ingresa todos los datos de contacto y adjunta la documentación oficial que identifique o acredite al usuario externo para cumplir sus obligaciones con Pertróleos Mexicanos</label>
+        </div>
+    </div>
+</div>
+<div class="row">
+
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Nombre</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Nombre" placeholder="Nombre">
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Correo electrónico</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Nombre" placeholder="Correo electrónico">
+        </div>
+    </div>
+    <div class="col-12 col-md-2">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Vigencia inicio</label>
+            <input type="date" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="VigenciaInicio">
+        </div>
+    </div>
+    <div class="col-12 col-md-2">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Vigencia fin</label>
+            <input type="date" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="VigenciaFin">
+        </div>
+    </div>
+
+
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">RFC</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Nombre" placeholder="RFC">
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Teléfono</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Phone" placeholder="Teléfono">
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Perfil</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="VigenciaFin" placeholder="Perfil">
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Departamento</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Departamento" placeholder="Departamento">
+        </div>
+    </div>
+    <div class="col-12 col-md-4">
+        <div class="form-group ">
+            <label class="col-form-label text-sm text-secondary" for="Nombre">Puesto</label>
+            <input type="text" class="form-control form-control-lg bg-light-pink rounded border-0 small-custom" id="Puesto" placeholder="Puesto">
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="alert alert-default border-0 elevation-1">
+            <label class="h5 mr-3">Indica los organismos en los cuales tendrá actividad</label>
+            <button class="btn btn-success border-0 rounded-pill mr-2 text-sm pl-3 pr-3 bg-pantone7421" data-toggle="modal" data-target="#modal-external">
+                Organismos
+            </button>
+        </div>
+    </div>
+    <div class="col-12">
+        <div class="alert alert-default border-0 elevation-1">
+            <label class="h5">Documentación obligatoria</label>
+            <div class="input-group mb-3">
+                <button class="btn btn-lg bg-light-pink border-0 rounded-pill text-sm mr-2">
+                    <img src="~/images/cloud-upload.png" class="mr-2" style="width: 20px;"> Identificación oficial (INE, Pasaporte)
+                </button>
+                <button class="btn btn-lg bg-light-pink border-0 rounded-pill text-sm">
+                    <img src="~/images/cloud-upload.png" class="mr-2" style="width: 20px;"> Documento probatorio
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12 col-sm-6 col-md-12 d-flex justify-content-end">
+        <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421 mr-3" id="cancel-user">
+            Cancelar
+        </button>
+        <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421" id="save-user">
+            Guardar
+        </button>
+    </div>
+</div>
+
+@section scripts{
+    <script>
+
+    </script>
+}

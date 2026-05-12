@@ -1,0 +1,15 @@
+﻿@model BERRecepcion.Front.Models.ComprobanteBE
+<dl class="row m-0 info-factura">
+    <dt class="col-sm-3">Versión CFDI</dt>
+    <dd class="col-sm-9">@Model.Version</dd>
+    <dt class="col-sm-3">Serie</dt>
+    <dd class="col-sm-9">@Model.Serie</dd>
+    <dt class="col-sm-3">Folio:</dt>
+    <dd class="col-sm-9">@Model.Folio</dd>
+    <dt class="col-sm-3">Fecha factura:</dt>
+    <dd class="col-sm-9">@(Convert.ToDateTime(Model.Fecha).ToString("dd/MM/yyyy"))</dd>
+    <dt class="col-sm-3">UUID:</dt>
+    <dd class="col-sm-9">@Model.Complemento.TimbreFiscalDigital.UUID.ToString().ToUpper()</dd>
+    <dt class="col-sm-3">VU / Asignación:</dt>
+    <dd class="col-sm-4"><input type="text" class="form-control form-control-sm" id="factura-Region" /></dd>
+</dl>

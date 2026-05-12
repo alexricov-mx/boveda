@@ -1,0 +1,100 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<CatalogosCartaPorteDto>>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-hover" id="catalogos-cartaporte-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                @*<th></th>*@
+                @if (ViewBag.Catalogo.Contains("c_Colonia"))
+                {
+                    <th>Colonia</th>
+                    <th>Código postal</th>
+                    <th>Asentamiento</th>
+                }
+                else if (ViewBag.Catalogo.Contains("c_Localidad"))
+                {
+                    <th>Localidad</th>
+                    <th>Estado</th>
+                    <th>Descripción</th>
+                    <th>Inicio de vigencia</th>
+                    <th>Fin de vigencia</th>
+                }
+                else if (ViewBag.Catalogo.Contains("c_Municipio"))
+                {
+                    <th>Municipio</th>
+                    <th>Estado</th>
+                    <th>Descripción</th>
+                    <th>Inicio de vigencia</th>
+                    <th>Fin de vigencia</th>
+                }
+                else
+                {
+                    <th>Clave</th>
+                    <th>Inicio de vigencia</th>
+                    <th>Fin de vigencia</th>
+                }
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                @if (ViewBag.Catalogo.Contains("c_Colonia"))
+                {
+                    <tr>
+                        <td>@item.c_Colonia</td>
+                        <td>@item.c_CodigoPostal</td>
+                        <td>@item.NombreAsentamiento</td>
+                    </tr>
+                }
+                else if (ViewBag.Catalogo.Contains("c_Localidad"))
+                {
+                    <tr>
+                        <td>@item.c_Localidad</td>
+                        <td>@item.c_Estado</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.FechaInicioVigencia?.ToString("d")</td>
+                        <td>@item.FechaFinVigencia?.ToString("d")</td>
+                    </tr>
+                }
+                else if (ViewBag.Catalogo.Contains("c_Municipio"))
+                {
+                    <tr>
+                        <td>@item.c_Municipio</td>
+                        <td>@item.c_Estado</td>
+                        <td>@item.Descripcion</td>
+                        <td>@item.FechaInicioVigencia?.ToString("d")</td>
+                        <td>@item.FechaFinVigencia?.ToString("d")</td>
+                    </tr>
+                }
+                else
+                {
+                    <tr>
+                        <td>@item.value</td>
+                        <td>@item.InicioVigencia?.ToString("d")</td>
+                        <td>@item.FinVigencia?.ToString("d")</td>
+                    </tr>
+                }
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("catalogos-cartaporte-table");
+        });
+    </script>
+
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No existen registros.</p>
+    </div>
+}

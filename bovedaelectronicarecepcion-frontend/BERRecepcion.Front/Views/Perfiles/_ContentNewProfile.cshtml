@@ -1,0 +1,66 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model IEnumerable<RolesCatalogoDto>
+@{
+    var groupedRoles = Model.OrderBy(x => x.CategoriaOrden).GroupBy(x => x.Categoria).ToList();
+}
+
+<div class="card card-olive card-outline">
+    <div class="card-header">
+        <h4>Nuevo</h4>
+    </div>
+    <div class="card-body">
+
+        <div class="form-row align-items-center">
+            <div class="col-md-6 col-sm-12">
+                <div class="input-group mb-2">
+                    <input type="text" class="form-control form-control-sm" id="profileName" placeholder="Nombre del perfil" required maxlength="50">
+                </div>
+            </div>
+            <div class="col-md-4 col-sm-12">
+                <div class="input-group mb-2">
+                    <a class="btn btn-sm btn-outline-danger float-right mr-1" id="profile-cancel"><i class="fas fa-times mr-1"></i> Cancelar</a>
+                    <a class="btn btn-sm btn-outline-primary float-right" id="profile-save"><i class="fas fa-save mr-1"></i> Guardar</a>
+                </div>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col-md-12 col-sm-12">
+                <div class="card card-olive card-tabs">
+                    <div class="card-header p-0 pt-1">
+                        <ul class="nav nav-tabs" id="custom-tabs-two-tab" role="tablist">
+                            @for (int i = 0; i < groupedRoles.Count; i++)
+                            {
+                                <li class="nav-item">
+                                    <a class="nav-link nav-link-tab @(i == 0 ? "active":"")" name="checkCategoria" id="@groupedRoles[i].Key.Replace(" ","").Replace("/","")-tab" data-toggle="pill" href="#@groupedRoles[i].Key.Replace(" ","").Replace("/","")" role="tab" aria-controls="@groupedRoles[i].Key.Replace(" ","").Replace("/","")" aria-selected="true">@groupedRoles[i].Key</a>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+                    <div class="card-body">
+                        <div class="tab-content" id="custom-tabs-two-tabContent">
+                            @for (int i = 0; i < groupedRoles.Count; i++)
+                            {
+                            <div class="tab-pane  @(i == 0 ? "fade show active":"")" id="@groupedRoles[i].Key.Replace(" ", "").Replace("/", "")" role="tabpanel" aria-labelledby="@groupedRoles[i].Key.Replace(" ", "").Replace("/", "")-tab">
+                                <div class="row">
+                                    @foreach (var rol in groupedRoles[i].OrderBy(x => x.RolOrden).ToList())
+                                    {
+                                        <div class="col-lg-3 col-md-3 col-sm-12">
+                                            <div class="custom-control custom-checkbox">
+                                                <input class="custom-control-input custom-control-input-danger custom-control-input-outline checkRol" type="checkbox" id="check_@rol.Rol" name="@groupedRoles[i].Key.Replace(" ","").Replace("/","")-tab" data-rol="@rol.RolId" />
+                                                <label class="custom-control-label text-muted" for="check_@rol.Rol">@rol.Descripcion</label>
+                                            </div>
+                                        </div>
+                                    }
+                                </div>
+                            </div>
+                            }
+                        </div>
+                    </div>
+                    <!-- /.card -->
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- /.card -->
+</div>

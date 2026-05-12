@@ -1,0 +1,61 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <UserSecretsId>e00287ed-7bc1-4922-a0c0-ccea65e770f7</UserSecretsId>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Remove="Views\CentrosGestores - Copia\**" />
+    <Content Remove="Views\CentrosGestores - Copia\**" />
+    <EmbeddedResource Remove="Views\CentrosGestores - Copia\**" />
+    <None Remove="Views\CentrosGestores - Copia\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Remove="ProgramCopy.cs" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Remove="Views\Usuarios\DatosUsuario.cshtml" />
+    <Content Remove="Views\Usuarios\_ModalAddExternal.cshtml" />
+    <Content Remove="Views\Usuarios\_ModalAddUser.cshtml" />
+    <Content Remove="Views\Usuarios\_OrganismExternal.cshtml" />
+    <Content Remove="Views\Usuarios\_OrganismPemex.cshtml" />
+    <Content Remove="Views\Usuarios\_UserExternal.cshtml" />
+    <Content Remove="Views\Usuarios\_UserPemex.cshtml" />
+    <Content Remove="Views\Usuarios\_UsuarioPemexOld.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\IISProfile-des.pubxml" />
+    <_WebToolingArtifacts Remove="Properties\PublishProfiles\IISProfile-qa.pubxml" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="ClosedXML" Version="0.102.1" />
+    <PackageReference Include="FluentValidation.AspNetCore" Version="11.3.0" />
+    <PackageReference Include="Microsoft.Identity.Abstractions" Version="9.2.0" />
+    <PackageReference Include="Microsoft.Identity.Web" Version="3.10.0" />
+    <PackageReference Include="Microsoft.Identity.Web.UI" Version="3.10.0" />
+    <PackageReference Include="Microsoft.Identity.Web.DownstreamApi" Version="3.10.0" />
+    <PackageReference Include="Microsoft.Data.SqlClient" Version="5.2.2" />
+    <PackageReference Include="System.Data.SqlClient" Version="4.8.6" />
+    <PackageReference Include="System.IO.Packaging" Version="8.0.1" />
+    <PackageReference Include="NuGet.Common" Version="6.12.1" />
+    <PackageReference Include="NuGet.Packaging" Version="6.12.1" />
+    <PackageReference Include="NuGet.Protocol" Version="6.12.1" />
+    <PackageReference Include="QRCoder" Version="1.4.2" />
+    <PackageReference Include="RestSharp" Version="112.1.0" />
+    <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.5.0" />
+    <PackageReference Include="Serilog.Sinks.MSSqlServerCore" Version="1.1.1" />
+    <PackageReference Include="SpreadsheetLight" Version="3.5.0" />
+    <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
+    <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="logs\" />
+    <Folder Include="TemporalPDF\" />
+    <Folder Include="wwwroot\css\DatetimePicker\" />
+  </ItemGroup>
+  <ProjectExtensions>
+    <VisualStudio>
+      <UserProperties appsettings_1json__JsonSchema="" wwwroot_4dist_4css_4alt_4adminlte_1core_1css_1map__JsonSchema="" />
+    </VisualStudio>
+  </ProjectExtensions>
+</Project>

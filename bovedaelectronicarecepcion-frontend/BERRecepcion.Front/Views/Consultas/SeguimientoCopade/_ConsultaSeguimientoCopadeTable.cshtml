@@ -1,0 +1,99 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<CopadeDto>>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-hover" id="ConsultaCopade-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th>Expediente Electrónico</th>
+                <th>Organismo</th>
+                <th>Contrato</th>
+                <th>Pedido</th>
+                <th>Copade</th>
+                <th>Nombre  Acreedor </th>
+                <th>No. Acreedor</th>
+                <th>Ejercicio</th>
+                <th>CxP</th>
+                <th>Estatus</th>
+                <th>Cancelado</th>
+                <th>Factura Recibida</th>
+                <th>Tipo de factura</th>
+                <th>Fecha Factura</th>
+                <th>fecha recepción de factura</th>
+                <th>Serie</th>
+                <th>Folio</th>
+                <th>UUID</th>
+                @*<th class="text-center" id="field-info">Detalle</th>
+            <th>COPADE</th>
+            <th>Ejercicio</th>
+            <th>Organismo</th>
+            <th>Funcionario 1</th>
+            <th>Funcionario 2</th>
+            <th>Cancelado</th>
+            <th class="text-right">Total</th>
+            <th>Contrato</th>
+            <th>OS</th>*@
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    @*Revisión con Alejandro Rico: Seguimiento COPADE, COPADE y COPADE Bancario*@
+                    <td class="text-center">
+                        <i class="fas fa-history" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-copadeid="@item.CopadeID" data-saporder="@item.SapOrder" data-reception="@item.Reception"></i>
+                    </td>
+                    <td>@item.clave</td>
+                    <td>@item.Contract</td>
+                    <td>@item.SapOrder</td>
+                    <td>@item.Reception</td>
+                    <td>@item.Creditor</td>
+                    <td>@item.CreditorNumber</td>
+                    <td>@item.Exercise</td>
+                    <td>???</td>
+                    <td>@(@item.Functionary1SignDate.HasValue && @item.Functionary2SignDate.HasValue ? "Firmado" : (@item.Functionary1SignDate.HasValue ? "Funcionario 1" : (@item.Functionary2SignDate.HasValue ? "Funcionario 2" : "")))</td>
+                    <td>@(@item.IsCancel.HasValue && @item.IsCancel.Value ? "CANCELADO" : "NO")</td>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>???</td>
+                    <td>???</td>
+                    @*<td class="text-center">
+            <i class="fas fa-history" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-copadeid="@item.CopadeID" data-saporder="@item.SapOrder" data-reception="@item.Reception"></i>
+            </td>
+            <td scope="row">@item.Reception</td>
+            <td scope="row">@item.Exercise</td>
+            <td scope="row">@item.clave</td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.Functionary1SignDate.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.Functionary2SignDate.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.IsCancel.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-right">@String.Format("{0,6:C2}", Convert.ToDecimal(item.Total))</td>
+            <td scope="row">@item.Contract</td>
+            <td scope="row">@item.SapOrder</td>*@
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("ConsultaCopade-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se ha encontrado información.</p>
+    </div>
+}
+
+

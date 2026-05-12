@@ -1,0 +1,95 @@
+﻿@model DataResult<IEnumerable<BERRecepcion.Front.Models.Dto.UsersDto>>
+@using Newtonsoft.Json
+
+@if (Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-hover" id="user-table" style="font-size:14px;">
+        <thead class="bg-light-pink">
+            <tr>
+                <th></th>
+                <th class="pl-1 pr-1">Status</th>
+                <th>Ficha</th>
+                <th>Nombre</th>
+                <th>Email</th>
+                <th>Tipo de usuario</th>
+                <th>Perfil</th>
+                @*<th>Centro</th>*@
+                <th>RFC</th>
+                <th>Válido desde</th>
+                <th>Válido hasta</th>
+                <th>Último acceso</th>
+                <th>Fecha creación</th>
+            </tr>
+        </thead>
+        <tbody class="bg-white">
+            @foreach (var user in Model.Data)
+            {
+                <tr>
+                    <td></td>
+                    <td style="vertical-align: middle;">
+                        <img src="~/images/reload-status.png" style="width: 25px;" class="mr-1 pointer d-block m-auto" data-toggle="dropdown">
+                        @*<i class="fas fa-ellipsis-v pr-2 pl-2 float-right p-3 rounded-pill" style="font-size:17px; cursor:pointer;" data-toggle="dropdown"></i>*@
+                        <ul class="dropdown-menu border-0 elevation-1 bg-light-gray pt-0 pb-0">
+                            <li>
+                                <a class="dropdown-item" name="user-edit" style="cursor:pointer;" data-userid="@user.UserID" data-token="@user.Token">
+                                    <img src="~/images/icon-edit.png" style="width: 25px;" class="mr-1">
+                                    <span class="text-sm text-bold ml-1"> Editar</span>
+                                </a>
+                            </li>
+                            <li name="btn-activo" data-user="@(JsonConvert.SerializeObject(new { userName = user.UserName, name = user.Name, email = user.Email, userId = user.UserID }))">
+                                <a class="dropdown-item" style="cursor:pointer;">
+                                    <div class="custom-control custom-switch custom-switch-off-default custom-switch-on-success">
+                                        <input type="checkbox" class="custom-control-input" name="activo" id="activo_@user.UserID" @(!user.IsBlocked ? "checked" : "")>
+                                        <label class="custom-control-label text-sm text-dark pointer" for="activo_@user.UserID">Activo</label>
+                                    </div>
+                                </a>
+                            </li>
+                            @if (!string.IsNullOrWhiteSpace(user.Token))
+                            {
+                                <li name="btn-admin" data-userid="@user.UserID">
+                                    <a class="dropdown-item" style="cursor:pointer;">
+                                        <div class="custom-control custom-switch custom-switch-off-default custom-switch-on-success">
+                                            <input type="checkbox" class="custom-control-input" name="admin" id="admin_@user.UserID" @(user.UserType == "UserTypeA" ? "checked" : "")>
+                                            <label class="custom-control-label text-sm text-dark pointer" for="admin_@user.UserID">Administrador</label>
+                                        </div>
+                                    </a>
+                                </li>
+                                <li name="btn-super-admin" data-userid="@user.UserID">
+                                    <a class="dropdown-item" style="cursor:pointer;">
+                                        <div class="custom-control custom-switch custom-switch-off-default custom-switch-on-success">
+                                            <input type="checkbox" class="custom-control-input" name="super-admin" id="super-admin_@user.UserID" @(user.UserType == "UserTypeS" ? "checked" : "")>
+                                            <label class="custom-control-label text-sm text-dark pointer" for="super-admin_@user.UserID">Sup. Administrador</label>
+                                        </div>
+                                    </a>
+                                </li>
+                            }
+                        </ul>
+                    </td>
+                    <td>@user.Token</td>
+                    <td>@user.Name</td>
+                    <td>@user.Email</td>
+                    <td>@user.UserTypeDescription</td>
+                    <td>@user.ProfileName</td>
+                    @*<td>@user.Centro</td>*@
+                    <td>@user.RFC</td>
+                    <td>@user.DateInitialValid.ToString("dd/MM/yyyy")</td>
+                    <td>@user.DateEndValid.ToString("dd/MM/yyyy")</td>
+                    <td>@(user.UltimoAcceso != null ? user.UltimoAcceso.Value.ToString("dd/MM/yyyy") : "")</td>
+                    <td>@user.CreationDate.ToString("dd/MM/yyyy")</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <script>
+        $(function () {
+            DataTableInitialize("user-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se ha encontrado información.</p>
+    </div>
+}

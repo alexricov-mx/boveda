@@ -1,0 +1,98 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<ReceptionDto>>
+@{
+    Layout = null;
+}
+
+
+<p>
+    <div class="row col-md-12 d">
+        <input type="text" id="SearchString" style="width:150px; height:30px " />
+        <button class="btn btn-danger align-bottom" style="width:80px; height:30px; margin-left:4px" id="Filter">
+            Buscar
+        </button>
+    </div>
+</p>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <div class="col-lg-12 col-md-12 col-sm-12 text-left">
+        @*<h6>Firma de COPADE</h6>
+            <small>Seleccione el documento a firmar</small>*@
+    </div>
+    <table class="table table-hover">
+        <thead class="thead-light">
+            <tr>
+                <th>Organismo</th>
+                <th>No. Contrato</th>
+                <th>No. OS</th>
+                <th>No. Recepcion</th>
+                <th>Centro</th>
+                <th></th>
+                <th class="text-center">PDF</th>
+            </tr>
+        </thead>
+        <tbody>
+
+            @foreach (var item in Model.Data)
+            {
+
+                <tr>
+                    <td scope="row">@item.Clave</td>
+                    <td scope="row">@item.Contract</td>
+                    <td scope="row">@item.SapOrder</td>
+                    <td scope="row">@item.Reception</td>
+                    <td scope="row">@item.Contract</td>
+                    <td scope="row">
+                        <div class="checkbox icheck-danger">                            
+                            <input type="checkbox" name="checkPDF" id="@item.ReceptionID" data-saporder="@item.SapOrder"
+                                   data-functionarysigndate="@item.FunctionarySignDate" data-contract="@item.Contract" data-reception="@item.Reception" @((ViewBag.PDFCheckDisabled == null || ViewBag.PDFCheckDisabled) ? "disabled" : "") />
+
+                            <label class="font-weight-bold" for="@item.ReceptionID"></label>
+                        </div>
+                    </td>
+                    <td scope="row" class="text-center"><img class="image-pdf" src="~/images/pdf-icon2.png" data-id="@item.ReceptionID" style="cursor:pointer;" onclick="pdfPreview('@item.Clave','@item.SapOrder','@item.ReceptionID','@item.Exercise');" /></td>
+                </tr>
+            }
+        </tbody>
+        <tfoot>
+            <tr>
+                <td colspan="14" class="text-right"><button class="btn btn-danger" style="width:100px;" id="btnFirmar">Firmar</button></td>
+            </tr>
+        </tfoot>
+        @if (Model.Pager.EndPage > 1)
+        {
+            <tfoot>
+                <tr>
+                    <td colspan="5">
+                        <nav aria-label="Page navigation example" id="bitacora-nav">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item @(Model.Pager.CurrentPage == 1 ? "disabled" : "")" style="cursor:pointer;">
+                                    <a class="page-link" href="#" tabindex="-1" data-page_num="@(Model.Pager.CurrentPage - 1)">Anterior</a>
+                                </li>
+                                @for (var p = Model.Pager.StartPage; p <= Model.Pager.EndPage; p++)
+                                {
+                                    <li class="page-item @(p == Model.Pager.CurrentPage ? "active" : "")" style="cursor:pointer;">
+                                        <a class="page-link" data-page_num="@p">@p</a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.Pager.CurrentPage == Model.Pager.TotalPages ? "disabled" : "")" style="cursor:pointer;">
+                                    <a class="page-link" data-page_num="@(Model.Pager.CurrentPage + 1)">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se encontraron resultados.</p>
+    </div>
+    <script>
+        $(".d").hide();
+    </script>
+}

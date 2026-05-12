@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewData["Title"] = "Firma COPADE";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Firma COPADE</h1>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="copade-card">
+
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<sign-widget data-reloadTableName="GetCopades"
+             data-urlFirmar="Copade/Firmar"
+             data-urlCompletarFirma="Copade/CompletarFirma">
+</sign-widget>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Copade/index.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/sign-widget.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />
+

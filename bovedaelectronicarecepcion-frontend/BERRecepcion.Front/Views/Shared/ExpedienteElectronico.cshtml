@@ -1,0 +1,633 @@
+﻿@model BERRecepcion.Front.Models.ExpedienteEViewModel
+@{
+    ViewData["Title"] = "Expediente electrónico";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-12">
+                <h3>
+                    Expediente electrónico
+                    <button class="btn btn-sm btn-secondary float-right" data-redirect="@Model.RedirectAction" style="width:135px;" id="btnRegresar">
+                        <i class="fas fa-arrow-left mr-1"></i> Regresar
+                    </button>
+                </h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                @if (Model.SupplyOrder != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Órden de surtimiento
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="supply-order-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>No. Contrato</th>
+                                    <th>No. OS</th>
+                                    <th>Tipo Doc.</th>
+                                    <th>Tipo</th>
+                                    <th>Ficha Firmante</th>
+                                    <th>Nombre Firmante</th>
+                                    <th>Proveedor</th>
+                                    <th>No. Acreedor</th>
+                                    <th>Total</th>
+                                    <th>Moneda</th>
+                                    <th>Funcionario</th>
+                                    <th>Proveedor</th>
+                                    <th>Administrador</th>
+                                    <th>Estatus ERP</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.SupplyOrder.Contract</td>
+                                    <td>@Model.SupplyOrder.SAPOrder</td>
+                                    <td>Estimaciones</td>
+                                    @switch (@Model.SupplyOrder.DocumentType)
+                                    {
+                                        case "B":
+                                            <td>Bienes</td>
+                                            break;
+                                        case "O":
+                                            <td>Obras</td>
+                                            break;
+                                        case "S":
+                                            <td>Servicios</td>
+                                            break;
+                                        case "M":
+                                            <td>Medicamentos</td>
+                                            break;
+                                        default:
+                                            <td>@Model.SupplyOrder.DocumentType</td>
+                                            break;
+                                    }
+                                    <td>@Model.SupplyOrder.FunctionaryFicha</td>
+                                    <td>@Model.SupplyOrder.FunctionarySignerName</td>
+                                    <td>@Model.SupplyOrder.ProviderSignerName</td>
+                                    <td>@Model.SupplyOrder.CreditorNumber</td>
+                                    <td class="text-right">@Convert.ToDouble(@Model.SupplyOrder.Total).ToString("c")</td>
+                                    <td>@Model.SupplyOrder.Currency</td>
+                                    <td class="text-center">A<span class="@(@Model.SupplyOrder.FunctionarySignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td class="text-center"><span class="@(@Model.SupplyOrder.ProviderSignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td class="text-center"><span class="@(@Model.SupplyOrder.AdministratorSignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td>@(@Model.SupplyOrder.FunctionarySignDate.HasValue && @Model.SupplyOrder.ProviderSignDate.HasValue ? "Firmado" : (!@Model.SupplyOrder.FunctionarySignDate.HasValue ? "Funcionario" : "Proveedor"))</td>
+                                </tr>
+                                @*<tr>
+                            <td class="text-center">
+                            <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.SupplyOrder.SupplyOrderID" data-documentobeid="@(!string.IsNullOrWhiteSpace(Model.SupplyOrder.FunctionarySignDate.ToString()) ? Model.SupplyOrder.SupplyOrderID.ToString() : null)" data-sapOrder="@Model.SupplyOrder.SAPOrder" data-organismClave="@Model.SupplyOrder.OrganismClave" data-functionarysigndate="@Model.SupplyOrder.FunctionarySignDate"></i>
+                            </td>
+                            <td>
+                            @Model.SupplyOrder.SAPOrder
+                            </td>
+                            <td>
+                            @Model.SupplyOrder.FunctionarySignerName
+                            </td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.SupplyOrder.FunctionarySignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.SupplyOrder.SupplyOrderID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td>
+                            @(Model.SupplyOrder.FunctionarySignDate != null ? Model.SupplyOrder.FunctionarySignDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "../../....")
+                            </td>
+                            <td>@Model.SupplyOrder.ProviderSignerName</td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.SupplyOrder.ProviderSignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.SupplyOrder.SupplyOrderID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td>
+                            @(Model.SupplyOrder.ProviderSignDate != null ? Model.SupplyOrder.ProviderSignDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "../../....")
+                            </td>
+                            <td scope="row" class="text-center">
+                            <span class="@((string.IsNullOrWhiteSpace(Model.SupplyOrder.LiberacionVPDate.ToString())) ? "dot" : "dot-active")"></span>
+                            </td>
+                            <td class="text-right">
+                            $@String.Format("{0:#,##0.#0}", Convert.ToDouble(Model.SupplyOrder.Total))
+                            </td>
+                            <td>
+                            @Model.SupplyOrder.Currency
+                            </td>
+                            </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (Model.SOEstimation != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Estimación de obra
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="estimacion-obra-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>No. Contrato</th>
+                                    <th>No. OS </th>
+                                    @*<th>Tipo Doc. </th>*@
+                                    <th>Tipo</th>
+                                    <th>Ficha Firmante</th>
+                                    <th>Nombre Firmante </th>
+                                    <th>No. Acreedor</th>
+                                    <th>Total</th>
+                                    <th>Moneda </th>
+                                    <th>Funcionario</th>
+                                    <th>Proveedor</th>
+                                    <th>Documento </th>
+                                </tr>
+                                @*<tr>
+                            <th class="text-center">PDF</th>
+                            <th>ES</th>
+                            <th>Proveedor</th>
+                            <th class="text-center">Prov. status</th>
+                            <th>Fecha firma</th>
+                            <th>Funcionario</th>
+                            <th class="text-center">Func. status</th>
+                            <th>Fecha firma</th>
+                            <th class="text-right">Total</th>
+                            <th>Moneda</th>
+                            </tr>*@
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.SOEstimation.Contract</td>
+                                    <td>@Model.SOEstimation.SapOrder</td>
+                                    @*<td>???</td>*@
+                                    @switch (@Model.SupplyOrder.DocumentType)
+                                    {
+                                        case "B":
+                                            <td>Bienes</td>
+                                            break;
+                                        case "O":
+                                            <td>Obras</td>
+                                            break;
+                                        case "S":
+                                            <td>Servicios</td>
+                                            break;
+                                        case "M":
+                                            <td>Medicamentos</td>
+                                            break;
+                                        default:
+                                            <td>@Model.SupplyOrder.DocumentType</td>
+                                            break;
+                                    }
+                                    <td>@Model.SOEstimation.Signer</td>
+                                    <td>@Model.SOEstimation.FunctionarySignerName</td>
+                                    <td>@Model.SOEstimation.CreditorNumber</td>
+                                    <td class="text-right">@Convert.ToDouble(@Model.SOEstimation.Total).ToString("c")</td>
+                                    <td>@Model.SOEstimation.Currency</td>
+                                    <td class="text-center"><span class="@(@Model.SOEstimation.FunctionarySignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td class="text-center"><span class="@(@Model.SOEstimation.ProviderSignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td class="text-center">
+                                        <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.SOEstimation.EstimacionID" data-documentobeid="@(!string.IsNullOrWhiteSpace(Model.SOEstimation.ProviderSignDate.ToString()) ? Model.SOEstimation.EstimacionID.ToString() : null)" data-sapOrder="@Model.SOEstimation.SapOrder" data-organismClave="@Model.SOEstimation.OrganismClave" data-providersigndate="@Model.SOEstimation.ProviderSignDate"></i>
+                                    </td>
+                                </tr>
+                                @*<tr>
+                            <td class="text-center">
+                            <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.SOEstimation.EstimacionID" data-documentobeid="@(!string.IsNullOrWhiteSpace(Model.SOEstimation.ProviderSignDate.ToString()) ? Model.SOEstimation.EstimacionID.ToString() : null)" data-sapOrder="@Model.SOEstimation.SapOrder" data-organismClave="@Model.SOEstimation.OrganismClave" data-providersigndate="@Model.SOEstimation.ProviderSignDate"></i>
+                            </td>
+                            <td>
+                            @Model.SOEstimation.SapOrder
+                            </td>
+                            <td>@Model.SOEstimation.ProviderSignerName</td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.SOEstimation.ProviderSignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.SOEstimation.EstimacionID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td>
+                            @(Model.SOEstimation.ProviderSignDate != null ? Model.SOEstimation.ProviderSignDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "../../....")
+                            </td>
+                            <td>
+                            @Model.SOEstimation.FunctionarySignerName
+                            </td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.SOEstimation.FunctionarySignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.SOEstimation.EstimacionID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td>
+                            @(Model.SOEstimation.FunctionarySignDate != null ? Model.SOEstimation.FunctionarySignDate.Value.ToString("dd/MM/yyyy HH:mm:ss") : "../../....")
+                            </td>
+                            <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(Model.SOEstimation.Total))</td>
+                            <td>
+                            @Model.SOEstimation.Currency
+                            </td>
+                            </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (Model.Copade != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Copade
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="ConsultaCopade-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>No. Contrato </th>
+                                    <th>No. O.S</th>
+                                    <th>Ejercicio</th>
+                                    <th>COPADE</th>
+                                    <th>Centro</th>
+                                    <th>Funcionario Asignado Firma 1</th>
+                                    <th>Funcionario Asignado Firma 2</th>
+                                    <th>Tipo Documento</th>
+                                    <th>Ficha Funcionario 1 </th>
+                                    <th>Nombre Funcionario  1</th>
+                                    <th>Ficha Funcionario 2</th>
+                                    <th>Nombre Funcionario  2</th>
+                                    <th>Firmante 1 </th>
+                                    <th>Firmante 2 </th>
+                                    <th>Prefactura </th>
+                                    <th>No. Contrato </th>
+                                </tr>
+                                @*<tr>
+                            <th class="text-center">PDF</th>
+                            <th>COPADE</th>
+                            <th class="text-center">Prefactura</th>
+                            <th>Ejercicio</th>
+                            <th>Nombre</th>
+                            <th class="text-center">Func. 1</th>
+                            <th>Nombre</th>
+                            <th class="text-center">Func. 2</th>
+                            <th>Contrato</th>
+                            <th>OS</th>
+                            </tr>*@
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.Copade.Contract</td>
+                                    <td>@Model.Copade.SapOrder</td>
+                                    <td>@Model.Copade.Exercise</td>
+                                    <td>@Model.Copade.Reception</td>
+                                    <td>@Model.Copade.Center</td>
+                                    @if (Model.Copade.unicoFirmante)
+                                    {
+                                        <td>Titular:<br />@Model.Copade.fichaSigner1 @Model.Copade.signer1</td>
+                                        <td></td>
+                                    }
+                                    else
+                                    {
+                                        <td>Titular:<br />@Model.Copade.fichaSigner1 @Model.Copade.signer1<br /><br />Suplente:<br />@Model.Copade.fichaAlternate1 @Model.Copade.alternate1</td>
+                                        <td>Titular:<br />@Model.Copade.fichaSigner2 @Model.Copade.signer2<br /><br />Suplente:<br />@Model.Copade.fichaAlternate2 @Model.Copade.alternate2</td>
+                                    }
+                                    @switch (@Model.Copade.DocumentType)
+                                    {
+                                        case "B":
+                                            <td>Bienes</td>
+                                            break;
+                                        case "O":
+                                            <td>Obras</td>
+                                            break;
+                                        case "S":
+                                            <td>Servicios</td>
+                                            break;
+                                        case "M":
+                                            <td>Medicamentos</td>
+                                            break;
+                                        default:
+                                            <td>@Model.Copade.DocumentType</td>
+                                            break;
+                                    }
+                                    <td>@Model.Copade.Functionary1Ficha</td>
+                                    <td>@Model.Copade.Functionary1SignerName</td>
+                                    <td>@Model.Copade.Functionary2Ficha</td>
+                                    <td>@Model.Copade.Functionary2SignerName</td>
+                                    <td><span class="@(@Model.Copade.Functionary1SignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td><span class="@(@Model.Copade.Functionary2SignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td scope="row" class="text-center">
+                                        <i class="fas fa-file-code" style="font-size:1.5em; cursor:pointer;" name="prefactura" data-id="@Model.Copade.Reception" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = Model.Copade.CopadeID, tipo = true } )'"></i>
+                                    </td>
+                                    <td class="text-center">
+                                        <i class="fas fa-file-pdf pdf-red-color" style="font-size:1.5em;" data-id="@Model.Copade.CopadeID" onclick="pdfPreview('@Model.Copade.clave', '@Model.Copade.SapOrder', '@Model.Copade.Reception', '@Model.Copade.Exercise', '@Model.Copade.Functionary1SignDate', '@Model.Copade.CopadeID')"></i>
+                                    </td>
+                                </tr>
+                                @*<tr>
+                            <td class="text-center">
+                            <i class="fas fa-file-pdf pdf-red-color" style="font-size:1.5em;" data-id="@Model.Copade.CopadeID" onclick="pdfPreview('@Model.Copade.clave', '@Model.Copade.SapOrder', '@Model.Copade.Reception', '@Model.Copade.Exercise', '@Model.Copade.Functionary1SignDate', '@Model.Copade.CopadeID')"></i>
+                            </td>
+                            <td scope="row">@Model.Copade.Reception</td>
+                            <td scope="row" class="text-center">
+                            <i class="fas fa-file-code" style="font-size:1.5em; cursor:pointer;" name="prefactura" data-id="@Model.Copade.Reception" onclick="location.href='@Url.Action("DownloadXml","PreFactura", new { CopadeID = Model.Copade.CopadeID, tipo = true } )'"></i>
+                            </td>
+                            <td scope="row">@Model.Copade.Exercise</td>
+                            <td scope="row">@Model.Copade.Functionary1SignerName - @Model.Copade.Functionary1Ficha</td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.Copade.Functionary1SignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.Copade.CopadeID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td scope="row">@Model.Copade.Functionary2SignerName - @Model.Copade.Functionary2Ficha</td>
+                            <td scope="row" class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.Copade.Functionary2SignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.Copade.CopadeID" data-orden="2" style="font-size:1.5em; cursor:pointer;"></i>
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td scope="row">@Model.Copade.Contract</td>
+                            <td scope="row">@Model.Copade.SapOrder</td>
+                            </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (Model.Invoice != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Facturas
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="ConsultaCopade-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">PDF</th>
+                                    @*<th>COPADE</th>*@
+                                    <th>Serie</th>
+                                    <th>Folio</th>
+                                    <th>Fecha</th>
+                                    <th>UUID</th>
+                                    <th>DocumentoSAP</th>
+                                    <th>Tipo de Recepción</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    @*<td class="text-center">
+                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.Copade.CopadeID" data-esordensurtimiento="false" data-sapOrder="@Model.Copade.SapOrder" data-organismClave="@Model.Copade.OrganismID"></i>
+                                </td>*@
+                                    <td scope="row" class="text-center">
+                                        <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.Invoice.InvoiceId" data-documentobeid="@Model.Invoice.InvoiceId" data-tipo="I"></i>
+                                    </td>
+                                    @*<td scope="row">@Model.Invoice.DocumentoBEId</td>*@
+                                    <td scope="row">@Model.Invoice.Serie</td>
+                                    <td scope="row">@Model.Invoice.Folio</td>
+                                    <td scope="row">@Model.Invoice.FechaEmision</td>
+                                    <td scope="row">@Model.Invoice.Uuid</td>
+                                    <td scope="row">@Model.Invoice.SapDocument</td>
+                                    <td scope="row">@Model.Invoice.ElectronicReception</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+
+                @if (Model.NotasCredito != null && Model.NotasCredito.Count() > 0)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Notas Crédito
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="ConsultaCopade-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">PDF</th>
+                                    @*<th>FACTURA</th>*@
+                                    <th>Serie</th>
+                                    <th>Folio</th>
+                                    <th>Fecha</th>
+                                    <th>UUID</th>
+                                    <th>Total</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                @foreach (var item in Model.NotasCredito)
+                                {
+
+                                    <tr>
+                                        <td scope="row" class="text-center">
+                                            <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.NotaCreditoId" data-documentobeid="@item.NotaCreditoId" data-tipo="N"></i>
+                                        </td>
+                                        @*<td scope="row">@item.InvoiceId</td>*@
+                                        <td scope="row">@item.Serie</td>
+                                        <td scope="row">@item.Folio</td>
+                                        <td scope="row">@item.ReceptionDate</td>
+                                        <td scope="row">@item.Uuid</td>
+                                        <td scope="row">@String.Format("{0,6:C2}", Convert.ToDecimal(item.Total))</td>
+                                        <td scope="row"></td>
+                                    </tr>
+                                }
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (Model.Pagos != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Comprobantes
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="ConsultaCopade-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th class="text-center">PDF</th>
+                                    <th>Comprobante</th>
+                                    <th>Fecha</th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td scope="row" class="text-center">
+                                        <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@Model.Pagos.UUid" onclick="ComprobantePDF('@Model.Pagos.UUid')"></i>
+                                    </td>
+                                    <td scope="row">@Model.Pagos.UUid</td>
+                                    @*<td scope="row">@Model.Pagos.</td>*@
+                                    <td scope="row"></td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                }
+                @if (Model.AnaliticoPago != null)
+                {
+                    <div class="callout callout-info">
+                        <div class="form-group row">
+                            <h3 class="card-title">
+                                <i class="fas fa-file-invoice mr-2"></i>Analitico Pago
+                            </h3>
+                        </div>
+                        <table class="table table-hover" id="analiticopago-table" style="font-size:14px;">
+                            <thead>
+                                <tr>
+                                    <th>Organismo </th>
+                                    <th>Transportista</th>
+                                    <th>Cliente</th>
+                                    <th>Ejercicio </th>
+                                    <th>Analitico </th>
+                                    <th>No. De Cédula </th>
+                                    <th>Fecha de Proceso</th>
+                                    <th>Ficha de Firmante  </th>
+                                    <th>Firmante</th>
+                                    <th>Firmado</th>
+                                    <th>Fecha Firma</th>
+                                    <th>Fecha Recepción Factura</th>
+                                    @*<th>Fecha Factura</th>*@
+                                    @*<th>Serie </th>*@
+                                    @*<th>Folio </th>*@
+                                    @*<th>UUID</th>*@
+                                    <th>Subtotal </th>
+                                    <th>IVA</th>
+                                    <th>Retención </th>
+                                    <th>Total</th>
+                                    <th>Faltante</th>
+                                    <th>Moneda</th>
+                                    @*<th>Factura </th>*@
+                                    @*<th>CxP</th>*@
+                                    <th>Documento</th>
+                                </tr>
+                                @*<tr>
+                            <th class="text-center">PDF</th>
+                            <th>Analitico</th>
+                            <th>Ejercicio</th>
+                            <th>Trasportista</th>
+                            <th>Firmante</th>
+                            <th class="text-center">Evidencia</th>
+                            <th>Cliente</th>
+                            <th>Cédula</th>
+                            <th>Organismo</th>
+                            <th>Fecha</th>
+                            <th class="text-right">Total</th>
+                            <th>Contrato</th>
+                            </tr>*@
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@Model.AnaliticoPago.clave</td>
+                                    <td>@Model.AnaliticoPago.CveTransportista</td>
+                                    <td>@Model.AnaliticoPago.NumCliente</td>
+                                    <td>@Model.AnaliticoPago.Ejercicio</td>
+                                    <td>@Model.AnaliticoPago.Analitico</td>
+                                    <td>@Model.AnaliticoPago.Cedula</td>
+                                    <td>@Model.AnaliticoPago.FechaEmision</td>
+                                    <td>@Model.AnaliticoPago.FunctionaryFicha</td>
+                                    <td>@Model.AnaliticoPago.FunctionarySignerName</td>
+                                    <td class="text-center"><span class="@(@Model.AnaliticoPago.FunctionarySignDate.HasValue ? "dot-active" : "dot")"></span></td>
+                                    <td>@Model.AnaliticoPago.FunctionarySignDate</td>
+                                    <td>@(@Model.Invoice != null ? @Model.Invoice.ReceptionDate : "")</td>
+                                    @*<td>@(@Model.Invoice != null ? @Model.Invoice.InvoiceDate : "")</td>*@
+                                    @*<td>@(@Model.Invoice != null ? @Model.Invoice.Serie : "")</td>*@
+                                    @*<td>@(@Model.Invoice != null ? @Model.Invoice.Folio : "")</td>*@
+                                    @*<td>@(@Model.Invoice != null ? @Model.Invoice.Uuid : "")</td>*@
+                                    <td>@(@Model.Invoice != null ? @Convert.ToDouble(@Model.Invoice.Subtotal).ToString("c") : "")</td>
+                                    <td>@(@Model.Invoice != null ? @Convert.ToDouble(@Model.Invoice.TotalImpuestosTrasladados).ToString("c") : "")</td>
+                                    <td>@(@Model.Invoice != null ? @Convert.ToDouble(@Model.Invoice.TotalImpuestosRetenidos).ToString("c") : "")</td>
+                                    <td>@(@Model.Invoice != null ? @Convert.ToDouble(@Model.Invoice.Total).ToString("c") : "")</td>
+                                    <td>@Model.AnaliticoPago.Faltante</td>
+                                    <td>@Model.AnaliticoPago.Moneda</td>
+                                    @*<td>???</td>*@
+                                    @*<td>???</td>*@
+                                    <td scope="row" class="text-center">
+                                        <i class="fas fa-file-pdf pdf-red-color" style="font-size:1.5em" name="pdfAP" data-id="@Model.AnaliticoPago.AnaliticoPagoID" data-cvetransportista="@Model.AnaliticoPago.CveTransportista" data-numcliente="@Model.AnaliticoPago.NumCliente" data-exercise="@Model.AnaliticoPago.Ejercicio" data-analitico="@Model.AnaliticoPago.Analitico"></i>
+                                    </td>
+                                </tr>
+                                @*<tr>
+                            <td scope="row" class="text-center">
+                            <i class="fas fa-file-pdf pdf-red-color" style="font-size:1.5em" name="pdfAP" data-id="@Model.AnaliticoPago.AnaliticoPagoID" data-cvetransportista="@Model.AnaliticoPago.CveTransportista" data-numcliente="@Model.AnaliticoPago.NumCliente" data-exercise="@Model.AnaliticoPago.Ejercicio" data-analitico="@Model.AnaliticoPago.Analitico"></i>
+                            </td>
+                            <td>@Model.AnaliticoPago.Analitico</td>
+                            <td>@Model.AnaliticoPago.Ejercicio</td>
+                            <td>@Model.AnaliticoPago.CveTransportista</td>
+                            <td>@Model.AnaliticoPago.FunctionarySignerName</td>
+                            <td class="text-center">
+                            @if (!string.IsNullOrWhiteSpace(Model.AnaliticoPago.FunctionarySignDate.ToString()))
+                            {
+                            <i class="fas fa-file-signature" name="detalleFirma" data-documentobeid="@Model.AnaliticoPago.AnaliticoPagoID" data-orden="1" style="font-size:1.5em; cursor:pointer;"></i>
+
+                            }
+                            else
+                            {
+                            <span class="dot"></span>
+                            }
+                            </td>
+                            <td>@Model.AnaliticoPago.NumCliente</td>
+                            <td>@Model.AnaliticoPago.Cedula</td>
+                            <td>@Model.AnaliticoPago.clave</td>
+                            <td>@Model.AnaliticoPago.FechaEmision</td>
+                            <td scope="row" class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(Model.AnaliticoPago.Total))</td>
+                            <td> @Model.AnaliticoPago.Contrato</td>
+                            </tr>*@
+                            </tbody>
+                        </table>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</section>
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/ExpedienteElectronico/index.js")"></script>
+    <script src="https://cdn.jsdelivr.net/npm/xml-beautify@1.1.2/dist/XmlBeautify.js"></script>
+
+    <script>
+        var search = '@ViewBag.Search';
+        var fechaInicial = '@ViewBag.FechaInicial';
+        var fechaFinal = '@ViewBag.FechaFinal';
+        var redirect = '@Model.RedirectAction';
+        $(function () {
+            DataTableInitialize("supply-order-table");
+            DataTableInitialize("estimacion-obra-table");
+            DataTableInitialize("ConsultaCopade-table");
+            DataTableInitialize("analiticopago-table");
+        });
+    </script>
+}
+
+<partial name="_ModalDocumentoPDF" />
+<partial name="_ModalPrefactura" />
+<partial name="_ModalEvidenciaFirma" />

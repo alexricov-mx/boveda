@@ -1,0 +1,210 @@
+﻿@using BERRecepcion.Front.Models
+@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+
+@model List<ComprobanteDto>
+@{
+    var emisor = (Emisor)ViewBag.Emisor;
+    var receptor = (OrganismDto)ViewBag.Receptor;
+
+    var todas = Model.Count();
+    var validadas = Model.Count(x => !x.existedException);
+    var noValidadas = Model.Count(x => x.existedException);
+}
+@if (ViewBag.ContieneError == true)
+{
+    <div class="alert alert-default-danger alert-dismissible datos-factura">
+        <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+        <h5><i class="icon fas fa-exclamation-circle"></i>Atención</h5>
+        <label class="text-muted">Algunas facturas no fueron validadas correctamente, estas serán excluidas de su recepción.</label>
+    </div>
+}
+<div class="card card-outline card-olive datos-factura">
+    <div class="card-header">
+        <h4 class="card-title">
+            <i class="fas fa-globe mr-2"></i>Datos generales
+        </h4>
+    </div>
+    <div class="card-body">
+        <h4 class="card-title ml-2">
+            <i class="fas fa-circle-notch mr-2"></i>Emisor
+        </h4><hr class="mt-4">
+        <div class="row">
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        RFC: <strong class="ml-1">@emisor.Rfc</strong>
+                    </h6>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        Nombre: <strong class="ml-1">@emisor.Nombre</strong>
+                    </h6>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        Régimen fiscal: <strong class="ml-1">@emisor.RegimenFiscal</strong>
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <h4 class="card-title ml-2">
+            <i class="fas fa-circle-notch mr-2"></i>Receptor
+        </h4><hr class="mt-4">
+        <div class="row">
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        Organismo: <strong class="ml-1">@receptor.Clave</strong>
+                    </h6>
+                </div>
+            </div>
+            <div class="col-xl-3 col-lg-6 col-md-6 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        RFC: <strong class="ml-1">@receptor.Rfc</strong>
+                    </h6>
+                </div>
+            </div>
+            <div class="col-xl-6 col-lg-12 col-md-12 col-sm-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0 mr-1">
+                        Factura expedida a favor de: <strong class="ml-1">@receptor.Name</strong>
+                    </h6>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-12">
+                <div class="callout callout-info">
+                    <h6 class="text-muted m-0">Dirección: <strong class="ml-1">@receptor.Address</strong></h6>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card card-outline card-olive datos-factura">
+    <div class="card-header">
+        <div class="col-sm-12 col-md-9 col-lg-9 col-xl-9 float-left mt-1">
+            <h4 class="card-title">
+                <i class="fas fa-file-invoice mr-2"></i>Las siguientes facturas han sido prevalidadas y están listas para su recepción
+            </h4>
+        </div>
+        <div class="col-sm-12 col-md-3 col-lg-3 col-xl-3 float-right">
+            <select class="form-control form-control-sm" id="status-facturas">
+                <option value="all" selected="">Todas (@todas)</option>
+                <option value="factura-valid">Facturas validadas (@validadas)</option>
+                <option value="factura-not-valid">Facturas no validadas (@noValidadas)</option>
+            </select>
+        </div>
+    </div>
+    <div class="card-body">
+        @foreach (var item in Model)
+        {
+            <div class="col-12">
+                <div class="callout @(item.existedException ? "callout-danger factura-not-valid" : "callout-success factura-valid")">
+                    <h5 class="text-muted">
+                        <i class="fas @(item.existedException ? "fa-times text-danger" : "fa-check text-success") mr-2"></i>Factura @item.comprobante.Complemento.TimbreFiscalDigital.UUID.ToString().ToUpper()
+                    </h5>
+                    @if (item.existedException)
+                    {
+                        <h6 class="text-muted text-danger">
+                            Esta factura no puede ser procesada debido a la siguiente información: <b>@item.exceptionMessage</b>
+                        </h6>
+                    }
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Copade</th>
+                                    <th>Fecha</th>
+                                    <th class="text-right">Total</th>
+                                    <th>Moneda</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>@item.comprobante.Addenda.Addenda_Pemex.ENTRADA</td>
+                                    <td>@Convert.ToDateTime(item.comprobante.Fecha).ToString("dd/MM/yyyy")</td>
+                                    <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.comprobante.Total))</td>
+                                    <td>@item.comprobante.Moneda</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    @if (item.notasCreditoBD != null && item.notasCreditoBD.Count() > 0)
+                    {
+                        <div class="table-responsive">
+                            <h5 class="text-muted">
+                                <i class="fas fa-file mr-2"></i>Notas de crédito
+                            </h5>
+                            <table class="table table-striped table-hover m-0">
+                                <thead>
+                                    <tr>
+                                        <th class="text-center w-auto">Info.</th>
+                                        <th>Concepto</th>
+                                        <th class="text-right">IVA</th>
+                                        <th class="text-right">Total</th>
+                                        <th>Status</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var nota in item.notasCreditoBD)
+                                    {
+                                        <tr>
+                                            @{ var contieneNota = !string.IsNullOrWhiteSpace(nota.Id.ToString());}
+                                            @if (!contieneNota)
+                                            {
+                                                <td class="text-center"><i class="fas fa-info-circle text-warning nota-invalida" style="font-size: 1.8em;"></i></td>
+                                            }
+                                            else if (nota.HasError)
+                                            {
+                                                <td class="text-center"><i class="fas fa-exclamation-triangle text-danger nota-invalida" style="font-size: 1.8em;"></i></td>
+                                            }
+                                            else
+                                            {
+                                                <td class="text-center"><i class="fas fa-check-circle" style="font-size: 1.8em; color: seagreen;"></i></td>
+                                            }
+                                            <td>@nota.Concepto</td>
+                                            <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(nota.Iva))</td>
+                                            <td class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(nota.Total))</td>
+
+                                            <td>
+                                                @if (!contieneNota)
+                                                {
+                                                    <span class="badge badge-warning">Pendiente</span>
+                                                }
+                                                else if (nota.HasError)
+                                                {
+                                                    <label class="text-muted">@nota.ErrorMessage</label>
+                                                }
+                                                else
+                                                {
+                                                    <span class="badge badge-success">Validada</span>
+                                                }
+                                            </td>
+                                        </tr>
+                                    }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+            <hr class="@(item.existedException ? "factura-not-valid" : "factura-valid")"/>
+        }
+        <div class="col-12">
+            <button class="btn btn-sm btn-outline-success float-right" id="btnEnviarFactura" style="width:100px;">
+                Enviar <i class="fas fa-chevron-right float-right mt-1"></i>
+            </button>
+            <button class="btn btn-sm btn-outline-info float-right mr-2" id="btnLimpiar" style="width:100px;">
+                Limpiar <i class="fas fa-stamp float-right mt-1"></i>
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,71 @@
+﻿@{
+    ViewData["Title"] = "Bitácora";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Administración de bitácora de Usuarios</h1>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0 text-olive">
+                            <i class="fa fa-filter"></i> Filtro
+                            <button class="btn btn-sm btn-outline-success float-right" style="width:135px;" id="ExcelBitacora"><span class="fas fa-download"></span> Excel</button>
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="form-row">
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label col-form-label-sm" for="FechaInicial">Fecha Inicial</label>
+                                <input type="date" class="form-control form-control-sm" id="FechaInicial" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="form-group col-md-3">
+                                <label class="col-form-label col-form-label-sm" for="FechaFinal">Fecha Final</label>
+                                <input type="date" class="form-control form-control-sm" id="FechaFinal" value="@DateTime.Now.ToString("yyyy-MM-dd")">
+                            </div>
+                            <div class="form-group col-md-5">
+                                <label class="col-form-label col-form-label-sm" for="Busqueda">Texto</label>
+                                <input type="text" class="form-control form-control-sm" id="Busqueda" placeholder="Opcional">
+                            </div>
+                            <div class="form-group col-md-1">
+                                <label class="col-form-label col-form-label-sm" for="btnBuscar" style="visibility:hidden;">.</label>
+                                <button type="button" class="btn btn-sm btn-default w-100" id="btnBuscar">
+                                    <i class="fa fa-search"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="row mt-2">
+                            <div class="col-md-12 col-lg-12" id="bitacora-div">
+                                <div class="callout callout-info">
+                                    <p>Selecciona un rango de fechas para hacer la búsqueda.</p>
+                                </div>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/bitacoraAdmon/index.js")"></script>    
+}

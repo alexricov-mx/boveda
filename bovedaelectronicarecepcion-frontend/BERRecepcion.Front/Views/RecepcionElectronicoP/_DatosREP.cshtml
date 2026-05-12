@@ -1,0 +1,202 @@
+﻿@*@model BERRecepcion.Front.Models.Dto.CopadeDto*@
+@*@using Newtonsoft.Json*@
+<div class="row datos-factura">
+    <div class="col-12">
+        <div class="callout callout-info">
+            <div class="form-group row m-0">
+                <h3 class="col-xl-4 col-lg-4 col-md-7 col-sm-12 card-title m-auto">
+                    <i class="fas fa-file-invoice mr-2"></i>Prefactura
+                </h3>
+                <div class="col-xl-8 col-lg-8 col-md-5 col-sm-12 m-0">
+                    <button class="btn btn-sm btn-outline-info float-right" id="btnDocumentoCopade" data-copadeid="">
+                        <i class="fas fa-eye mr-1"></i> Ver documento COPADE
+                    </button>
+                </div>
+            </div>
+            <hr />
+            <dl class="row m-0">
+                <dt class="col-sm-3">RFC Emisor:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">Razón social:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">No. Acreedor:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">Órdenes de Surtimiento:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">Ejercicio:</dt>
+                <dd class="col-sm-9"></dd>
+
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="callout callout-info">
+            <h5 class="mb-3">
+                <i class="fas fa-file-contract mr-2"></i> Conceptos
+            </h5>
+            <div class="table-responsive">
+                <table class="table table-striped table-hover m-0">
+                    <thead>
+                        <tr>
+                            <th>Cantidad</th>
+                            <th>Unidad</th>
+                            <th>Valor unitario</th>
+                            <th>Importe</th>
+                            <th>Descripción</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model)
+                        {
+                            <tr>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                                <td></td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    @if (Model.vNotasCredito != null && Model.vNotasCredito.notaCredito != null && Model.vNotasCredito.notaCredito.Count() > 0)
+    {
+        <div class="col-md-12">
+            <div class="callout callout-info">
+                <h5 class="mb-3">
+                    <i class="fas fa-upload mr-2"></i> Seleccione sus notas de crédito
+                </h5>
+                <div class="table-responsive">
+                    <table class="table table-striped table-hover m-0">
+                        <thead>
+                            <tr>
+                                <th>Nota de crédito</th>
+                                <th>Concepto</th>
+                                <th>Total</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach (var item in Model.vNotasCredito.notaCredito)
+                            {
+                                item.Id = Guid.NewGuid();
+                                <tr>
+                                    <td>
+                                        <button class="btn btn-sm btn-outline-info" name="btnNotaCredito" data-buttonid="@item.Id">
+                                            <i class="fas fa-file-upload mr-1"></i> <span id="filename_@item.Id">seleccionar archivo</span>
+                                        </button>
+                                        <input type="file" name="notaCredito" data-notacredito="" data-fileid="@item.Id" id="@item.Id" accept=".xml" class="d-none">
+                                    </td>
+                                    <td>@item.Concepto</td>
+                                    <td>$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.Total))</td>
+                                    <td><span id="progress_status_@item.Id" class="badge badge-warning">Pendiente</span></td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    }
+
+</div>
+<div class="row datos-factura">
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div class="callout callout-info">
+            <h6 class="text-muted m-0 mr-1">
+                Subtotal:
+                <strong class="ml-1"></strong>
+            </h6>
+        </div>
+    </div>
+    <div class="col-xl-4 col-lg-4 col-md-6 col-sm-12">
+        <div class="callout callout-info">
+            <h6 class="text-muted m-0 mr-1">
+                Impuestos trasladados:
+                <strong class="ml-1"></strong>
+            </h6>
+        </div>
+    </div>
+    <div class="col-xl-3 col-lg-3 col-md-6 col-sm-12">
+        <div class="callout callout-info">
+            <h6 class="text-muted m-0 mr-1">
+                Total:
+                <strong class="ml-1"></strong>
+            </h6>
+        </div>
+    </div>
+    <div class="col-xl-2 col-lg-2 col-md-6 col-sm-12">
+        <div class="callout callout-info">
+            <h6 class="text-muted m-0 mr-1">
+                Moneda: <strong class="ml-1"></strong>
+            </h6>
+        </div>
+    </div>
+</div>
+<div class="row datos-factura">
+    <div class="col-md-12">
+        <div class="callout callout-info">
+            <h5>
+                <i class="fas fa-file-invoice mr-2"></i>
+                Factura
+            </h5>
+            <hr />
+            <dl class="row m-0">
+                <dt class="col-sm-3">Serie</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">Folio:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">Fecha factura:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">UUID:</dt>
+                <dd class="col-sm-9"></dd>
+                <dt class="col-sm-3">VU / Asignación:</dt>
+                <dd class="col-sm-9"></dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="row datos-factura">
+    <div class="col-md-12">
+        <div class="callout callout-info">
+            <h5>
+                <i class="fas fa-file-invoice mr-2"></i>
+                Addenda
+            </h5>
+            <hr />
+            <dl class="row m-0">
+                <dt class="col-sm-6">Partida</dt>
+                <dd class="col-sm-6 bg-danger">falta</dd>
+                <dt class="col-sm-6">No. Contrato:</dt>
+                <dd class="col-sm-6"></dd>
+                <dt class="col-sm-6">Orden Surtimiento:</dt>
+                <dd class="col-sm-6"></dd>
+                <dt class="col-sm-6">No. Acreedor:</dt>
+                <dd class="col-sm-6"></dd>
+                <dt class="col-sm-6">Centro:</dt>
+                <dd class="col-sm-6 bg-danger">falta</dd>
+                <dt class="col-sm-6">Finiquito:</dt>
+                <dd class="col-sm-6">/dd>
+                <dt class="col-sm-6">Posición de afectación presupuestaria:</dt>
+                <dd class="col-sm-6 bg-danger">falta</dd>
+            </dl>
+        </div>
+    </div>
+</div>
+<div class="row">
+    <div class="col-12" id="validationErrorsFactura"></div>
+</div>
+<div class="row datos-factura">
+    <div class="col-12">
+        <button class="btn btn-sm btn-outline-success float-right" id="btnEnviarFactura" style="width:135px;">
+            Enviar <i class="fas fa-chevron-right ml-1"></i>
+        </button>
+        <button class="btn btn-sm btn-outline-info float-right mr-2" id="btnLimpiar" style="width:135px;">
+            Limpiar <i class="fas fa-stamp ml-1"></i>
+        </button>
+    </div>
+</div>

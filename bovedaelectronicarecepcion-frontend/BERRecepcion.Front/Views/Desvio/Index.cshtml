@@ -1,0 +1,59 @@
+﻿
+@{
+    ViewData["Title"] = "Desvío de Firmas";
+}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h3 class="m-0">Desvío de Firmas</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="card">
+                <div class="card">  
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8">
+                                <form id="desvio-form-search">
+                                    <div class="input-group">
+                                        <input type="search" class="form-control form-control-sm" id="txtContrato" autocomplete="off" placeholder="No. Contrato" autofocus>
+                                        <div class="input-group-append">
+                                            <button type="submit" class="btn btn-sm btn-default">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">                        
+                        <div class="row">
+                            <div class="col-md-12 col-lg-12 col-sm-12" id="desvio-div">
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Desvio/index.js")"></script>
+}

@@ -1,0 +1,49 @@
+﻿/*@font-face {
+    font-family: arial_narrow_7;
+    src: url(~/Fuentes/arial_narrow_7.ttf)*/
+    /* font-family: PIXEARG_;
+    src: url(~/Fuentes/PIXEARG_.eot)*/
+/*}*/
+/*@font-face {
+    font-family: "Miestilo";
+    src: url(~/Fuentes/fa-regular-400.eot)
+}*/
+/*@font-face {
+    font-family: 'fa-regular-400';
+    src: url('file:///C:\Users\Paulina Garcia\Documents\Pemex\Backend\07062021\bovedaelectronicarecepcion\BERecepcion.Api\Fuentes\fa-regular-400.eot') format('embedded-opentype');
+}
+
+@font-face {
+    font-family: 'arial_narrow_7';
+    src: url('file:///C:\Users\Paulina Garcia\Documents\Pemex\Backend\07062021\bovedaelectronicarecepcion\BERecepcion.Api\Fuentes\arial_narrow_7.ttf') format('truetype');
+}
+*/
+
+/* abeezee-regular - latin */
+@font-face {
+    font-family: 'ABeeZee';
+    font-style: normal;
+    font-weight: 400;
+    src: url('../fonts/abeezee-v14-latin-regular.eot'); /* IE9 Compat Modes */
+    src: local(''), url('../fonts/abeezee-v14-latin-regular.eot?#iefix') format('embedded-opentype'), /* IE6-IE8 */
+    url('../fonts/abeezee-v14-latin-regular.woff2') format('woff2'), /* Super Modern Browsers */
+    url('../fonts/abeezee-v14-latin-regular.woff') format('woff'), /* Modern Browsers */
+    url('../fonts/abeezee-v14-latin-regular.ttf') format('truetype'), /* Safari, Android, iOS */
+    url('../Fuentes/abeezee-v14-latin-regular.svg#ABeeZee') format('svg'); /* Legacy iOS */
+}
+@font-face {
+    font-family: 'abeezee-v14-latin-regular';
+    src: url('file:///C:\Users\Paulina Garcia\Documents\Pemex\Backend\07062021\bovedaelectronicarecepcion\BERecepcion.Api\Fuentes\abeezee-v14-latin-regular.svg') format('svg');
+    src: url('file:///C:\Users\Paulina Garcia\Documents\Pemex\Backend\07062021\bovedaelectronicarecepcion\BERecepcion.Api\Fuentes\abeezee-v14-latin-regular.eot') format('embedded-opentype');
+    src: url('file:///C:\Users\Paulina Garcia\Documents\Pemex\Backend\07062021\bovedaelectronicarecepcion\BERecepcion.Api\Fuentes\abeezee-v14-latin-regular.ttf') format('truetype');
+}
+
+h1 {
+    font-family: "ABeeZee";
+    font-size: 15px;
+    color: #00ffff;
+}
+
+/*h1 {
+    font-family: arial_narrow_7;
+}*/

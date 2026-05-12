@@ -1,0 +1,63 @@
+﻿@{
+    ViewData["Title"] = "Catálogos Carta Porte";
+}
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="m-0">Catálogos Carta Porte</h1>
+            </div>
+        </div>
+    </div>
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <div class="row">
+                            <div class="col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12">
+                                <select id="idCatalogo" class="form-control form-control-sm" )>
+                                    <option value="c_CveTransporte" selected>Catálogo de la clave del transporte.</option>
+                                    <option value="c_TipoEstacion">Catálogo de tipo de estación.</option>
+                                    <option value="c_Estaciones">Catálogo de puertos marítimos, estaciones aeroportuarias y estaciones férreas.</option>
+                                    <option value="c_ClaveUnidadPeso">Catálogo de unidades de medida y embalaje.</option>
+                                    <option value="c_ClaveProdServCP">Catálogo de productos Carta Porte.</option>
+                                    <option value="c_MaterialPeligroso">Catálogo de materiales peligrosos.</option>
+                                    <option value="c_TipoEmbalaje">Catálogo de tipo de embalaje.</option>
+                                    <option value="c_TipoPermiso">Catálogo tipo permiso.</option>
+                                    <option value="c_Colonia">Catálogo de colonias.</option>
+                                    <option value="c_Localidad">Catálogo de localidades. </option>
+                                    <option value="c_Municipio">Catálogo de municipios.</option>
+                                    <option value="c_ParteTransporte">Catálogo de partes del transporte rentadas o prestadas.</option>
+                                    <option value="c_FiguraTransporte">Catálogo de figura transporte.</option>
+                                    <option value="c_ConfigAutotransporte">Catálogo de configuración autotransporte federal.</option>
+                                    <option value="c_SubTipoRem">Catálogo de tipo de remolque.</option>
+                                    <option value="c_ConfigMaritima">Catálogo de configuración marítima.</option>
+                                    <option value="c_ClaveTipoCarga">Catálogo del tipo de carga.</option>
+                                    <option value="c_ContenedorMaritimo">Catálogo de contenedores marítimos.</option>
+                                    <option value="c_NumAutorizacionNaviero">Catálogo de número autorización agente naviero consignatario. </option>
+                                    <option value="c_CodigoTransporteAereo">Catálogo código transporte aéreo.</option>
+                                    <option value="c_TipoDeServicio">Catálogo de tipo servicio.</option>
+                                    <option value="c_DerechosDePaso">Catálogo derechos de paso.</option>
+                                    <option value="c_TipoCarro">Catálogo de tipo de carro.</option>
+                                    <option value="c_Contenedor">Catálogo de tipo de contenedor.</option>
+                                    <option value="c_TipoDeTrafico">Catálogo de tipo de tráfico ferroviario.</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="card-body">
+                        <div id="divCatalogo"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Catalogos/CartaPorte/index.js" )"></script>
+}

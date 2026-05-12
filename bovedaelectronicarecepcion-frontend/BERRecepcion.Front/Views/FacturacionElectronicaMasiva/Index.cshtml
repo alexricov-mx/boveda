@@ -1,0 +1,84 @@
+﻿@{
+    ViewData["Title"] = "Recepción electrónica masiva de facturación";
+}
+
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-12">
+                <h3 class="m-0">Recepción electrónica masiva de facturación (COPADE)</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card card-outline card-olive">
+                    <div class="card-header">
+                        <h3 class="card-title">
+                            <i class="fas fa-upload mr-2"> </i>Por favor, seleccione tantas facturas y notas de crédito desee enviar
+                        </h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="bs-stepper">
+                            <div class="bs-stepper-header" role="tablist">
+                                <!-- Boton facturas -->
+                                <div class="step" data-target="#facturas-part">
+                                    <button type="button" class="step-trigger" role="tab" aria-controls="facturas-part" id="facturas-part-trigger">
+                                        <span class="bs-stepper-circle">1</span>
+                                        <span class="bs-stepper-label">Facturas</span>
+                                    </button>
+                                </div>
+                                <div class="line"></div>
+                                <!-- Boton notas credito -->
+                                <div class="step" data-target="#notas-credito-part">
+                                    <button type="button" class="step-trigger" role="tab" aria-controls="notas-credito-part" id="notas-credito-part-trigger">
+                                        <span class="bs-stepper-circle">2</span>
+                                        <span class="bs-stepper-label">Notas de crédito</span>
+                                    </button>
+                                </div>
+                            </div>
+                            <div class="bs-stepper-content">
+                                <!--Area de facturas -->
+                                <div id="facturas-part" class="content" role="tabpanel" aria-labelledby="facturas-part-trigger">
+                                    <button class="btn btn-sm btn-outline-info pl-3 pr-3 mr-2" id="btnFacturas">
+                                        <i class="fas fa-file-upload mr-1"></i><span id="file-name">seleccione sus facturas</span>
+                                    </button>
+                                    <input type="file" id="fileFacturas" multiple accept=".xml" class="d-none">
+                                    <button class="btn btn-sm btn-outline-secondary" id="next-step" style="width:100px;" disabled>
+                                        Continuar <i class="fas fa-arrow-right float-right mt-1"></i>
+                                    </button>
+                                </div>
+                                <!--Area de notas de credito-->
+                                <div id="notas-credito-part" class="content" role="tabpanel" aria-labelledby="notas-credito-part-trigger">
+                                    <button class="btn btn-sm btn-outline-info pl-3 pr-3 mr-2" id="btnNotasCredito">
+                                        <i class="fas fa-file-upload mr-1"></i><span id="file-name">seleccione sus notas de crédito</span>
+                                    </button>
+                                    <input type="file" id="fileNotasCredito" multiple accept=".xml" class="d-none">
+
+                                    <button class="btn btn-sm btn-outline-secondary mr-2" style="width:100px;" onclick="stepper.previous()">
+                                        <i class="fas fa-arrow-left float-left mt-1"></i> Regresar
+                                    </button>
+                                    @*<button class="btn btn-sm btn-outline-success" id="btnEnviarFactura" style="width:100px;">
+                                        Enviar <i class="fas fa-chevron-right float-right mt-1"></i>
+                                    </button>*@
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- /.card -->
+                <div id="info-facturas"></div>
+            </div>
+        </div>
+    </div>
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/FacturacionElectronicaMasiva/index.js")"></script>
+}

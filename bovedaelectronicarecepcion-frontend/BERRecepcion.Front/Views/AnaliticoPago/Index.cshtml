@@ -1,0 +1,36 @@
+﻿
+@{
+    ViewData["Title"] = "Analitico de Pago";
+}
+
+<div class="content-header" id="titulo">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0"> Firma de Analítico de Pago</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="analiticopago-card">
+
+            </div>
+        </div>
+    </div>
+</section>
+<sign-widget  data-reloadTableName="GetAPTable"
+             data-urlFirmar="AnaliticoPago/Firmar"
+             data-urlCompletarFirma="AnaliticoPago/CompletarFirma">
+</sign-widget>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/AnaliticoPago/index.js" )"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/sign-widget.js")"></script>
+}
+
+<partial name="_Modal" />
+<partial name="_ModalDocumentoPDF" />

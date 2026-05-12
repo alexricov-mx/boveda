@@ -1,0 +1,183 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using BERRecepcion.Front.Enums
+@model UsersDto
+@{
+    var perfiles = (IEnumerable<ProfilesDto>)ViewBag.Perfiles;
+    var organismos = (IEnumerable<OrganismDto>)ViewBag.Organismos;
+
+}
+<form id="formExternos">
+    <input type="hidden" id="userID" value="@(Model is null? "" : @Model.UserID)" />
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+            <div class="form-group">
+                <label class="col-form-label text-sm text-secondary" for="UserType">Tipo de Usuario</label>
+                <select class="form-control form-control-lg rounded border-0 small-custom" type="text" asp-for="@Model.UserType" autocomplete="off">
+                    <option selected disabled> Elige una opción</option>
+                    <option value="@UserTypeEnum.UserTypeP">@Enum.GetName(TipoUsuarioEnum.Proveedor)</option>
+                    <option value="@UserTypeEnum.Auditor">@Enum.GetName(UserTypeEnum.Auditor)</option>
+                    <option value="@UserTypeEnum.UsuarioPPI">@Enum.GetName(UserTypeEnum.UsuarioPPI)</option>
+                </select>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-md-12">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-dark">Ingresa todos los datos de contacto y adjunta la documentación oficial que identifique o acredite al usuario externo para cumplir sus obligaciones con Petróleos Mexicanos</label>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="Name">Nombre</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.Name" placeholder="Nombre" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="RFC">RFC</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.RFC" placeholder="RFC" autocomplete="off" style="text-transform: uppercase">
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="DateInitialValid">Vigencia inicio</label>
+                <input type="date" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.DateInitialValid" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="DateEndValid">Vigencia fin</label>
+                <input type="date" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.DateEndValid" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="PhoneNumber">Teléfono</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.PhoneNumber" placeholder="Teléfono" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="ManagementCenter">Departamento</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.ManagementCenter" placeholder="Departamento" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="ProfileID">Perfil</label>
+                <select class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.ProfileID" 
+                    asp-items="@(new SelectList(perfiles, nameof(ProfilesDto.ProfileID), nameof(ProfilesDto.Name)))">
+                    <option selected disabled>Elige una opción</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="Puesto">Puesto</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" id="Puesto" placeholder="Puesto">
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="alert alert-default-secondary border-0 elevation-1" id="OrganismosContenedor">
+                <label class="h6 pt-2 pb-2">Indica los organismos en los cuales tendrá actividad</label>
+                <div class="btn btn-success border-0 rounded-pill mr-2 text-sm pl-3 pr-3 pt-1 pb-1 bg-pantone7421 float-sm-right" id="new-organism-external">
+                    <i class="fas fa-plus mr-1"></i> Nuevo Organismo
+                </div>
+                <div class="row">
+                    <table class="table table-hover" id="external-organims-table" style="font-size:14px;">
+                        <thead class="bg-light-pink">
+                            <tr>
+                                <th class="d-none"></th>
+                                <th>Correo Alterno</th>
+                                <th>Compañía</th>
+                                <th>No. Acreedor</th>
+                                <th>Creditor RFC</th>
+                                <th>Organismo</th>
+                                <th></th>
+                            </tr>
+                        </thead>
+                        <tbody class="bg-white">
+                            @if (Model != null)
+                            {
+                                @foreach (var org in Model.Organisms)
+                                {
+                                    <tr>
+                                        <td>@org.EmailAlternate</td>
+                                        <td>@org.Company</td>
+                                        <td>@org.CreditorNumber</td>
+                                        <td>@org.CreditorRFC</td>
+                                        <td>
+                                            @organismos.FirstOrDefault(x=> x.OrganismID == @org.OrganismID).Name
+                                            <input type="hidden" value="@org.OrganismID" />
+                                        </td>
+                                        <td class="d-flex flex-row">
+                                            <div id="delete-org" class="btn btn-sm btn-default border-0 bg-white pb-2 mr-2">
+                                                <i class="fas fa-trash-alt text-secondary mt-2 p-1"></i>
+                                            </div>
+                                            <div id="update-org" class="btn btn-sm btn-default border-0 bg-white pb-2 px-2">
+                                                <i class="fa fa-pen text-secondary mt-2 p-1"></i>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                }
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="alert alert-default border-0 elevation-1">
+                <label class="h6 mr-3 text-dark">Documentación obligatoria</label>
+                <div class="input-group mb-3">
+                    <input type="file" id="fileID" accept=".pdf" class="d-none">
+                    <div class="btn btn-lg bg-light-pink border-0 rounded-pill text-sm mr-2 text-black" id="btnFileID">
+                        <img src="~/images/cloud-upload.png" class="mr-2" style="width: 20px;"> Identificación oficial (INE, Pasaporte)
+                    </div>
+                    <div class="btn btn-lg bg-light-pink border-0 rounded-pill text-sm mr-2 text-black" id="btnFileDP">
+                        <img src="~/images/cloud-upload.png" class="mr-2" style="width: 20px;"> Documento probatorio
+                    </div>
+                    <input type="file" id="fileDP" accept=".pdf" class="d-none">
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-12 d-flex justify-content-end">
+            <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421 mr-3" name="cancel" data-dismiss="modal">
+                Cancelar
+            </button>
+            <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421" id="save-user-external">
+                Guardar
+            </button>
+        </div>
+    </div>
+    <template id="row-template">
+        <tr>
+            <td><input type="text" class="form-control form-control-lg rounded border-0 small-custom" id="EmailAlternate" placeholder="Correo Alterno" autocomplete="off"></td>
+            <td><input type="text" class="form-control form-control-lg rounded border-0 small-custom" id="Company" placeholder="Compañía" autocomplete="off"></td>
+            <td>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" id="CreditorNumber" onkeypress="return onlyNumberKey(event)" placeholder="No. Acreedor" autocomplete="off">
+            </td>
+            <td><input type="text" class="form-control form-control-lg rounded border-0 small-custom" id="CreditorRFC" placeholder="Creditor RFC" autocomplete="off" style="text-transform: uppercase"></td>
+            <td>
+                <select class="form-control form-control-lg rounded border-0 small-custom" id="OrganismID"
+                        asp-items="@(new SelectList(organismos, nameof(OrganismDto.OrganismID), nameof(OrganismDto.Name)))">
+                    <option selected disabled>Elige una opción</option>
+                </select>
+            </td>
+            <td class="d-flex flex-row">
+                <div id="add-org" class="btn btn-sm btn-default border-1 bg-white pb-2 mr-2">
+                    <i class="fas fa-check text-secondary mt-2 p-1"></i>
+                </div>
+                <div id="cancel-add-org" class="btn btn-sm btn-default border-1 bg-white pb-2 px-2">
+                    <i class="fas fa-times text-secondary mt-2 p-1"></i>
+                </div>
+            </td>
+        </tr>
+    </template>
+</form>

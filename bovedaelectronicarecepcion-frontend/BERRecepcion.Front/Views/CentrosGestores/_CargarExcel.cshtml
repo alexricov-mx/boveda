@@ -1,0 +1,34 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model ManagementCentersDto
+
+<h4>El archivo de Excel debe de tener las siguientes columnas:</h4>
+<p style="padding-left:40px;">1)  Organismo</p>
+<p style="padding-left:40px;">2)  Número del Centro Gestor</p>
+<p style="padding-left:40px;">3)  Descripción</p>
+<p style="padding-left:40px;">4)  Ficha del Firmante 1</p>
+<p style="padding-left:40px;">5)  Ficha del Suplente 1</p>
+<p style="padding-left:40px;">6)  Ficha del Firmante 2 @*(para PGPB) o Ficha del Suplente 2 (para Refinación)*@</p>
+<p style="padding-left:40px;">7)  Ficha del Suplente 2 @*(para Refinación se debe de repetir la columna anterior)*@</p>
+<p style="padding-left:40px;">8)  Tipo de Centro Gestor: B, S, O (respectivamente, Bienes, Servicios u Obras) @*de PGPB) o la celda vacía para REF.*@</p>
+<p>Los datos deben de venir a partir del segundo renglón (en el primero pueden venir los títulos) y se leen hasta que se detecte un renglón vacío. NO se realizan validaciones de la información.</p>
+
+
+
+@*<input type="file" id="fileUploader" name="fileUploader" accept=".xls, .xlsx" />
+<br />
+<br />
+<label hidden id="jsonObject"> JSON : </label>*@
+
+
+<div class="card-body box-profile">
+    <button type="button" class="btn btn-sm btn-outline-success" id="formFile">
+        <i class="fas fa-file-upload mr-1"></i> Selecciona Archivo .xlsx
+    </button>
+    <label id="fileLabel" class="text-muted float-right"></label>
+    <input type="file" id="fileCert" accept=".xls, .xlsx" class="d-none">
+    <label hidden id="jsonObject"> JSON : </label>
+</div>
+
+@*<script src="~/js/jquery.js"></script>*@
+<script lang="javascript" src="~/js/xlsx.full.min.js"></script>
+<script src="~/js/CentrosGestores/index.js"></script>

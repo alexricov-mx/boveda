@@ -1,0 +1,50 @@
+﻿@model DataResult<BERRecepcion.Front.Models.Dto.ExternosDto>
+
+<div class="row mb-3">
+    <div class="col-12">
+        <i class="fas fa-user-check mr-2 text-secondary" style="font-size: 1.8em;"></i> Información del firmante
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-4">
+        <label class="col-form-label col-form-label-sm">Nombre del firmante</label>
+        <h6 class="text-muted ml-1">@Model.User.Name</h6>
+    </div>
+    <div class="form-group col-md-4">
+        <label class="col-form-label col-form-label-sm">Correo electrónico del firmante</label>
+        <h6 class="text-muted ml-1">@Model.User.Email</h6>
+    </div>
+    <div class="form-group col-md-4">
+        <label class="col-form-label col-form-label-sm">RFC del firmante</label>
+        <h6 class="text-muted ml-1">@Model.User.RFC</h6>
+    </div>
+</div>
+<hr class="mt-0">
+<div class="row mb-2">
+    <div class="col-12">
+        <i class="fas fa-copy mr-2 text-secondary" style="font-size: 1.8em;"></i> Documento firmado
+    </div>
+</div>
+<div class="form-row">
+    <div class="form-group col-md-2 bg-success pb-4 text-center d-flex align-items-center justify-content-center flex-wrap">
+        <h5 class="text-center pt-2"> Firmado</h5>
+        <h6 class="text-center"> @Model.Data.documentoFirma.FechaFirma.ToString("dd/MM/yyyy HH:mm:ss")</h6>
+        <img src="data:application/img;base64,@ViewBag.QRFirmaDetalle" class="w-100" alt="">
+    </div>
+    <div class="form-group col-md-10">
+        <label class="col-form-label col-form-label-sm">Firma</label>
+        <textarea class="form-control border-0 hide-overflow" rows="7" style="resize: none;">@Model.Data.documentoFirma.AlgoritmoResult</textarea>
+    </div>
+    <div class="form-group col-md-5">
+        <label class="col-form-label col-form-label-sm">Certificado</label>
+        <h6 class="text-muted ml-1 text-wrap">@Model.Data.documentoFirma.Certificado.Nombre</h6>
+    </div>
+    <div class="form-group col-md-3">
+        <label class="col-form-label col-form-label-sm">Método</label>
+        <h6 class="text-muted ml-1">@Model.Data.documentoFirma.AlgoritmoDescripcion</h6>
+    </div>
+    <div class="form-group col-md-2">
+        <label class="col-form-label col-form-label-sm">Codificación</label>
+        <h6 class="text-muted ml-1">@Model.Data.documentoFirma.Certificado.Codificacion</h6>
+    </div>
+</div>

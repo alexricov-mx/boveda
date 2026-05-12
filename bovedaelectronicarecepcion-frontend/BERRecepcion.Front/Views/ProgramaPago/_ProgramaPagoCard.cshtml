@@ -1,0 +1,102 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<PaymentScheduleDto>>
+
+@{
+    bool contieneInfo = Model != null && Model.Data != null && Model.Data.Count() > 0;
+}
+<div class="card">
+    <div class="card-header">
+        <div class="row">
+            <div class="col-md-8">
+                @if (contieneInfo)
+                {
+                    <h6>Información del programa de pago</h6>
+                    <small>Seleccione el documento a firmar</small>
+                }
+            </div>
+            <div class="col-md-4">
+                <form id="programa-pago-form-search">
+                    <div class="input-group">
+                        <input type="search" class="form-control form-control-sm" autocomplete="off" placeholder="Búsqueda de programas de pago" value="@ViewBag.Search" id="search">
+                        <div class="input-group-append">
+                            <button type="submit" class="btn btn-sm btn-default">
+                                <i class="fa fa-search"></i>
+                            </button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+    <div class="card-body">
+        @if (contieneInfo)
+        {
+            <table class="table table-hover" id="programa-pago-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th class="text-center">PDF</th>
+                        <th></th>
+                        <th>Consolidación ID</th>
+                        <th>Fecha programa</th>
+                        <th>Fecha pago</th>
+                        <th>Organismo</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td scope="row" class="text-center">
+                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.PaymentScheduleID" data-ppid="@item.ProgramaPago_Id" data-organismClave="@item.OrganismClave" ></i>
+                            </td>
+                            <td scope="row" class="text-center">
+                                @{
+                                    var _model = new Dictionary<string, object>
+                                                                                                                    {
+                                            {"ItemID", item.PaymentScheduleID }, //Obligatorio para estandarizar ID's
+                                            {"Descripcion", string.Concat(item.ProgramaPago_Id) },
+                                            {"PaymentScheduleID", item.PaymentScheduleID },
+                                            {"ProgramaPago_Id", item.ProgramaPago_Id },
+                                            {"OrganismClave", item.OrganismClave },
+                                            {"TokenTo", item.TokenTo },
+                                        };
+                                }
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkPDF" id="@item.PaymentScheduleID" @((ViewBag.PDFCheckDisabled == null || ViewBag.PDFCheckDisabled) ? "disabled" : "") data-model="@JsonConvert.SerializeObject(_model)" />
+                                    <label class="custom-control-label" for="@item.PaymentScheduleID"></label>
+                                </div>
+                            </td>
+                            <td scope="row">@item.ProgramaPago_Id</td>
+                            <td scope="row">@item.ScheduleDate.ToString("dd/MM/yyyy")</td>
+                            <td scope="row">@item.PaymentDate.ToString("dd/MM/yyyy")</td>
+                            <td scope="row">@item.OrganismClave</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="row mt-2">
+                <div class="col-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 mt-1 mb-2">
+                    <button class="btn btn-sm btn-outline-success w-100" onclick="validarInfo(event);" style="width:100px;">
+                        Firmar<i class="fas fa-pencil-alt float-right mt-1"></i>
+                    </button>
+                </div>
+                <div class="col-12 col-sm-9 col-md-10 col-lg-10 col-xl-10">
+                    <partial name="_Pagination" model="@Model.Pager" />
+                </div>
+            </div>
+            <script>
+                $(function () {
+                    DataTableInitialize("programa-pago-table");
+                });
+            </script>
+        }
+        else
+        {
+            <div class="callout callout-info">
+                <p>No se han encontrado programas de pago.</p>
+            </div>
+        }
+    </div>
+    <!-- /.card-body -->
+</div>

@@ -1,0 +1,62 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<AnaliticoPagoDto>>
+@{ bool hasData = Model != null && Model.Data != null && Model.Data.Count() > 0;}
+@if (hasData)
+{
+    <table class="table table-hover" id="analiticopago-table" style="font-size:14px;">
+        <thead>
+            <tr>
+                <th class="text-center">Expediente</th>
+                <th>Analitico</th>
+                <th>Ejercicio</th>
+                <th>Trasportista</th>
+                <th>Cliente</th>
+                <th>Cédula</th>
+                <th>Organismo</th>
+                <th>Fecha</th>
+                <th class="text-right">Total</th>
+                <th>Contrato</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td class="text-center">
+                        <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-analiticopagoid="@item.AnaliticoPagoID"></i>
+                    </td>
+                    <td>@item.Analitico</td>
+                    <td>@item.Ejercicio</td>
+                    <td>@item.CveTransportista</td>
+                    <td>@item.NumCliente</td>
+                    <td>@item.Cedula</td>
+                    <td>@item.clave</td>
+                    <td>@item.FechaEmision</td>
+                    <td scope="row" class="text-right">$@String.Format("{0:#,##0.#0}", Convert.ToDouble(item.Total))</td>
+                    <td> @item.Contrato</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("analiticopago-table");
+        });
+    </script>
+}
+
+else
+{
+    <div class="callout callout-info">
+        <p>No se encontraron Analíticos de Pago.</p>
+    </div>
+}
+<script>
+    var _hasData = @(hasData ? "true" : "false");
+</script>

@@ -1,0 +1,48 @@
+﻿@model BERRecepcion.Front.Models.Addenda_Pemex
+@{
+    List<AddendaViewModel> addendas = new List<AddendaViewModel>();
+    addendas.Add(new AddendaViewModel("AUTORIZA", Model.AUTORIZA));
+    addendas.Add(new AddendaViewModel("CEJECUTOR", Model.CEJECUTOR));
+    addendas.Add(new AddendaViewModel("CONTRATO", Model.CONTRATO));
+    addendas.Add(new AddendaViewModel("CORREOPMI", Model.CORREOPMI));
+    addendas.Add(new AddendaViewModel("C_GESTOR", Model.C_GESTOR));
+    addendas.Add(new AddendaViewModel("DOSALMILLAR", Model.DOSALMILLAR));
+    addendas.Add(new AddendaViewModel("EJERCICIO", Model.EJERCICIO));
+    addendas.Add(new AddendaViewModel("ENTRADA", Model.ENTRADA));
+    addendas.Add(new AddendaViewModel("FICHAE", Model.FICHAE));
+    addendas.Add(new AddendaViewModel("FICHAF", Model.FICHAF));
+    addendas.Add(new AddendaViewModel("FINIQUITO", Model.FINIQUITO));
+    addendas.Add(new AddendaViewModel("FONDO", Model.FONDO));
+    addendas.Add(new AddendaViewModel("MONEDA", Model.MONEDA));
+    addendas.Add(new AddendaViewModel("NREMISION", Model.NREMISION));
+    addendas.Add(new AddendaViewModel("N_ACREEDOR", Model.N_ACREEDOR));
+    addendas.Add(new AddendaViewModel("N_ESTIMACION", Model.N_ESTIMACION));
+    addendas.Add(new AddendaViewModel("O_SURTIMIENTO", Model.O_SURTIMIENTO));
+    addendas.Add(new AddendaViewModel("PLAZO", Model.PLAZO));
+    addendas.Add(new AddendaViewModel("POSICIONAP", Model.POSICIONAP));
+    addendas.Add(new AddendaViewModel("POSICIONF", Model.POSICIONF));
+    addendas.Add(new AddendaViewModel("P_ESTIMACION", Model.P_ESTIMACION));
+    addendas.Add(new AddendaViewModel("RECEPSAP", Model.RECEPSAP));
+    addendas.Add(new AddendaViewModel("REMESA", Model.REMESA));
+    addendas.Add(new AddendaViewModel("RFCPROVEEDOR", Model.RFCPROVEEDOR));
+    addendas.Add(new AddendaViewModel("SERVICIOA", Model.SERVICIOA));
+    addendas.Add(new AddendaViewModel("SERVICIOG", Model.SERVICIOG));
+    addendas.Add(new AddendaViewModel("VUREGION", Model.VUREGION));
+    var filteredAddendas = addendas.Where(x => !string.IsNullOrWhiteSpace(x.Value)).ToList();
+}
+<div class="col-md-12">
+    <div class="callout callout-info">
+        <h5>
+            <i class="fas fa-file-invoice mr-2"></i>
+            Addenda
+        </h5>
+        <hr />
+        <dl class="row m-0">
+            @foreach (var item in filteredAddendas)
+            {
+                <dt class="col-sm-6">@item.Property</dt>
+                <dd class="col-sm-6">@item.Value</dd>
+            }
+        </dl>
+    </div>
+</div>

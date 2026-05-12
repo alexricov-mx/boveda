@@ -1,0 +1,73 @@
+﻿@{
+    ViewData["Title"] = "Cancelación de Copades";
+}
+
+@Html.Hidden("urlCC", Url.Action("BusquedaCancelacionesListaPago"))
+
+<div class="content-header" id="titulo">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1 class="m-0">Consulta de Lista de Pago</h1>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<section class="content">
+    <div class="container-fluid">
+
+        <div class="card-header">
+            <div class="row">
+                <div class="col-12">
+                    <div class="card">
+
+                        <form id="consulta-form-search">
+                            <div class="card-header">
+                                <h5 class="mb-0 text-olive">
+                                    <i class="fa fa-filter"></i> Filtro
+                                    <button class="btn btn-sm btn-outline-success float-right" style="width:135px;display:none;" id="ExportExcelAll"><span class="fas fa-download"></span> Excel</button>
+                                </h5>
+                            </div>
+                            <div class="card-body">
+                                <div class="form-row">
+                                    <div class="form-group col-md-3">
+                                        <label class="col-form-label col-form-label-sm" for="FechaInicial">Fecha Inicial</label>
+                                        <input type="date" class="form-control form-control-sm" id="FechaInicial" max="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                    </div>
+                                    <div class="form-group col-md-3">
+                                        <label class="col-form-label col-form-label-sm" for="FechaFinal">Fecha Final</label>
+                                        <input type="date" class="form-control form-control-sm" id="FechaFinal" max="@DateTime.Now.ToString("yyyy-MM-dd")">
+                                    </div>
+                                    <div class="form-group col-md-5">
+                                        <label class="col-form-label col-form-label-sm" for="Busqueda">Texto</label>
+                                        <input type="text" class="form-control form-control-sm" value="@ViewBag.Search" id="Busqueda" placeholder="Buscar">
+                                    </div>
+                                    <div class="form-group col-md-1">
+                                        <label class="col-form-label col-form-label-sm" for="btnBuscar" style="visibility:hidden;">.</label>
+                                        <button type="submit" class="btn btn-sm btn-default w-100" id="btnBuscar">
+                                            <i class="fa fa-search"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <div class="col-12" id="cancelacionesListaPago-card">
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/Cancelaciones/CancelacionesListaPago/index.js" )"></script>
+}
+
+
+<partial name="_Modal" />

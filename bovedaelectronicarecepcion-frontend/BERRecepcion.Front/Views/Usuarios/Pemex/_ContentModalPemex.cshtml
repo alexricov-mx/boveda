@@ -1,0 +1,139 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using BERRecepcion.Front.Enums
+@model UsersDto
+@{
+    var perfiles = (IEnumerable<ProfilesDto>)ViewBag.Perfiles;
+    var organismos = (IEnumerable<OrganismDto>)ViewBag.Organismos;
+}
+<form id="formPemex">
+    <input type="hidden" id="userID" value="@(Model is null? "" : @Model.UserID)" />
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+            <div class="form-group">
+                <label class="col-form-label text-sm text-secondary" for="UserType">Tipo de Usuario</label>
+                @if (Model is null)
+                {
+                    <select class="form-control form-control-lg rounded border-0 small-custom" type="text" asp-for="@Model.UserType" autocomplete="off">
+                        <option selected disabled> Elige una opción</option>
+                        <option value="@UserTypeEnum.UserTypeF">Funcionario</option>
+                    </select>
+                }
+                else
+                {
+                    <select class="form-control form-control-lg rounded border-0 small-custom" type="text" asp-for="@Model.UserType" autocomplete="off" disabled>
+                        <option value="@UserTypeEnum.UserTypeF">Funcionario</option>
+                        <option value="@UserTypeEnum.UserTypeA">Administrador</option>
+                        <option value="@UserTypeEnum.UserTypeS">Super Administrador</option>
+                    </select>
+                }
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-6 col-lg-4">
+            <label class="col-form-label text-sm text-secondary" for="Token">Ficha</label>
+            <div id="token-form-search">
+                <div class="input-group">
+                    <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.Token" placeholder="Ficha" autocomplete="off">
+                    <div class="input-group-append">
+                        <div class="btn btn-lg btn-default bg-white pl-3 pr-3 my-auto" id="btnBuscarFicha">
+                            <i class="fa fa-search"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <hr>
+    <div class="row">
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="Name">Nombre</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.Name" placeholder="Nombre" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="Email">Correo electrónico</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.Email" placeholder="Correo electrónico" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="DateInitialValid">Vigencia inicio</label>
+                <input type="date" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.DateInitialValid" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-2">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="DateEndValid">Vigencia fin</label>
+                <input type="date" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.DateEndValid" autocomplete="off">
+            </div>
+        </div>
+
+
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="RFC">RFC</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.RFC" placeholder="RFC" autocomplete="off" style="text-transform: uppercase">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="ManagementCenter">Centro</label>
+                <input type="text" class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.ManagementCenter" placeholder="Centro" autocomplete="off">
+            </div>
+        </div>
+        <div class="col-12 col-md-4">
+            <div class="form-group ">
+                <label class="col-form-label text-sm text-secondary" for="ProfileID">Perfil</label>
+                <select class="form-control form-control-lg rounded border-0 small-custom" asp-for="@Model.ProfileID"
+                        asp-items="@(new SelectList(perfiles, nameof(ProfilesDto.ProfileID), nameof(ProfilesDto.Name)))">
+                    <option selected disabled>Elige una opción</option>
+                </select>
+            </div>
+        </div>
+        <div class="col-12">
+            <div class="alert alert-default-secondary border-0 elevation-1" id="OrganismosContenedor">
+                <label class="h6 pt-2 pb-2">Indica los organismos en los cuales tendrá actividad</label>
+                <div class="row">
+                    @foreach (var item in organismos)
+                    {
+                        <div class="col-12 col-sm-6 col-md-6 col-lg-4 mb-0 pb-0">
+                            <div class="alert alert-dismissible text-dark pr-3 mb-0 pb-0 bg-light-white rounded-0 border-bottom pb-2">
+                                @if (@Model is not null && @Model.Organisms.Any(x => x.OrganismID == @item.OrganismID))
+                                {
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input custom-control-input-danger pointer" type="checkbox" id="@item.OrganismID" checked>
+                                        <label for="@item.OrganismID" class="custom-control-label pointer">@item.Clave</label>
+                                        <h6>
+                                            @item.Name
+                                        </h6>
+                                    </div>
+                                }
+                                else
+                                {
+                                    <div class="custom-control custom-checkbox">
+                                        <input class="custom-control-input custom-control-input-danger pointer" type="checkbox" id="@item.OrganismID">
+                                        <label for="@item.OrganismID" class="custom-control-label pointer">@item.Clave</label>
+                                        <h6>
+                                            @item.Name
+                                        </h6>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-12 d-flex justify-content-end">
+            <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421 mr-3" name="cancel" data-dismiss="modal">
+                Cancelar
+            </button>
+            <button class="btn btn-success border-0 text-sm pl-4 pr-4 pt-2 pb-2 bg-pantone7421" id="save-user-pemex">
+                Guardar
+            </button>
+        </div>
+    </div>
+</form>

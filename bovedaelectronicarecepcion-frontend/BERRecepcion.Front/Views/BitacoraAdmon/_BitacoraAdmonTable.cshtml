@@ -1,0 +1,63 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<BitacoraAdmonDto>>
+
+@if (Model.Data != null && Model.Data.Count() > 0)
+{
+    <table class="table table-striped table-hover" id="bitacoraAdmon-table">
+        <thead>
+            <tr>
+                <th scope="row">Evento</th>
+                <th scope="row">Usuario</th>
+                <th scope="row">Descripción</th>
+                <th scope="row">Fecha</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var item in Model.Data)
+            {
+                <tr>
+                    <td scope="row">@item.Evento</td>
+                    <td scope="row">@item.Usuario</td>
+                    <td scope="row">@item.Descripcion</td>
+                    <td scope="row">@item.FechaCambio.ToString("dd/MM/yyyy HH:mm:ss")</td>
+                </tr>
+            }
+        </tbody>
+        @if (Model.Pager.EndPage > 1)
+        {
+            <tfoot>
+                <tr>
+                    <td colspan="4">
+                        <nav aria-label="Page navigation example" id="bitacora-nav">
+                            <ul class="pagination justify-content-center">
+                                <li class="page-item @(Model.Pager.CurrentPage == 1 ? "disabled" : "")" style="cursor:pointer;">
+                                    <a class="page-link" href="#" tabindex="-1" data-page_num="@(Model.Pager.CurrentPage - 1)">Anterior</a>
+                                </li>
+                                @for (var p = Model.Pager.StartPage; p <= Model.Pager.EndPage; p++)
+                                {
+                                    <li class="page-item @(p == Model.Pager.CurrentPage ? "active" : "")" style="cursor:pointer;">
+                                        <a class="page-link" data-page_num="@p">@p</a>
+                                    </li>
+                                }
+                                <li class="page-item @(Model.Pager.CurrentPage == Model.Pager.TotalPages ? "disabled" : "")" style="cursor:pointer;">
+                                    <a class="page-link" data-page_num="@(Model.Pager.CurrentPage + 1)">Siguiente</a>
+                                </li>
+                            </ul>
+                        </nav>
+                    </td>
+                </tr>
+            </tfoot>
+        }
+    </table>
+    <script>
+        $(function () {
+            DataTableInitialize("bitacoraAdmon-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se encontraron resultados.</p>
+    </div>
+}

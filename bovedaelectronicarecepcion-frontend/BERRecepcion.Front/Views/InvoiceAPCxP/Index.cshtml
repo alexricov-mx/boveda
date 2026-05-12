@@ -1,0 +1,37 @@
+﻿
+@{
+    ViewData["Title"] = "Ejecución AP CxP";
+}
+<!-- Content Header (Page header) -->
+@Html.Hidden("urlSaveInvoiceAPCxP", Url.Action("SaveInvoiceAPCxP"))
+
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h3 class="m-0">Ejecución AP CxP</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="InvoiceAPCxP-card">
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/InvoiceAPCxP/index.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />

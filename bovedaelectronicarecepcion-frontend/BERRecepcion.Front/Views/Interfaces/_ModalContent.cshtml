@@ -1,0 +1,52 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model ControlInterfacesDto
+@{
+    bool? activar = ViewBag.Activar;
+    string textTitle = (activar != null && activar == true) ? "Activar interfaz" : (activar != null && activar == false) ? "Bloquear interfaz" : "Editar interfaz";
+}
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">@textTitle - @Model.SAP</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-12">
+            <div class="form-group">
+                <label>Justificación</label>
+                <textarea class="form-control form-control-sm" id="Mensaje" rows="3" placeholder="Justificación del cambio"></textarea>
+            </div>
+        </div>
+    </div>
+    @if (activar != null)
+    {
+        <div class="alert alert-default-secondary alert-dismissible text-sm">
+            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">&times;</button>
+            <h5><i class="icon fas @((bool)activar ? "fa-unlock-alt" : "fa-lock")"></i>@textTitle</h5>
+            Los elementos con color <span class="@((bool)activar ? "text-success": "text-danger")"><strong>@((bool)activar ? "verde" : "rojo")</strong></span> se @((bool)activar ? "habilitarán activando" : "deshabilitarán bloqueando") por completo la interfaz seleccionada, para continuar presione guardar.
+        </div>
+    }
+
+    <div class="row">
+        @foreach (var rol in Model.ControlInterfacesRoles)
+        {
+            <div class="col-12 col-sm-6 col-md-4 col-lg-3">
+                <div class="custom-control custom-checkbox">
+                    @if (activar == null || (activar != null && rol.status == true))
+                    {
+
+                        <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" @(rol.status == true ? "checked" : "") id="@rol.rolid" name="checkRol" data-rol="@rol.rolid" />
+                    }
+                    <label class="custom-control-label text-sm @(activar == null ? "text-muted" : (activar == true && rol.status == false) ? "text-success" : (activar == false && rol.status == true) ? "text-danger":"text-muted")" for="@rol.rolid">@rol.Descripcion</label>
+                </div>
+            </div>
+        }
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="modal" style="width:135px;">
+        <i class="fas fa-times mr-2"></i> Cerrar
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-sapid="@Model.SAPID" data-activar="@(activar == null ? "null":activar == true ? "true": "false")" id="btnSave" style="width:135px;">
+        <i class="fas fa-save mr-2"></i> Guardar
+    </button>
+</div>

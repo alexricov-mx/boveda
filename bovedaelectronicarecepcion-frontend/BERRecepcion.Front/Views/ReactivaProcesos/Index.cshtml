@@ -1,0 +1,55 @@
+﻿
+@{
+    ViewData["Title"] = "Index";
+}
+
+@Html.Hidden("urlBuscarRP", Url.Action("BuscaReactivarProcesos"))
+@Html.Hidden("urlFirmarRP", Url.Action("FirmarReactivarProcesos"))
+
+@section scripts
+{
+    <script type="text/javascript" src="@Url.Content("~/js/ReactivaProcesos/index.js" )"></script>
+}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h3 class="m-0">Reactivar Procesos</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-4 offset-md-8 col-sm-12 col-lg-4 offset-lg-8">
+                                <form id="RP-form-search">
+                                    <div class="input-group mb-3">
+                                        <input type="search" class="form-control form-control-sm" id="txtSapOrder" autocomplete="off" placeholder="Búsqueda de órdenes de surtimiento" autofocus>
+                                        <div class="input-group-append">
+                                            <button type="submit" id="btnRP" class="btn btn-sm btn-default w-100">
+                                                <i class="fa fa-search"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="detalle">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->    
+    <!-- /.container-fluid -->
+</section>
+
+

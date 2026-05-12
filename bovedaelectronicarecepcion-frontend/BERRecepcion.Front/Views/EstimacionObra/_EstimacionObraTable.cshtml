@@ -1,0 +1,105 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+
+@model DataResult<IEnumerable<SOEstimationDto>>
+@{
+    bool contieneEstimaciones = Model != null && Model.Data != null && Model.Data.Count() > 0;
+}
+
+<div class="card">
+    <div class="card-header">
+        <div class="col-lg-12 col-md-12 col-sm-12 text-left">
+            @if (contieneEstimaciones)
+            {
+                <h6>Información de Estimacion de Obra</h6>
+                <small>Seleccione el documento a firmar</small>
+            }
+        </div>
+    </div>
+    <div class="card-body">
+        @if (contieneEstimaciones)
+        {
+            <table class="table table-hover" id="estimacion-obra-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th class="text-center">PDF</th>
+                        <th></th>
+                        <th>OS</th>
+                        <th>Contrato</th>
+                        <th>Organismo</th>
+                        <th>Tipo</th>
+                        <th style="max-width:40px;">Acreedor</th>
+                        <th class="text-right">Total</th>
+                        <th>Moneda</th>
+                        <th class="text-center">Prov. Status</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+                        <tr>
+                            <td scope="row" class="text-center">
+                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.EstimacionID" data-sapOrder="@item.SapOrder" data-providersigndate="@item.ProviderSignDate" data-organismClave="@item.OrganismClave"></i>
+                            </td>
+                            <td scope="row" class="text-center">
+                                @{
+                                    var _model = new Dictionary<string, object>
+                                                                                                                                                                                        {
+                                            {"ItemID", item.EstimacionID }, //Obligatorio para estandarizar ID's
+                                            {"Descripcion", string.Concat(item.SapOrder, " - ", item.Contract) },
+                                            {"EstimacionID", item.EstimacionID },
+                                            {"SapOrder", item.SapOrder },
+                                            {"Contract", item.Contract },
+                                            {"OrganismClave", item.OrganismClave },
+                                            {"ProviderSignDate", item.ProviderSignDate },
+                                            {"CreditorNumber", item.CreditorNumber },
+                                            {"Signer", item.Signer },
+                                        };
+                                }
+                                <div class="custom-control custom-checkbox">
+                                    <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkPDF" id="@item.EstimacionID" @((ViewBag.PDFCheckDisabled == null || ViewBag.PDFCheckDisabled) ? "disabled" : "") data-model="@JsonConvert.SerializeObject(_model)" />
+                                    <label class="custom-control-label" for="@item.EstimacionID"></label>
+                                </div>
+                            </td>
+                            <td scope="row">@item.SapOrder</td>
+                            <td scope="row">@item.Contract</td>
+                            <td scope="row">@item.OrganismClave</td>
+                            <td scope="row">Obras</td>
+                            <td scope="row">@item.CreditorNumber</td>
+                            <td scope="row" class="text-right">$@String.Format("{0:#,##0.##}", item.Total)</td>
+                            <td scope="row">@item.Currency</td>
+                            <td scope="row" class="text-center">
+                                <span class="@(string.IsNullOrWhiteSpace(item.ProviderSignDate.ToString()) ? "dot":"dot-active")"></span>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+            <div class="row mt-2">
+                <div class="col-12 col-sm-3 col-md-2 col-lg-2 col-xl-2 mt-1 mb-2">
+                    <button class="btn btn-sm btn-outline-success w-100" onclick="validarInfo(event);" style="width:100px;">
+                        Firmar<i class="fas fa-pencil-alt float-right mt-1"></i>
+                    </button>
+                </div>
+                <div class="col-12 col-sm-9 col-md-10 col-lg-10 col-xl-10">
+                    <partial name="_Pagination" model="@Model.Pager" />
+                </div>
+            </div>
+            <script>
+                $(function () {
+                    DataTableInitialize("estimacion-obra-table");
+                });
+            </script>
+        }
+        else
+        {
+            <div class="callout callout-info">
+                <p>No se han encontrado Estimaciones de Obra.</p>
+            </div>
+        }
+
+
+
+    </div>
+    <!-- /.card-body -->
+</div>

@@ -1,0 +1,123 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<PrefacturaAPDto>>
+
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <div class="card-body">
+        <table class="table table-hover" id="pre-facturaAP-table" style="font-size:14px;">
+            <thead>
+                <tr class="text-center">
+                    <th>Organismo</th>
+                    <th>Transportista</th>
+                    <th>Ejercicio</th>
+                    <th>Analítico</th>
+                    <th>Nombre  Acreedor </th>
+                    <th>No. Acreedor</th>
+                    <th>Fecha de Firma </th>
+                    <th>Fecha de Envío de Correo al Proveedor</th>
+                    <th>Moneda</th>
+                    <th>Total</th>
+                    @*<th></th>
+                <th>PDF</th>
+                <th>Pre-Factura</th>
+                <th>Nota-Credito</th>
+                <th>Analitico</th>
+                <th>Ejercicio</th>
+                <th>Trasportista</th>
+                <th>Cliente</th>
+                <th>Cédula</th>
+                <th>Organismo</th>
+                <th>Fecha</th>
+                <th>Contrato</th>*@
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Data)
+                {
+                    <tr class="text-center">
+                        <td>@item.OrganismID</td>
+                        <td>@item.CveTransportista</td>
+                        <td>@item.Ejercicio</td>
+                        <td>@item.Analitico</td>
+                        <td>@item.Creditor</td>
+                        <td>@item.NumAcreedor</td>
+                        <td>@item.FunctionarySignDate</td>
+                        <td>@item.ProviderEmailSendDate</td>
+                        <td>@item.Moneda</td>
+                        <td>@Convert.ToDouble(@item.Total).ToString("c")</td>
+                    </tr>
+                    @*<tr class="text-center">
+            <td scope="row" class="text-center">
+
+            <div class="custom-control custom-checkbox">
+            <input class="custom-control-input custom-control-input-danger custom-control-input-outline" type="checkbox" name="checkPDF" id="@item.AnaliticoPagoID" data-rol="@item.AnaliticoPagoID" />
+            <label class="custom-control-label" for="@item.AnaliticoPagoID"></label>
+            </div>
+            </td>
+
+            <td scope="row" class="text-center">
+            <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.AnaliticoPagoID" onclick="pdfPreview('@item.CveTransportista', '@item.NumCliente', '@item.Ejercicio', '@item.Analitico')"></i>
+            </td>
+
+            <td scope="row" class="text-center">
+            <i class="fas fa-file-code image-pdf pdf-black-color" data-id="@item.AnaliticoPagoID" onclick="location.href='@Url.Action("DownloadXml","PreFacturaAP", new { AnaliticoPagoID = @item.AnaliticoPagoID, tipo = true } )'"></i>
+            </td>
+
+            <td scope="row" class="text-center">
+            @if (item.NotaCreditoXML != null)
+            {
+            <i class="far fa-file-code image-pdf pdf-black-color" data-id="@item.AnaliticoPagoID" onclick="location.href='@Url.Action("DownloadXml","PreFacturaAP", new { AnaliticoPagoID = @item.AnaliticoPagoID, tipo = false } )'"></i>
+            }
+            </td>
+
+            <td>
+            @Html.DisplayFor(modelItem => item.Analitico)
+            </td>
+
+            <td>
+            @Html.DisplayFor(modelItem => item.Ejercicio)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.CveTransportista)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.NumCliente)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.Cedula)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.clave)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.FechaEmision)
+            </td>
+            <td>
+            @Html.DisplayFor(modelItem => item.Contrato)
+            </td>
+            </tr>*@
+                }
+            </tbody>
+        </table>
+        <div class="row mt-2">
+            <div class="col-12">
+                <partial name="_Pagination" model="@Model.Pager" />
+            </div>
+        </div>
+        <script>
+            $(function () {
+                DataTableInitialize("pre-facturaAP-table");
+            });
+        </script>
+    </div>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No tiene Pre Facturas de Analitico de Pago.</p>
+    </div>
+}
+
+

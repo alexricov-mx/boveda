@@ -1,0 +1,52 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model AltaContratosDto
+@{
+    bool isEdit = ViewBag.IsEdit;
+}
+<div class="modal-header">
+    <h4 class="modal-title" id="modal-title">@(isEdit ? "Editar contrato" : "Nuevo contrato")</h4>
+    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+</div>
+<div class="modal-body">
+    <div class="row">
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Contract" class="col-form-label">Contrato</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Contract" @(isEdit ? "disabled" : "") value="@Model?.Contract" autocomplete="off" maxlength="10">
+            </div>
+        </div>
+        
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Firma1" class="col-form-label">Firmante 1</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Firma1" value="@Model?.Firma1" autocomplete="off" maxlength="6">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Suplente1" class="col-form-label">Suplente 1</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Suplente1" value="@Model?.Suplente1" autocomplete="off" maxlength="6">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Firma2" class="col-form-label">Firmante 2</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Firma2" value="@Model?.Firma2" autocomplete="off" maxlength="6">
+            </div>
+        </div>
+        <div class="col-12 col-sm-6 col-md-4 col-lg-3 col-xl-3">
+            <div class="form-group">
+                <label for="Suplente2" class="col-form-label">Suplente 2</label>
+                <input class="form-control form-control-sm numberonly" type="text" id="Suplente2" value="@Model?.Suplente2" autocomplete="off" maxlength="6">
+            </div>
+        </div>
+    </div>
+</div>
+<div class="modal-footer">
+    <button type="button" class="btn btn-sm btn-outline-danger" data-dismiss="modal" style="width:135px;">
+        <i class="fas fa-times mr-2"></i> Cerrar
+    </button>
+    <button type="button" class="btn btn-sm btn-outline-primary" data-altacontratoid="@Model?.AltaContratoID" id="btnSave" style="width:135px;">
+        <i class="fas fa-save mr-2"></i> Guardar
+    </button>
+</div>

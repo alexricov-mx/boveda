@@ -1,0 +1,72 @@
+﻿@model IEnumerable<BERRecepcion.Front.Models.Dto.AdmonGRMDto>
+
+@{
+    ViewData["Title"] = "Administración GRM";
+}
+
+@Html.Hidden("urlConsultaGRM", Url.Action("GetGRM"))
+
+
+@section scripts
+{
+    <script type="text/javascript" src="@Url.Content("~/js/AdmonGRM/ConsultaGRM.js" )"></script>
+}
+
+<!DOCTYPE html>
+
+<html>
+<head>
+    <meta name="viewport" content="width=device-width" />
+    <title>Index</title>
+</head>
+<body>
+
+    <div class="row mt-2">
+        <div class="col-lg-12 col-md-12 col-sm-12 text-center">
+            
+            <h4>
+                Administración GRM
+            </h4>
+            <hr />
+            <dl class="row">
+            </dl>
+        </div>
+    </div>
+
+    <div class="col-md-12">
+        <div class="form-group row">
+            <div class="col-md-4 mt-1">
+
+            </div>
+            <div class="col-md-1 mt-1">
+                <h6><label for="contrato">Ficha:</label></h6>
+            </div>
+            <div class="col-md-2 mt-1">
+                <input type="text" class="form-control " id="txttoken" name="token" maxlength="10" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+            </div>
+            @*<div class="col-md-2 mt-1">
+            <h6><label for="contrato">Inicio de página:</label></h6>
+            </div>
+            <div class="col-md-1 mt-1">
+                <input type="text" class="form-control text-xl-center" id="txtinipage" name="iniciopagina" maxlength="10" value="1" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+            </div>
+            <div class="col-md-2 mt-1">
+                <h6><label for="contrato">No. de registros a mostrar:</label></h6>
+            </div>
+            <div class="col-md-1 mt-1">
+                <input type="text" class="form-control text-xl-center" id="txtnummos" name="nregistros" maxlength="10"  value="10" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+            </div>*@
+            <div class="col-md-1 mt-1">
+                <button type="button" class="btn btn-danger" id="buscar">Mostrar</button>
+            </div>
+            <div class="col-md-4 mt-1">
+
+            </div>
+        </div>
+    </div>
+
+    <div id="resultadosGRM">
+
+    </div>
+</body>
+</html>

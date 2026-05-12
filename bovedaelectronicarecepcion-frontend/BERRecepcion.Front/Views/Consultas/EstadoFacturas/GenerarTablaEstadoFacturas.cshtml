@@ -1,0 +1,84 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<EstadoFacturaDto>>
+
+@{
+    bool contieneFacturas = Model != null && Model.Data != null && Model.Data.Count() > 0;
+}
+
+
+        @if (contieneFacturas)
+        {
+            <table class="table table-hover" id="estadofacturas-table" style="font-size:14px;">
+                <thead>
+                    <tr>
+                        <th class="text-center" id="field-info">Expediente</th>
+                        <th>Documento</th>
+                        <th>Origen</th>
+                        <th>Tipo</th>
+                        <th>Organismo</th>
+                        <th>Fecha Recepción</th>
+                        <th>Fecha Factura</th>
+                        <th>Documento SAP</th>
+                        <th>Comentarios</th>
+                        <th>Folio</th>
+                        <th>UUID</th>
+                        <th>Total</th>
+                        <th>Correo env.</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Data)
+                    {
+
+                    <tr>
+                        <td class="text-center">
+                            @if (!String.IsNullOrEmpty(item.Reception))
+                            {
+                                <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-documentoid="@item.DocumentoId" data-saporder="@item.SapOrder" data-reception="@item.Reception"></i>
+                            }
+                            else
+                            {
+                                <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpedienteAnalitico" data-documentoid="@item.DocumentoId"></i>
+                            }
+                        <td scope="row">@item.Documento</td>
+                        <td scope="row">@item.Origen</td>
+                        <td scope="row">@item.Tipo</td>
+                        <td scope="row">@item.Organismo</td>
+                        <td scope="row">@item.FechaRecepcion.ToString("dd/MM/yyyy hh:mm")</td>
+                        <td scope="row">@item.FechaFactura.ToString("dd/MM/yyyy hh:mm")</td>
+                        <td scope="row">@item.SapOrder</td>
+                        <td scope="row">@item.Comentario</td>
+                        <td scope="row">@item.Folio</td>
+                        <td scope="row">@item.UUID</td>
+                        @if (!String.IsNullOrEmpty(item.Total))
+                        {
+                            <td scope="row">@Convert.ToDecimal(item.Total).ToString("c")</td>
+                        }
+                        else
+                        {
+                            <td scope="row"></td>
+                        }
+                        <td scope="row">@item.CorreoEnviado</td>
+                    </tr>
+                    }
+                </tbody>                
+            </table>
+            <div class="row mt-2">
+                <div class="col-12">
+                    <partial name="_Pagination" model="@Model.Pager" />
+                </div>
+            </div>
+            <script>
+                $(function () {
+                    DataTableInitialize("estadofacturas-table");
+                });
+            </script>
+        }
+        else
+        {
+            <div class="callout callout-info">
+                <p>No se ha encontrado información.</p>
+            </div>
+        }
+    

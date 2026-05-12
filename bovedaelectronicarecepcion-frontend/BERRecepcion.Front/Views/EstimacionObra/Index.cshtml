@@ -1,0 +1,40 @@
+﻿
+@{
+    ViewData["Title"] = "Estimacion de Obra";
+}
+<!-- Content Header (Page header) -->
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="m-0">Estimacion de Obra</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<!-- /.content-header -->
+<!-- Main content -->
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="estimacion-card">
+
+                <!-- /.card -->
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+<sign-widget data-reloadTableName="EstimacionObraTable"
+             data-urlFirmar="EstimacionObra/Firmar"
+             data-urlCompletarFirma="EstimacionObra/CompletarFirma">
+</sign-widget>
+
+@section scripts{
+    <script type="text/javascript" src="@Url.Content("~/js/EstimacionObra/index.js")"></script>
+    <script type="text/javascript" src="@Url.Content("~/js/sign-widget.js")"></script>
+}
+
+<partial name="_ModalDocumentoPDF" />

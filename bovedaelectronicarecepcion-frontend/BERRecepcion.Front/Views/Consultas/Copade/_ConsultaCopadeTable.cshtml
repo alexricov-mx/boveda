@@ -1,0 +1,145 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@using Newtonsoft.Json
+@model DataResult<IEnumerable<CopadeDto>>
+
+@if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+{
+    <div class="table-responsive p-0">
+        <table class="table table-hover text-nowrap" id="ConsultaCopade-table" style="font-size:14px;">
+            <thead>
+                <tr>
+                    <th class="text-center" id="field-info">Expediente</th>
+                    <th>Organismo</th>
+                    <th>No. Contrato</th>
+                    <th>No. OS</th>
+                    <th>COPADE</th>
+                    <th>CENTRO </th>
+                    <th>EJERCICIO</th>
+                    <th>COPADE PDF</th>
+                    <th>Ficha Funcionario 1 </th>
+                    <th>Nombre Funcionario  1</th>
+                    <th>Fecha de Firma Funcionario 1 </th>
+                    <th>Correo Funcionario 1 </th>
+                    <th>Ficha Funcionario 2</th>
+                    <th>Nombre Funcionario  2</th>
+                    <th>Fecha de Firma Funcionario 2</th>
+                    <th>Correo Funcionario 2 </th>
+                    <th>Estatus Firmado </th>
+                    <th>Asignación </th>
+                    <th>Ficha Funcionario Elabora </th>
+                    <th>Nombre del Funcionario Elabora </th>
+                    <th>Correo Funcionario Elabora  </th>
+                    <th>Nombre  Acreedor </th>
+                    <th>No. Acreedor </th>
+                    <th>Correo </th>
+                    <th>Cancelado </th>
+                    <th>Factura </th>
+                    <th>Emitido por</th>
+                    <th>Firmado por </th>
+                    <th>No. De Serie </th>
+                    <th>Total</th>
+                    <th>Importe (Subtotal)</th>
+                    <th>Moneda </th>
+                    <th>Suma de Retenciones y Deducciones </th>
+                    <th>Importe Neto COPADE </th>
+                    <th>Estimación </th>
+                    <th>Fecha-Emisión </th>
+                    <th>Mes </th>
+                    <th>Día </th>
+                </tr>
+                @*<tr>
+            <th class="text-center" id="field-info">Expediente</th>
+            <th>COPADE</th>
+            <th>Ejercicio</th>
+            <th>Organismo</th>
+            <th>Funcionario 1</th>
+            <th>Funcionario 2</th>
+            <th>Cancelado</th>
+            <th class="text-right">Total</th>
+            <th>Contrato</th>
+            <th>OS</th>
+            </tr>*@
+            </thead>
+            <tbody>
+                @foreach (var item in Model.Data)
+                {
+                    <tr>
+                        @*Revisión con Alejandro Rico: Seguimiento COPADE, COPADE y COPADE Bancario*@
+                        <td class="text-center">
+                            <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-copadeid="@item.CopadeID" data-saporder="@item.SapOrder" data-reception="@item.Reception"></i>
+                        </td>
+                        <td scope="row">@item.clave</td>
+                        <td scope="row">@item.Contract</td>
+                        <td scope="row">@item.SapOrder</td>
+                        <td scope="row">@item.Reception</td>
+                        <td scope="row">@item.Center</td>
+                        <td scope="row">@item.Exercise</td>
+                        <td scope="row">???</td>
+                        <td scope="row">@item.Functionary1Ficha</td>
+                        <td scope="row">@item.Functionary1SignerName</td>
+                        <td scope="row">@item.Functionary1SignDate</td>
+                        <td scope="row">@item.Functionary1Email</td>
+                        <td scope="row">@item.Functionary2Ficha</td>
+                        <td scope="row">@item.Functionary2SignerName</td>
+                        <td scope="row">@item.Functionary2SignDate</td>
+                        <td scope="row">@item.Functionary2Email</td>
+                        <td>@(@item.Functionary1SignDate.HasValue && @item.Functionary2SignDate.HasValue ? "Firmado" : (@item.Functionary1SignDate.HasValue ? "Funcionario 1" : (@item.Functionary2SignDate.HasValue ? "Funcionario 2" : "")))</td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                        <td scope="row"></td>
+                    </tr>
+                    @*<tr>
+            <td class="text-center">
+            <i class="fas fa-folder" style="font-size:1.5em; cursor:pointer;" name="btnExpediente" data-copadeid="@item.CopadeID" data-saporder="@item.SapOrder" data-reception="@item.Reception"></i>
+            </td>
+            <td scope="row">@item.Reception</td>
+            <td scope="row">@item.Exercise</td>
+            <td scope="row">@item.clave</td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.Functionary1SignDate.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.Functionary2SignDate.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-center"><span class="@(string.IsNullOrWhiteSpace(item.IsCancel.ToString()) ? "dot" : "dot-active")"></span></td>
+            <td scope="row" class="text-right">@String.Format("{0,6:C2}", Convert.ToDecimal(item.Total))</td>
+            <td scope="row">@item.Contract</td>
+            <td scope="row">@item.SapOrder</td>
+            </tr>*@
+                }
+            </tbody>
+        </table>
+    </div>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@Model.Pager" />
+        </div>
+    </div>
+    <script>
+        $(function () {
+            //DataTableInitialize("ConsultaCopade-table");
+        });
+    </script>
+}
+else
+{
+    <div class="callout callout-info">
+        <p>No se ha encontrado información.</p>
+    </div>
+}
+
+

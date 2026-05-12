@@ -1,0 +1,200 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model DataResult<IEnumerable<OrganismDto>>
+
+@{
+    ViewData["Title"] = "Administrar Organismos";
+}
+
+@Html.Hidden("urlEditar", Url.Action("Editar"))
+@Html.Hidden("urlEliminar", Url.Action("Eliminar"))
+
+
+@section scripts
+{
+    <script type="text/javascript" src="@Url.Content("~/js/AdminOrganism/index.js" )"></script>
+    <script>
+        $(function () {
+            DataTableInitialize("AdminOrganism-table");
+        });
+    </script>
+}
+<div class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h3 class="m-0">Administración de Organismos</h3>
+            </div><!-- /.col -->
+        </div><!-- /.row -->
+    </div><!-- /.container-fluid -->
+</div>
+<section class="content">
+    <div class="container-fluid">
+        <div class="row">
+            <div class="col-12" id="estimacion-card">
+                @if (Model != null && Model.Data != null && Model.Data.Count() > 0)
+                {
+                    <div class="card">
+                        <div class="card-header">
+                            <div class="row">
+                                <div class="col-lg-12 col-md-12 col-sm-12 text-left">
+                                    <a class="btn btn-sm btn-outline-info" id="btnAgregar" style="width:135px;"><i class="fas fa-plus mr-1"></i> Nuevo</a>
+
+                                    <a class="btn btn-sm btn-outline-success float-right" style="width:135px;" href="@Url.Action("DownloadExcel", "Adefas")"><i class="fas fa-download mr-1"></i> Excel</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <table class="table table-hover" id="AdminOrganism-table" style="font-size:14px;">
+                                <thead class="thead-light">
+                                    <tr>
+                                        <th class="text-center"></th>
+                                        <th>Organismo</th>
+                                        <th>Clave</th>
+                                        <th>Dirección</th>
+                                        <th>Rfc</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    @foreach (var item in Model.Data)
+                                    {
+                                        <tr>
+                                            <td scope="row" class="text-center">
+                                                <span class="info-box-text text-wrap">
+                                                    <small>
+                                                        <button type="button" class="btn btn-sm btn-outline-secondary float-right" data-toggle="dropdown">
+                                                            <span class="fas fa-cog">
+                                                            </span>
+                                                        </button>
+                                                        <ul class="dropdown-menu">
+                                                            <li><a class="dropdown-item text-muted text-info w-100" name="cg-edit" style="cursor:pointer;" href="javascript:EditarAdefas('@item.OrganismID','@item.Name','@item.Clave','@item.Address','@item.Rfc')">Editar</a></li>
+                                                         
+                                                        </ul>
+                                                    </small>
+                                                </span>
+                                            </td>
+                                            <td scope="row">@item.Name</td>
+                                            <td scope="row">@item.Clave</td>
+                                            <td scope="row">@item.Address</td>
+                                            <td scope="row">@item.Rfc</td>
+                                        </tr>
+                                    }
+                                </tbody>
+                              
+                            </table>
+                        </div>
+                        <!-- /.card-body -->
+                    </div>
+
+
+                }
+            </div>
+            <!-- /.col -->
+        </div>
+        <!-- /.row -->
+    </div>
+    <!-- /.container-fluid -->
+</section>
+
+
+<div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+    @Html.HiddenFor(model => model.Data.FirstOrDefault().OrganismID)
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabel">Editar Organismo</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="username" class="col-md-3 col-form-label mt-1">Organismo: </label>
+                        <div class="col-md-9 mt-1">
+                            <input type="text" class="form-control" id="txtName"  autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="username" class="col-md-5 col-form-label mt-1">Clave: </label>
+                        <div class="col-md-3 mt-1">
+                            <input type="text" class="form-control" id="txtClave"  autocomplete="off">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="fec_ini" class="col-4 col-form-label">Dirección:</label>
+                        <div class="col-8">
+                            <input class="form-control" type="text" id="txtAddress">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="fec_fin" class="col-4 col-form-label">Rfc</label>
+                        <div class="col-8">
+                            <input class="form-control" type="text" id="txtRfc">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnEditar" data-eliminar="">Editar</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
+<div class="modal fade" id="myModalAgre" tabindex="-1" role="dialog" aria-labelledby="myModalLabelAgre">
+    @Html.HiddenFor(model => model.Data.FirstOrDefault().OrganismID)
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h4 class="modal-title" id="myModalLabelAgre">Agregar Adefa</h4>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            </div>
+            <div class="modal-body">
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        @Html.LabelFor(model => model.Data.FirstOrDefault().Name)
+                        <div class="col-md-9 mt-1">
+                            @Html.DropDownList("ddOrganismo", null, new { @class = "form-control select2" })
+                            @Html.ValidationMessageFor(model => model.Data.FirstOrDefault().Name, "", new { @class = "text-danger" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="username" class="col-md-5 col-form-label mt-1">Año Factura: </label>
+                        <div class="col-md-3 mt-1">
+                            @Html.DropDownList("ddFecha", null, new { @class = "form-control select2" })
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="fec_iniAgre" class="col-4 col-form-label">Fin de Ventana:</label>
+                        <div class="col-8">
+                            <input class="form-control" type="datetime-local" id="fec_iniAgre">
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-12">
+                    <div class="form-group row">
+                        <label for="fec_finAgre" class="col-4 col-form-label">Inicio de Ventana:</label>
+                        <div class="col-8">
+                            <input class="form-control" type="datetime-local" id="fec_finAgre">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cerrar</button>
+                <button type="button" class="btn btn-primary" id="btnAgregarAdef" data-eliminar="">Agregar</button>
+            </div>
+        </div>
+    </div>
+</div>

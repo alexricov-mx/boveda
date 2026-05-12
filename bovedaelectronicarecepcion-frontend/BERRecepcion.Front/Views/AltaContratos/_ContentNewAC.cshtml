@@ -1,0 +1,96 @@
+﻿@using BERRecepcion.Front.Models.Dto
+@model AltaContratosDto
+
+    <div class="card card-olive card-outline">
+        <div class="card-header">
+            <h4>Nuevo Contrato</h4>
+        </div>
+        <div class="card-body">
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Contrato:</label>
+                    <div class="col-3">
+                        <input class="form-control form-control-sm" type="text" id="txtACNew" maxlength="50" autocomplete="off" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Firmante 1</label>
+                    <div class="col-3">
+                        <input class="form-control form-control-sm" type="text" id="txtF1New" autocomplete="off">
+                        @*<input class="form-control form-control-sm" type="text" id="txtF1New" maxlength="50" autocomplete="off" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Firmante1Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Suplente 1</label>
+                    <div class="col-3">
+                        <input class="form-control form-control-sm" type="text" id="txtS1New" autocomplete="off">
+                        @*<input class="form-control form-control-sm" type="text" id="txtS1New" maxlength="50" autocomplete="off" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Suplente1Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Firmante 2</label>
+                    <div class="col-3">
+                        <input class="form-control form-control-sm" type="text" id="txtF2New" autocomplete="off">
+                        @*<input class="form-control form-control-sm" type="text" id="txtF2New" maxlength="50" autocomplete="off" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Firmante2Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+
+            <div class="col-md-6 col-sm-12">
+                <div class="form-group row">
+                    <label class="col-4 col-form-label">Suplente 2</label>
+                    <div class="col-3">
+                        <input class="form-control form-control-sm" type="text" id="txtS2New" autocomplete="off" >
+                        @*<input class="form-control form-control-sm" type="text" id="txtS2New" maxlength="50" autocomplete="off" onKeypress="if (event.keyCode < 45 || event.keyCode > 57) event.returnValue = false;">*@
+                    </div>
+                    <label class="col-5" id="Suplente2Busqueda" maxlength="50"> </label>
+                </div>
+            </div>
+            <button class="btn btn-sm btn-outline-info" name="ac-save" id="ac-save">
+                <i class="fas fa-save mr-1"></i>
+                Agregar
+            </button>
+            <button class="btn btn-sm btn-outline-danger" name="cancel" id="cancelar">
+                <i class="fas fa-times mr-1"></i>
+                Cancelar
+            </button>
+        </div>
+    </div>
+
+    <script>
+        $(document).ready(function () {
+            $("#txtF1New").keyup(function (event) {
+                var ficha = $("#txtF1New").val();
+                var indice = 1;
+                Busqueda_Usuario(ficha, indice);
+
+            });
+            $("#txtS1New").keyup(function (event) {
+                var ficha = $("#txtS1New").val();
+                var indice = 2;
+                Busqueda_Usuario(ficha, indice);
+            });
+            $("#txtF2New").keyup(function (event) {
+                var ficha = $("#txtF2New").val();
+                var indice = 3;
+                Busqueda_Usuario(ficha, indice);
+            });
+            $("#txtS2New").keyup(function (event) {
+                var ficha = $("#txtS2New").val();
+                var indice = 4;
+                Busqueda_Usuario(ficha, indice);
+            });
+        });
+    </script>
+
