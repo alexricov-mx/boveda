@@ -126,15 +126,18 @@ namespace BERRecepcion.Front.Controllers
                 if (origen.ToLower() == "backend")
                 {
                     // Asumimos que el backend está en un directorio paralelo
-                    var frontendPath = AppContext.BaseDirectory;
-                    var berPath = Directory.GetParent(frontendPath)?.Parent?.Parent?.Parent?.FullName;
-                    logsPath = Path.Combine(berPath ?? "", "bovedaelectronicarecepcion", "BERecepcion.Api", "logs");
+                    var backendPath = AppContext.BaseDirectory;
+                    var berPath = Directory.GetParent(backendPath)?.Parent?.Parent?.Parent?.Parent?.Parent?.FullName;
+                    logsPath = Path.Combine(berPath,"bovedaelectronicarecepcion", "BERecepcion.Api", "logs");                    
+                    
                     origenLabel = "Backend (API)";
                 }
                 else
                 {
                     // Logs del frontend
-                    logsPath = Path.Combine(AppContext.BaseDirectory, "logs");
+                    var frontendPath = AppContext.BaseDirectory;
+                    var berPath = Directory.GetParent(frontendPath)?.Parent?.Parent?.Parent?.FullName;
+                    logsPath = Path.Combine(berPath ?? "", "logs");
                     origenLabel = "Frontend";
                 }
                 
