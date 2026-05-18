@@ -1,22 +1,18 @@
-﻿using BERecepcion.Core.Dto;
-using BERecepcion.Core.eSignDto;
+﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Dto;
+using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using RestSharp;
+using Newtonsoft.Json.Linq;
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Data;
-using System.Globalization;
-using System.IO;
 using System.Linq;
 using System.Net;
-using System.Text;
-using System.Text.Json;
+using System.Threading;
 using System.Threading.Tasks;
 
 
@@ -25,7 +21,8 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
     public class SOEstimacionRepository : BaseSQLServerSqlRepository, ISOEstimationRepository
     {
 
-        public SOEstimacionRepository(string cnnString) : base(cnnString)
+        public SOEstimacionRepository(IDbConnectionFactory connectionFactory)
+            : base(connectionFactory)
         {
         }
 
@@ -48,7 +45,38 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
             }
         }
 
-        public async Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEInternoAsync(string Token, int pageSize, int pageNum = 1)
+        public async Task<PagedResult<SOEstimationDto>> GetSOEInternoRefactorAsync(
+            string token, int pageSize, int pageNum = 1,
+            CancellationToken cancellationToken = default)
+        {
+            if (pageNum < 1) pageNum = 1;
+            if (pageSize < 1) pageSize = 5;
+
+            using IDbConnection db = GetConnection();
+
+            var par = new DynamicParameters();
+            par.Add("@Token", token);
+            par.Add("@pagenum", pageNum);
+            par.Add("@pagesize", pageSize);
+
+            var multi = await db.QueryMultipleAsync(
+                sql: "SP_SOEstimation_Interno_selecciona",
+                param: par,
+                commandType: CommandType.StoredProcedure);
+
+            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<SOEstimationDto>()).ToList();
+
+            return new PagedResult<SOEstimationDto>(
+                items,
+                totalItems: pager?.TotalItems ?? items.Count,
+                pageNumber: pager?.CurrentPage ?? pageNum,
+                pageSize: pager?.PageSize ?? pageSize);
+        }
+
+        public async Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEInternoAsync(
+            string token, int pageSize, int pageNum = 1,
+            CancellationToken cancellationToken = default)
         {
             DataResult<IEnumerable<SOEstimationDto>> resultItem = new DataResult<IEnumerable<SOEstimationDto>>()
             {
@@ -59,7 +87,7 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                 using (IDbConnection db = GetConnection())
                 {
                     DynamicParameters par = new DynamicParameters();
-                    par.Add("@Token", Token);
+                    par.Add("@Token", token);
                     par.Add("@pagenum", pageNum);
                     par.Add("@pagesize", pageSize);
 
@@ -78,7 +106,6 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                 throw;
             }
         }
-
         public async Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEProveedorAsync(string CreditorNumber, int pageSize, int pageNum = 1)
         {
             DataResult<IEnumerable<SOEstimationDto>> resultItem = new DataResult<IEnumerable<SOEstimationDto>>()
@@ -120,25 +147,25 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                     //db.Open();
                     //using (var tran = db.BeginTransaction())
                     //{
-                        try
-                        {
-                            DynamicParameters par = new DynamicParameters();
-                            par.Add("@EstimacionID", EstimacionID);
-                            par.Add("@UserType", UserType);
-                            var asdf = await db.QueryAsync(sql: "SP_SOEstimation_firma", param: par, commandType: CommandType.StoredProcedure);
+                    try
+                    {
+                        DynamicParameters par = new DynamicParameters();
+                        par.Add("@EstimacionID", EstimacionID);
+                        par.Add("@UserType", UserType);
+                        var asdf = await db.QueryAsync(sql: "SP_SOEstimation_firma", param: par, commandType: CommandType.StoredProcedure);
 
-                            //tran.Commit();
-                            resultItem.Message = "Firmado exitosamente";
-                        }
-                        catch (Exception ext)
-                        {
-                            //tran.Rollback();
-                            resultItem.Message = ext.Message;
-                            resultItem.Status = HttpStatusCode.BadRequest;
+                        //tran.Commit();
+                        resultItem.Message = "Firmado exitosamente";
+                    }
+                    catch (Exception ext)
+                    {
+                        //tran.Rollback();
+                        resultItem.Message = ext.Message;
+                        resultItem.Status = HttpStatusCode.BadRequest;
 
-                            return resultItem;
+                        return resultItem;
 
-                        }
+                    }
                     //}
                     return resultItem;
                 }
@@ -161,28 +188,28 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                     //db.Open();
                     //using (var tran = db.BeginTransaction())
                     //{
-                        try
-                        {
-                            // hay que avisarle al siguiente firmante
-                            DynamicParameters par = new DynamicParameters();
-                            par.Add("@EstimacionID", EstimacionID);
-                            par.Add("@UserType", UserType);
-                            par.Add("@Email", ProviderEmail);
+                    try
+                    {
+                        // hay que avisarle al siguiente firmante
+                        DynamicParameters par = new DynamicParameters();
+                        par.Add("@EstimacionID", EstimacionID);
+                        par.Add("@UserType", UserType);
+                        par.Add("@Email", ProviderEmail);
 
-                            var asdf = await db.QueryAsync(sql: "SP_SOEstimation_firma_correo", param: par, commandType: CommandType.StoredProcedure);
+                        var asdf = await db.QueryAsync(sql: "SP_SOEstimation_firma_correo", param: par, commandType: CommandType.StoredProcedure);
 
-                            //tran.Commit();
-                            resultItem.Message = "Firmado exitosamente";
-                        }
-                        catch (Exception ext)
-                        {
-                            //tran.Rollback();
-                            resultItem.Message = ext.Message;
-                            resultItem.Status = HttpStatusCode.BadRequest;
+                        //tran.Commit();
+                        resultItem.Message = "Firmado exitosamente";
+                    }
+                    catch (Exception ext)
+                    {
+                        //tran.Rollback();
+                        resultItem.Message = ext.Message;
+                        resultItem.Status = HttpStatusCode.BadRequest;
 
-                            return resultItem;
+                        return resultItem;
 
-                        }
+                    }
                     //}
                     return resultItem;
                 }

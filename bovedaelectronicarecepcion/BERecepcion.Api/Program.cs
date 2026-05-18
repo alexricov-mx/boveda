@@ -34,7 +34,9 @@ using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using BERecepcion.Infraestructura.SAPPI.Repositories;
 using BERecepcion.Infraestructura.SAT.Repositories;
-using FluentValidation.AspNetCore;
+using BERecepcion.Core.Exceptions;
+using BERecepcion.Infraestructura.StartupExtensions;
+using FluentValidation;
 using Google.Protobuf.WellKnownTypes;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
@@ -108,14 +110,36 @@ try
     builder.Services.AddControllers(options =>
     {
         options.Filters.Add<BERecepcion.Api.Filters.GlobalExceptionFilter>();
-    }).AddFluentValidation(options =>
-    {
-        // Validate child properties and root collection elements
-        options.ImplicitlyValidateChildProperties = true;
-        options.ImplicitlyValidateRootCollectionElements = true;
+    // [FV12] Registrar filtro de auto-validación (reemplaza AddFluentValidationAutoValidation de FV11)
+    options.Filters.Add<BERecepcion.Api.Filters.FluentValidationActionFilter>();
+    });
 
-        // Automatic registration of validators in assembly
-        options.RegisterValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+    // [FV12] Escaneo de validators — BERecepcion.Api
+    builder.Services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
+
+    // [FV12] Escaneo de validators — BERecepcion.Core completo (auto-descubre todo AbstractValidator<T>)
+    // Tipo ancla: ValidationException vive en BERecepcion.Core.Exceptions
+    builder.Services.AddValidatorsFromAssemblyContaining<BERecepcion.Core.Exceptions.ValidationException>();
+
+    // Unificar el formato de errores de model-state con GlobalExceptionFilter y FluentValidationActionFilter.
+    // Los tres caminos retornan ValidationProblemDetails RFC 7807.
+    builder.Services.Configure<ApiBehaviorOptions>(options =>
+    {
+        options.InvalidModelStateResponseFactory = context =>
+        {
+            var errors = context.ModelState
+                .Where(e => e.Value?.Errors.Count > 0)
+                .ToDictionary(
+                    e => e.Key,
+                    e => e.Value!.Errors.Select(err => err.ErrorMessage).ToArray());
+
+            return new BadRequestObjectResult(new ValidationProblemDetails(errors)
+            {
+                Title  = "Errores de validación",
+                Detail = "Uno o más errores de validación ocurrieron.",
+                Status = 400
+            });
+        };
     });
     builder.Services.AddSwaggerGen(c =>
     {
@@ -147,9 +171,10 @@ try
             }
         });
     });
-    builder.Services.AddTransient<ISupplyOrderRepository>(x => new SupplyOrderRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IAdefasRepository>(x => new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IDesvioFirmasRepository>(x => new DesvioFirmasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
+    // Infraestructura — Módulo OrdenSurtimiento migrado a DI limpio con IDbConnectionFactory
+    builder.Services.AddInfrastructure(builder.Configuration);
+
+    builder.Services.AddTransient<IAdefasRepository>(x => new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));    builder.Services.AddTransient<IDesvioFirmasRepository>(x => new DesvioFirmasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IUsuariosRepository>(x => new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
 
     builder.Services.AddTransient<IOldUsuariosRepository>(x => new OldUsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
@@ -168,7 +193,7 @@ try
     builder.Services.AddTransient<IInterfacesRepository>(x => new InterfacesRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IBitacoraRepository>(x => new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IBitacoraAdmonRepository>(x => new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<ISOEstimationRepository>(x => new SOEstimacionRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
+    // ISOEstimationRepository registrado en AddInfrastructure() arriba
     builder.Services.AddTransient<IDocumentosRepository>(x => new DocumentosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration));
     builder.Services.AddTransient<IESignRepository>(x => new ESignRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new DocumentoFirmadoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
     builder.Services.AddTransient<ICopadeRepository>(x => new CopadeRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));

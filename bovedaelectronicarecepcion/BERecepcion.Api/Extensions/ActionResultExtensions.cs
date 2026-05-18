@@ -1,7 +1,8 @@
+using BERecepcion.Core.Common.Enums;
+using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Dto;
 using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using BERecepcion.Core.Models;
-using BERecepcion.Core.Dto;
 
 namespace BERecepcion.Api.Extensions
 {
@@ -91,6 +92,58 @@ namespace BERecepcion.Api.Extensions
                 HttpStatusCode.Conflict => new ConflictObjectResult(new { message = result.Message }),
                 _ => new ObjectResult(new { message = result.Message }) { StatusCode = (int)result.Status }
             };
+        }
+    }
+
+    /// <summary>
+    /// Extensiones para traducir <see cref="Result{T}"/> de Core a <see cref="IActionResult"/>
+    /// con cuerpo <see cref="ProblemDetails"/> RFC 7807.
+    /// SOLID SRP: único lugar que conoce el mapeo ErrorType → HTTP status.
+    /// SOLID OCP: nuevo ErrorType = agregar una rama aquí, sin tocar controllers.
+    /// </summary>
+    public static class ResultExtensions
+    {
+        /// <summary>
+        /// Éxito → 200 OK con el valor.<br/>
+        /// Fallo → <see cref="ProblemDetails"/> con status HTTP derivado de <see cref="ErrorType"/>.
+        /// </summary>
+        public static IActionResult ToActionResult<T>(this Result<T> result, ControllerBase controller)
+        {
+            if (result.IsSuccess)
+                return controller.Ok(result.Value);
+
+            return result.Error.Type switch
+            {
+                ErrorType.Validation => controller.BadRequest(BuildProblem(result.Error, 400, ProblemTypes.Validation)),
+                ErrorType.NotFound => controller.NotFound(BuildProblem(result.Error, 404, ProblemTypes.NotFound)),
+                ErrorType.Conflict => controller.Conflict(BuildProblem(result.Error, 409, ProblemTypes.Conflict)),
+                ErrorType.Unauthorized => new ObjectResult(BuildProblem(result.Error, 401, ProblemTypes.Unauthorized)) { StatusCode = 401 },
+                ErrorType.Forbidden => new ObjectResult(BuildProblem(result.Error, 403, ProblemTypes.Forbidden)) { StatusCode = 403 },
+                _ => new ObjectResult(BuildProblem(result.Error, 500, ProblemTypes.ServerError)) { StatusCode = 500 }
+            };
+        }
+
+        private static ProblemDetails BuildProblem(Error error, int status, string type) => new()
+        {
+            Type = type,
+            Title = error.Code,
+            Detail = error.Description,
+            Status = status,
+        };
+
+        /// <summary>
+        /// URIs canónicas RFC 7807 §3.1 + RFC 9110.
+        /// Referencia: https://datatracker.ietf.org/doc/html/rfc9110
+        /// </summary>
+        internal static class ProblemTypes
+        {
+            public const string Validation = "https://tools.ietf.org/html/rfc9110#section-15.5.1";   // 400
+            public const string Unauthorized = "https://tools.ietf.org/html/rfc9110#section-15.5.2";   // 401
+            public const string Forbidden = "https://tools.ietf.org/html/rfc9110#section-15.5.4";   // 403
+            public const string NotFound = "https://tools.ietf.org/html/rfc9110#section-15.5.5";   // 404
+            public const string Conflict = "https://tools.ietf.org/html/rfc9110#section-15.5.10";  // 409
+            public const string Unprocessable = "https://tools.ietf.org/html/rfc9110#section-15.5.21";  // 422
+            public const string ServerError = "https://tools.ietf.org/html/rfc9110#section-15.6.1";   // 500
         }
     }
 }

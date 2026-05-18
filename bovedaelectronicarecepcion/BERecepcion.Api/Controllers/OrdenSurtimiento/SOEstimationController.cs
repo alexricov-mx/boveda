@@ -1,13 +1,18 @@
-﻿using BERecepcion.Api.Filters;
+﻿using BERecepcion.Api.Extensions;
+using BERecepcion.Api.Filters;
 using BERecepcion.Api.ModelBinding;
 using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Consulta.Copades.Dto;
 using BERecepcion.Core.Correos.Interfaces.Repositories;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.eSignDto;
+using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.FirmaDocumentos.Dto;
 using BERecepcion.Core.FirmaDocumentos.Interfaces.Repositories;
+using BERecepcion.Core.IntegracionEFirma;
+using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.SAPPI.Dto;
@@ -20,19 +25,18 @@ using Serilog;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Threading.Tasks;
-using BERecepcion.Core.IntegracionEFirma;
 using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers.OrdenSurtimiento
 {
     [Route("api/[controller]")]
     [ApiController]
     [ApiKeyAuth]
-    public class SOEstimationController : Controller
-    {       
+    public class SOEstimationController : ControllerBase
+    {
         private readonly ISOEstimationRepository _SOEstimationRepository;
-        private readonly IConfiguration _configuration;
         private readonly IHostEnvironment _env;
         private readonly IESignRepository _eSignRepository;
         private readonly ISAPPIRepository _sAPPIRepository;
@@ -41,16 +45,17 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         private readonly IUsuariosRepository _usuariosRepository;
         private readonly IDocumentosRepository _documentosRepository;
         private readonly IDocumentoFirmadoRepository _documentoFirmadoRepository;
+        private readonly ISoEstimacionServiceAsync _soEstimacionService;
 
-        public SOEstimationController(ISOEstimationRepository sOEstimationRepository, IConfiguration configuration, 
-                                      IHostEnvironment env, IESignRepository eSignRepository, 
-                                      ISAPPIRepository sAPPIRepository, IBitacoraRepository bitacoraRepository, 
-                                      IUsuariosRepository usuariosRepository, ICorreoRepository correoRepository, 
-                                      IDocumentosRepository documentosRepository, 
-                                      IDocumentoFirmadoRepository documentoFirmadoRepository)
+        public SOEstimationController(ISOEstimationRepository sOEstimationRepository, IConfiguration configuration,
+                                      IHostEnvironment env, IESignRepository eSignRepository,
+                                      ISAPPIRepository sAPPIRepository, IBitacoraRepository bitacoraRepository,
+                                      IUsuariosRepository usuariosRepository, ICorreoRepository correoRepository,
+                                      IDocumentosRepository documentosRepository,
+                                      IDocumentoFirmadoRepository documentoFirmadoRepository,
+                                      ISoEstimacionServiceAsync soEstimacionService)
         {
             _SOEstimationRepository = sOEstimationRepository;
-             _configuration = configuration;
             _env = env;
             _eSignRepository = eSignRepository;
             _sAPPIRepository = sAPPIRepository;
@@ -59,14 +64,14 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             _correoRepository = correoRepository;
             _documentosRepository = documentosRepository;
             _documentoFirmadoRepository = documentoFirmadoRepository;
-
+            _soEstimacionService = soEstimacionService;
         }
 
         [HttpGet("{Contract}")]
         [ProducesResponseType(typeof(IEnumerable<SOEstimationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-     
+
         public async Task<IActionResult> GetSOEstimacion(string Contract)
         {
             try
@@ -76,20 +81,21 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             catch (Exception ex)
             {
                 Log.Error("GetSOEstimacion: {error}", ex.ToString());
-                return Problem(null, null, 500, "Error interno", null);              
+                return Problem(null, null, 500, "Error interno", null);
             }
         }
 
-       
+
         [HttpGet("GetSOEInternoAsync")]
         [ProducesResponseType(typeof(IEnumerable<SOEstimationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetSOEInternoAsync(string Token, int pageSize, int pageNum = 1)
+        public async Task<IActionResult> GetSOEInternoAsync(string Token, int pageSize, int pageNum = 1, CancellationToken cancellationToken = default)
         {
             try
             {
-                return Ok(await _SOEstimationRepository.GetSOEInternoAsync(Token, pageSize, pageNum));
+                var result = await _SOEstimationRepository.GetSOEInternoAsync(Token, pageSize, pageNum);
+                return Ok(result);
             }
             catch (Exception ex)
             {
@@ -98,7 +104,25 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             }
         }
 
-        
+        /// <summary>
+        /// Obtiene estimaciones internas paginadas usando la capa de servicio con Result&lt;T&gt;.
+        /// Las respuestas de error siguen ProblemDetails RFC 7807.
+        /// </summary>
+        [HttpGet("GetSOEInternoRefactorAsync")]
+        [ProducesResponseType(typeof(PagedResult<SOEstimationInternoDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
+        public async Task<IActionResult> GetSOEInternoRefactorAsync(
+            [FromQuery] SOEstimationInternoRequestDto request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _soEstimacionService
+                .GetSOEInternoPaginationAsync(request, cancellationToken);
+
+            return result.ToActionResult(this);
+        }
+
+
         [HttpGet("GetSOEProveedorAsync")]
         [ProducesResponseType(typeof(IEnumerable<SOEstimationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -180,7 +204,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             try
             {
                 string NombreArchivo = string.Concat("Documento_", model.Data.paquete.Titulo.ToString(), ".pdf");
-                                
+
                 DataResult<ArchivoPDFDto> archivoPDF = new DataResult<ArchivoPDFDto>();
                 string archivo = "";
                 IFormFile documentoPDF;
@@ -189,7 +213,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 bool basePathExists = System.IO.Directory.Exists(basePath);
                 if (!basePathExists) Directory.CreateDirectory(basePath);
 
-                archivoPDF = await _documentosRepository.GetDocumentoAsync(model.Data.sOEstimation.SapOrder, 
+                archivoPDF = await _documentosRepository.GetDocumentoAsync(model.Data.sOEstimation.SapOrder,
                                                                            model.Data.sOEstimation.OrganismClave);
                 if (archivoPDF.Status != System.Net.HttpStatusCode.OK)
                 {
@@ -205,7 +229,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 using var stream = System.IO.File.OpenRead(archivo);
 
 
-                documentoPDF = new FormFile(stream, 0, stream.Length, null, Path.GetFileName(stream.Name))
+                documentoPDF = new FormFile(stream, 0, stream.Length, null, System.IO.Path.GetFileName(stream.Name))
                 {
                     Headers = new HeaderDictionary(),
                     ContentType = "application/pdf"
@@ -269,13 +293,13 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
 
             try
             {
-                   model.Data.agregarFirmante.IdCorrelacion = await _documentoFirmadoRepository.CreaPaqueteInicialAsync(
-                   model.Data.usuario.Id.ToString(),
-                   model.Data.paquete.Documentos.FirstOrDefault().CodigoTipoDocumento,
-                   model.Data.usuarioBEId,
-                   model.Data.documentoBEId,
-                   model.Data.paquete.Firmantes.FirstOrDefault().Figura
-               );
+                model.Data.agregarFirmante.IdCorrelacion = await _documentoFirmadoRepository.CreaPaqueteInicialAsync(
+                model.Data.usuario.Id.ToString(),
+                model.Data.paquete.Documentos.FirstOrDefault().CodigoTipoDocumento,
+                model.Data.usuarioBEId,
+                model.Data.documentoBEId,
+                model.Data.paquete.Firmantes.FirstOrDefault().Figura
+            );
 
                 var resultAgregaFirmante = await _eSignRepository.PostAgregaFirmanteEFirmaAsync(model.Data.agregarFirmante);
                 if (resultAgregaFirmante.Status != System.Net.HttpStatusCode.OK)
@@ -376,7 +400,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 await _bitacoraRepository.InsertaBitacoraAsync(new BitacoraDto
                 {
                     Accion = "Cambio de Estado",
-                    Descripcion = $"Envio a Firma {externos.Data.sOEstimation.SapOrder}", 
+                    Descripcion = $"Envio a Firma {externos.Data.sOEstimation.SapOrder}",
                     Seccion = "EstimacionObra",
                     UserID = externos.User.UserID
                 });
@@ -414,8 +438,8 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                             UserID = externos.User.UserID
                         });
                     }
-                    firmaPaqueteResult.Status = mail ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.Conflict;                
-                }                
+                    firmaPaqueteResult.Status = mail ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.Conflict;
+                }
 
                 resultItem.Data.firmaPaqueteResult = firmaPaqueteResult.Data;
                 return resultItem;
@@ -483,7 +507,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 return Problem(null, null, 500, "Error interno", null);
             }
         }
-        
+
         #endregion
     }
 }

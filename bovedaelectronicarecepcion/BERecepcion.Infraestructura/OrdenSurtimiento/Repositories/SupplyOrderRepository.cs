@@ -1,4 +1,5 @@
 ﻿using BERecepcion.Core.Dto;
+using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.Models;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
@@ -15,7 +16,8 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
 {
     public class SupplyOrderRepository : BaseSQLServerSqlRepository, ISupplyOrderRepository
     {
-        public SupplyOrderRepository(string cnnString) : base(cnnString)
+        public SupplyOrderRepository(IDbConnectionFactory connectionFactory)
+            : base(connectionFactory)
         {
         }
 

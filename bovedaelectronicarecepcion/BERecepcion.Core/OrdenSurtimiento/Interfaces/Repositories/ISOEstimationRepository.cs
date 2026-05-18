@@ -1,10 +1,12 @@
-﻿using BERecepcion.Core.Dto;
+﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Dto;
 using BERecepcion.Core.eSignDto;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
@@ -12,7 +14,9 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
     public interface ISOEstimationRepository
     {
         Task<IEnumerable<SOEstimationDto>> GetSOEstimacionAsync(string Contract);
-        Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEInternoAsync(string Token, int pageSize, int pageNum = 1);
+        Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEInternoAsync(string token, int pageSize, int pageNum = 1, CancellationToken cancellationToken = default);
+        Task<PagedResult<SOEstimationDto>> GetSOEInternoRefactorAsync(string token, int pageSize, int pageNum = 1, CancellationToken cancellationToken = default);
+
         Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEProveedorAsync(string CreditorNumber, int pageSize, int pageNum = 1);
         Task<DataResult<IEnumerable<SOEstimationDto>>> GetSOEstimacionFiltroAsync(string Token, string Filtro);
 
