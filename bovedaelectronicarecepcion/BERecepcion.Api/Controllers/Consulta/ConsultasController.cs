@@ -1,53 +1,45 @@
-﻿using BERecepcion.Api.ModelBinding;
-using BERecepcion.Core.Dto;
-using BERecepcion.Core.eSignDto;
-using BERecepcion.Core.Utils;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Xml;
-using System.Xml.Serialization;
-using BERecepcion.Api.HtmlHelpers;
-using iText.Html2pdf;
-using System.Globalization;
-using System.Drawing;
+﻿using BERecepcion.Api.Extensions;
 using BERecepcion.Api.Filters;
+using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Copades.Dto;
 using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Copades.Interfaces.Repositories;
+using BERecepcion.Core.Dto;
+using BERecepcion.Core.Facturas.Dto;
+using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
-using BERecepcion.Core.Admin.Interfaces.Repositories;
-using BERecepcion.Core.Consulta.Copades.Dto;
-using BERecepcion.Core.Facturas.Dto;
+using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using System;
+using System.Collections.Generic;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers.Consulta
 {
     [Route("api/[controller]")]
     [ApiController]
     [ApiKeyAuth]
-    public class ConsultasController : Controller
+    public class ConsultasController : ControllerBase
     {
         private readonly ICopadeRepository _copadeRepository;
         private readonly IBitacoraRepository _bitacoraRepository;
         private readonly IConsultasRepository _consultasRepository;
         private readonly ISOEstimationRepository _ordenSurtimientoRepository;
+        private readonly IConsultaServiceAsync _consultaServiceAsync;
 
         public ConsultasController(ICopadeRepository copadeRepository, ISOEstimationRepository ordenSurtimientoRepository,
-            IBitacoraRepository bitacoraRepository, IConsultasRepository consultasRepository)
+            IBitacoraRepository bitacoraRepository, IConsultasRepository consultasRepository, IConsultaServiceAsync consultaServiceAsync)
         {
             _copadeRepository = copadeRepository;
             _ordenSurtimientoRepository = ordenSurtimientoRepository;
             _bitacoraRepository = bitacoraRepository;
             _consultasRepository = consultasRepository;
+            _consultaServiceAsync = consultaServiceAsync;
         }
 
         [HttpGet("GetListaFiltroCopadesAsync")]
@@ -201,6 +193,16 @@ namespace BERecepcion.Api.Controllers.Consulta
                 Log.Error("Consultas: GetEstadoFacturasAsync {error}", ex.ToString());
                 return Problem(null, null, 500, "Error interno", null);
             }
+        }
+        [HttpGet("GetEstimacionesObraAsync")]
+        public async Task<IActionResult> GetEstimacionesObraAsync(
+            [FromQuery] EstimacionesObraRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _consultaServiceAsync
+                .GetEstimacionesObraAsync(request, cancellationToken);
+            
+            return result.ToActionResult(this);
         }
     }
 }

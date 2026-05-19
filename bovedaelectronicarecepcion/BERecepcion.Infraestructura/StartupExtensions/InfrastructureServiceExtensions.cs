@@ -1,7 +1,9 @@
+using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.Options;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Services;
+using BERecepcion.Infraestructura.Consulta.Repositories;
 using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -33,10 +35,11 @@ public static class InfrastructureServiceExtensions
         // 4. Repositorios migrados — Módulo OrdenSurtimiento
         services.AddScoped<ISOEstimationRepository, SOEstimacionRepository>();
         services.AddScoped<ISupplyOrderRepository, SupplyOrderRepository>();
+        services.AddScoped<IConsultasRepository, ConsultasRepository>();
 
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();
-
+        services.AddScoped<IConsultaServiceAsync, ConsultaServiceAsync>();
         return services;
     }
 }

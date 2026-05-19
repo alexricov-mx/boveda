@@ -1,23 +1,30 @@
-﻿using BERecepcion.Core.Consulta.Dto;
+﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Facturas.Dto;
+using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Infraestructura.Consulta.Repositories
 {
-    public class ConsultasRepository : BaseSQLServerSqlRepository, IConsultasRepository
+    public class ConsultasRepository
+        : BaseSQLServerSqlRepository, IConsultasRepository
     {
-        public ConsultasRepository(string cnnString) : base(cnnString)
+        public ConsultasRepository(IDbConnectionFactory connectionFactory)
+            : base(connectionFactory)
         {
+
         }
+
 
         public async Task<DataResult<IEnumerable<ReportePaymentScheduleDto>>> GetListaPaymentScheduleAsync(DateTime start, DateTime end, string search, Guid userId, int pageSize, int pageNum = 1, bool esDescarga = false)
         {
@@ -149,6 +156,43 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
                 resultItem.Message = $"Ocurrio un problema: {ex.Message}";
                 return resultItem;
             }
+        }
+
+        public async Task<PagedResult<SOEstimationDto>> GetEstimacionesObraAsyncRefactorAsync(
+            EstimacionesObraRequest request,
+            CancellationToken cancellationToken = default
+            )
+        {
+            if (request.PageNumber < 1) request.PageNumber = 1;
+            if (request.PageSize < 1) request.PageSize = 5;
+
+            using IDbConnection db = GetConnection();
+            DynamicParameters par = new();
+            par.Add("@pagenum", request.PageNumber);
+            par.Add("@pagesize", request.PageSize);
+            par.Add("@userId", request.UserId);
+            par.Add("@fechaInicial", request.FechaInicial);
+            par.Add("@fechaFinal", request.FechaFinal);
+            par.Add("@search", request.Search);
+            par.Add("@esDescarga", request.EsDescarga);
+
+            var multi = await db.QueryMultipleAsync(
+                sql: "SP_SOEstimation_Consulta_Selecciona",
+                param: par,
+                commandType: CommandType.StoredProcedure
+                );
+
+            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<SOEstimationDto>()).ToList();
+
+
+            return new PagedResult<SOEstimationDto>(
+                items: items,
+                totalItems: pager?.TotalItems ?? items.Count,
+                pageNumber: pager?.CurrentPage ?? request.PageNumber,
+                pageSize: pager?.PageSize ?? request.PageSize
+                );
+
         }
     }
 }

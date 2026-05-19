@@ -229,7 +229,6 @@ try
     builder.Services.AddTransient<IRecepcionEPRepository>(x => new RecepcionEPRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IConsultaCopadeRepository>(x => new ConsultaCopadeRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IOrganismRepository>(x => new OrganismRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IConsultasRepository>(x => new ConsultasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPreFacturaRepository>(x => new PreFacturaRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPrefacturaAPRepository>(x => new PrefacturaAPRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<ICancelacionesRepository>(x => new CancelacionesRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
@@ -336,7 +335,6 @@ try
                 new CFDIValidation40Repository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])))
         ));
     builder.Services.AddTransient<IExpedienteElectronicoRepository>(x => new ExpedienteElectronicoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IConsultasRepository>(x => new ConsultasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPaymentScheduleRepository>(x => new PaymentScheduleRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPaymentListRepository>(x => new PaymentListRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
 
