@@ -42,8 +42,6 @@
     <PackageReference Include="QRCoder" Version="1.4.2" />
     <PackageReference Include="RestSharp" Version="112.1.0" />
     <PackageReference Include="Serilog.AspNetCore" Version="8.0.0" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServer" Version="6.5.0" />
-    <PackageReference Include="Serilog.Sinks.MSSqlServerCore" Version="1.1.1" />
     <PackageReference Include="SpreadsheetLight" Version="3.5.0" />
     <PackageReference Include="Microsoft.VisualStudio.Web.CodeGeneration.Design" Version="8.0.0" />
     <PackageReference Include="Newtonsoft.Json" Version="13.0.3" />
@@ -52,6 +50,11 @@
     <Folder Include="logs\" />
     <Folder Include="TemporalPDF\" />
     <Folder Include="wwwroot\css\DatetimePicker\" />
+  </ItemGroup>
+  <ItemGroup>
+    <Reference Include="System.Private.CoreLib">
+      <HintPath>..\..\..\..\..\.dotnet\shared\Microsoft.NETCore.App\10.0.8\System.Private.CoreLib.dll</HintPath>
+    </Reference>
   </ItemGroup>
   <ProjectExtensions>
     <VisualStudio>

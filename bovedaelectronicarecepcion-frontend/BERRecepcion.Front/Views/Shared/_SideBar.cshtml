@@ -2,6 +2,7 @@
 @using BERRecepcion.Front.Models.Dto
 @using Microsoft.AspNetCore.Http
 @inject IHttpContextAccessor httpContextAccessor
+@inject Microsoft.Extensions.Configuration.IConfiguration Configuration
 
 @{
     var userMenu = JsonConvert.DeserializeObject<IEnumerable<RolesCatalogoDto>>(httpContextAccessor.HttpContext.Session.GetString("UserMenu")).ToList();
@@ -133,6 +134,52 @@
                                         </a>
                                     </li>
                                 }
+                            </ul>
+                        </li>
+                    }
+
+                    @{
+                        var vueBase = Configuration["VueApp:BasePath"];
+                    }
+                    @if (!string.IsNullOrEmpty(vueBase))
+                    {
+                        <li class="nav-item" id="menu_NuevaVersion">
+                            <a href="#" class="nav-link">
+                                <i class="nav-icon fas fa-rocket" style="color:#28a745;"></i>
+                                <p>
+                                    Nueva Versión
+                                    <i class="fas fa-angle-right right"></i>
+                                    <span class="badge badge-success right">Vue</span>
+                                </p>
+                            </a>
+                            <ul class="nav nav-treeview">
+                                <li class="nav-item">
+                                    <a href="@vueBase/orden-surtimiento" class="nav-link text-md">
+                                        <i class="fas fa-circle nav-icon ml-3 text-xs" style="color:#28a745;"></i>
+                                        <p>
+                                            Órdenes de Surtimiento
+                                            <span class="badge badge-success ml-1" style="font-size:9px;">Nuevo</span>
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="@vueBase/orden-surtimiento/recepcion-almacen" class="nav-link text-md">
+                                        <i class="fas fa-circle nav-icon ml-3 text-xs" style="color:#28a745;"></i>
+                                        <p>
+                                            Recepción de Almacén
+                                            <span class="badge badge-success ml-1" style="font-size:9px;">Nuevo</span>
+                                        </p>
+                                    </a>
+                                </li>
+                                <li class="nav-item">
+                                    <a href="@vueBase/orden-surtimiento/estimacion-obra" class="nav-link text-md">
+                                        <i class="fas fa-circle nav-icon ml-3 text-xs" style="color:#28a745;"></i>
+                                        <p>
+                                            Estimación de Obra
+                                            <span class="badge badge-success ml-1" style="font-size:9px;">Nuevo</span>
+                                        </p>
+                                    </a>
+                                </li>
                             </ul>
                         </li>
                     }

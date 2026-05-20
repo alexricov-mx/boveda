@@ -1,5 +1,6 @@
 using BERRecepcion.Front.Interfaces;
 using BERRecepcion.Front.Models;
+using BERRecepcion.Front.Services;
 using BERRecepcion.Front.Models.Dto;
 using BERRecepcion.Front.Utilities;
 using BERRecepcion.Front.Middleware;
@@ -35,12 +36,14 @@ namespace BERRecepcion.Front
     public class Startup
     {
         public IConfiguration Configuration { get; }
-        
-        public Startup(IConfiguration configuration)
+        private readonly IWebHostEnvironment _env;
+
+        public Startup(IConfiguration configuration, IWebHostEnvironment env)
         {
             Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(configuration).CreateLogger();
             Configuration = configuration;
+            _env = env;
         }
             
 
@@ -243,6 +246,28 @@ namespace BERRecepcion.Front
 
             services.AddScoped<IRestUtility, RestUtility>();
             services.AddTransient<IGenerals, Generals>();
+
+            // CORS para el servidor de desarrollo de Vue (solo en Development)
+            // Permite que http://localhost:4000 llame a /BerFront/Token con credenciales
+            if (_env.IsDevelopment())
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("VueDevOrigin", policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4000", "https://localhost:4000")
+                              .AllowAnyMethod()
+                              .AllowAnyHeader()
+                              .AllowCredentials();
+                    });
+                });
+            }
+
+            // Levantar servidor Vue en desarrollo si está configurada la ruta
+            if (_env.IsDevelopment() && !string.IsNullOrWhiteSpace(Configuration["VueApp:FrontPath"]))
+            {
+                services.AddHostedService<VueDevHostedService>();
+            }
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -259,6 +284,26 @@ namespace BERRecepcion.Front
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
+
+            // Fallback SPA para rutas del app Vue (/BERVueDist/**)
+            // Las rutas sin extensión devuelven index.html; los archivos estáticos
+            // (_nuxt/*.js, *.css, etc.) ya son servidos por UseStaticFiles arriba.
+            app.Use(async (context, next) =>
+            {
+                var reqPath = context.Request.Path.Value ?? string.Empty;
+                if (reqPath.StartsWith("/BERVueDist", StringComparison.OrdinalIgnoreCase)
+                    && !Path.HasExtension(reqPath))
+                {
+                    var indexFile = Path.Combine(env.WebRootPath, "BERVueDist", "index.html");
+                    if (File.Exists(indexFile))
+                    {
+                        context.Response.ContentType = "text/html";
+                        await context.Response.SendFileAsync(indexFile);
+                        return;
+                    }
+                }
+                await next();
+            });
 
             // ========================================
             // MIDDLEWARE DESHABILITADO - NO FUNCIONA EN LOAD BALANCER
@@ -282,6 +327,10 @@ namespace BERRecepcion.Front
             // Si UseSession() está después de UseAuthorization(), la sesión NO existe
             // cuando los filtros de autorización se ejecutan, causando comportamiento impredecible.
             app.UseSession();
+            // if (env.IsDevelopment())
+            // {
+            //     app.UseCors("VueDevOrigin");
+            // }
 
             app.UseAuthentication();
             app.UseAuthorization();

@@ -62,3 +62,6 @@ nunit-*.xml
 # AppSettings
 appsettings.json
 appsettings.*.json
+
+# Compilado del frontend Vue (generado por npm run gen:legacy)
+bovedaelectronicarecepcion-frontend/BERRecepcion.Front/wwwroot/BERVueDist/
