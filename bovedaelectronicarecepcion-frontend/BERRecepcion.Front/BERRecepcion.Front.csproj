@@ -51,12 +51,7 @@
     <Folder Include="TemporalPDF\" />
     <Folder Include="wwwroot\css\DatetimePicker\" />
   </ItemGroup>
-  <ItemGroup>
-    <Reference Include="System.Private.CoreLib">
-      <HintPath>..\..\..\..\..\.dotnet\shared\Microsoft.NETCore.App\10.0.8\System.Private.CoreLib.dll</HintPath>
-    </Reference>
-  </ItemGroup>
-  <ProjectExtensions>
+<ProjectExtensions>
     <VisualStudio>
       <UserProperties appsettings_1json__JsonSchema="" wwwroot_4dist_4css_4alt_4adminlte_1core_1css_1map__JsonSchema="" />
     </VisualStudio>

@@ -30,6 +30,8 @@ using System.IO;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenSurtimiento;
+using BERRecepcion.Front.Services.BackEndApi.OrdenSurtimiento;
 
 namespace BERRecepcion.Front
 {
@@ -246,6 +248,8 @@ namespace BERRecepcion.Front
 
             services.AddScoped<IRestUtility, RestUtility>();
             services.AddTransient<IGenerals, Generals>();
+            services.AddTransient<IOrdenSurtimiento, OrdenSurtimiento>();
+            
 
             // CORS para el servidor de desarrollo de Vue (solo en Development)
             // Permite que http://localhost:4000 llame a /BerFront/Token con credenciales

@@ -11,7 +11,7 @@ public static class UrisOrdenSurtimiento
     
     #region Refactor
     public const string GetListOSInternoRefactor = "SupplyOrders/GetOSInternoRefactorAsync?token={0}&pageSize={1}&pageNum={2}&search={3}";
-    public const string GetListOSProveedorRefactor = "SupplyOrders/GetOSProveedorRefactorAsync";
+    public const string GetListOSProveedorRefactor = "SupplyOrders/GetOSProveedorRefactorAsync?CreditorNumber={0}&pageSize={1}&pageNum={2}&search={3}";
     public const string PostValidaOCreaUsuariosRefactor = "ESign/ValidaOCreaUsuariosRefactor";
     public const string PostCompletaFirmaOSRefactor = "SupplyOrders/CompletaFirmaRefactorAsync";
     #endregion Refactor

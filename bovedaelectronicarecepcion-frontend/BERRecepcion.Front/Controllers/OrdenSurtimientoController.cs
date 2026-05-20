@@ -10,6 +10,7 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenSurtimiento;
 using BERRecepcion.Front.Models.IntegracionEFirma;
 using BERRecepcion.Front.Services.Uris;
 using static BERRecepcion.Front.Models.CrearPaquete;
@@ -55,7 +56,8 @@ namespace BERRecepcion.Front.Controllers
         private readonly IConfiguration _configuration;
         private readonly IRestUtility _utility;
         private readonly IGenerals _generals;
-        private readonly IHostEnvironment _env;
+        private readonly IOrdenSurtimiento _ordenSurtimiento;
+        
         private readonly static string TipoDocumentoOS = "OS";
         private readonly static string SeccionOS = "OrdenSurtimiento";
         private readonly static string AccionOS = "Firmar";
@@ -64,12 +66,12 @@ namespace BERRecepcion.Front.Controllers
         #endregion
 
         public OrdenSurtimientoController(IConfiguration configuration, IRestUtility utility, IGenerals generals,
-            IHostEnvironment env)
+            IOrdenSurtimiento ordenSurtimiento)
         {
             _configuration = configuration;
             _utility = utility;
             _generals = generals;
-            _env = env;
+            _ordenSurtimiento = ordenSurtimiento;
         }
 
         #region Ordenes de surtimiento
@@ -238,22 +240,18 @@ namespace BERRecepcion.Front.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrdenSurtimiento(int pageNum = 1, string search = null)
         {
-            try
-            {
+            // try
+            // {
                 int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
-               
-
-                
-
                 ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
                 ViewBag.Search = search;
-                return PartialView("_OrdenSurtimientoCard", ordenSurtimiento);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return Json(new { success = false, message = ErrorOrdenSurtimientoCard });
-            }
+                return PartialView("_OrdenSurtimientoCard", _ordenSurtimiento.GetPage(pageNum, pageSize, search));
+            // }
+            // catch (Exception ex)
+            // {
+            //     Log.Error(ex.Message);
+            //     return Json(new { success = false, message = ErrorOrdenSurtimientoCard });
+            // }
         }
 
         #endregion Refactor
