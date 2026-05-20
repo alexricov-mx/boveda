@@ -204,5 +204,16 @@ namespace BERecepcion.Api.Controllers.Consulta
             
             return result.ToActionResult(this);
         }
+
+        [HttpGet("GetOrdenesSurtimientoAsync")]
+        public async Task<IActionResult> GetOrdenesSurtimientoAsync(
+            [FromQuery] OrdenSurtimientoRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _consultaServiceAsync
+                .GetOrdenesSurtimientoAsync(request, cancellationToken);
+
+            return result.ToActionResult(this);
+        }
     }
 }

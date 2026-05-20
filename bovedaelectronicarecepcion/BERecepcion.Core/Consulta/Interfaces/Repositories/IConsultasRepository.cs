@@ -20,5 +20,8 @@ namespace BERecepcion.Core.Consulta.Interfaces.Repositories
             EstimacionesObraRequest request, 
             CancellationToken cancellationToken = default);
 
+        Task<PagedResult<SupplyOrderDto>> GetOrdenesSurtimientoAsync(
+            OrdenSurtimientoRequest request, 
+            CancellationToken cancellationToken = default);
     }
 }

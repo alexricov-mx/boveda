@@ -3,7 +3,9 @@ using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.Utils;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -75,5 +77,18 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
             result.PageNumber,
             result.PageSize
         ));
+    }
+
+    public async Task<Result<PagedResult<SupplyOrderDto>>> GetOrdenesSurtimientoAsync(
+        OrdenSurtimientoRequest request, 
+        CancellationToken cancellationToken = default)
+    {
+        if (!string.IsNullOrWhiteSpace(request.Search))
+            request.Search = SearchText.GetWhereClause(request.Search, 
+                ["SAPOrder", "Creditor", "DocumentType", "Currency", "Clave", "Contract"]);
+        var result = await _consultasRepository
+            .GetOrdenesSurtimientoAsync(request, cancellationToken);
+        return Result.Success(result);
+
     }
 }

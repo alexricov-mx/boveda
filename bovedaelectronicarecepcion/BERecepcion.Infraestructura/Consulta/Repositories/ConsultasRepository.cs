@@ -194,5 +194,39 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
                 );
 
         }
+
+        public async Task<PagedResult<SupplyOrderDto>> GetOrdenesSurtimientoAsync(
+            OrdenSurtimientoRequest request,
+            CancellationToken cancellationToken = default
+            )
+        {
+            if (request.PageNumber < 1) request.PageNumber = 1;
+            if (request.PageSize < 1) request.PageSize = 5;
+            using IDbConnection db = GetConnection();
+
+            DynamicParameters par = new();
+            par.Add("@pagenum", request.PageNumber);
+            par.Add("@pagesize", request.PageSize);
+            par.Add("@userId", request.UserId);
+            par.Add("@fechaInicial", request.FechaInicial);
+            par.Add("@fechaFinal", request.FechaFinal);
+            par.Add("@search", request.Search);
+            par.Add("@esDescarga", request.EsDescarga);
+
+            var multi = await db.QueryMultipleAsync(
+                sql: "SP_SupplyOrder_Consulta_Selecciona",
+                param: par,
+                commandType: CommandType.StoredProcedure);
+
+            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<SupplyOrderDto>()).ToList();
+
+            return new PagedResult<SupplyOrderDto>(
+                items: items,
+                totalItems: pager?.TotalItems ?? items.Count,
+                pageNumber: pager?.CurrentPage ?? request.PageNumber,
+                pageSize: pager?.PageSize ?? request.PageSize
+                );
+        }
     }
 }
