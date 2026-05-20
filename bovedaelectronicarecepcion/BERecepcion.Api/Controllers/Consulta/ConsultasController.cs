@@ -215,5 +215,18 @@ namespace BERecepcion.Api.Controllers.Consulta
 
             return result.ToActionResult(this);
         }
+
+
+        [HttpGet("GetPagedEstimacionesBancariasAsync")]
+
+        public async Task<IActionResult> GetPagedEstimacionesBancariasAsync(
+            [FromQuery] EstimacionBancariaRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _consultaServiceAsync
+                .GetEstimacionesBancariasAsync(request, cancellationToken);
+
+            return result.ToActionResult(this);
+        }
     }
 }

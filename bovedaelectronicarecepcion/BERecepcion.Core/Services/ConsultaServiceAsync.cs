@@ -1,7 +1,6 @@
 ﻿using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
-using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.Utils;
@@ -15,7 +14,21 @@ namespace BERecepcion.Core.Services;
 public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
     : IConsultaServiceAsync
 {
-    private readonly IConsultasRepository _consultasRepository  = consultasRepository;
+    private readonly IConsultasRepository _consultasRepository = consultasRepository;
+
+    public async Task<Result<PagedResult<SOEstimationDto>>> GetEstimacionesBancariasAsync(
+        EstimacionBancariaRequest request, 
+        CancellationToken cancellationToken = default
+        )
+    {
+        if (!string.IsNullOrWhiteSpace(request.Search))
+            request.Search = SearchText.GetWhereClause(request.Search, ["OrganismClave", "Contract", "saporder", "CreditorNumber"]);
+
+        var result = await _consultasRepository.GetEstimacionesBancariasAsync(request, cancellationToken);
+
+        return Result.Success(result);
+    }
+
     public async Task<Result<PagedResult<EstimacionObraResponseDto>>> GetEstimacionesObraAsync(
         EstimacionesObraRequest request,
         CancellationToken cancellationToken = default
@@ -27,12 +40,12 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
                request.Search,
                ["SAPOrder", "CreditorNumber", "Contract", "OrganismClave", "DocumentType", "Currency"]);
         }
-           
 
-        
+
+
         var result = await _consultasRepository
             .GetEstimacionesObraAsyncRefactorAsync(
-                request, 
+                request,
                 cancellationToken);
 
         var dtos = result.Items.Select(e => new EstimacionObraResponseDto
@@ -80,11 +93,11 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
     }
 
     public async Task<Result<PagedResult<SupplyOrderDto>>> GetOrdenesSurtimientoAsync(
-        OrdenSurtimientoRequest request, 
+        OrdenSurtimientoRequest request,
         CancellationToken cancellationToken = default)
     {
         if (!string.IsNullOrWhiteSpace(request.Search))
-            request.Search = SearchText.GetWhereClause(request.Search, 
+            request.Search = SearchText.GetWhereClause(request.Search,
                 ["SAPOrder", "Creditor", "DocumentType", "Currency", "Clave", "Contract"]);
         var result = await _consultasRepository
             .GetOrdenesSurtimientoAsync(request, cancellationToken);
