@@ -115,6 +115,18 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 return Problem(null, null, 500, "Error interno", null);
             }
         }
+
+        [HttpGet("GetSupplyOrderProveedorAsync")]
+        public async Task<IActionResult> GetSupplyOrderProveedorAsync(
+            [FromQuery] ProvedorSupplyOrderPagedRequest request,
+            CancellationToken cancellationToken
+            )
+        {
+            var result = await _supplyOrderServiceAsync
+                .GetPaginatedSupplyOrderByProveedorAsync(request, cancellationToken);
+            return result.ToActionResult(this);
+        }
+
         [HttpPost("SupplyOrderFirmaAsync")]
         [ProducesResponseType(typeof(DataResult<SupplyOrderDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

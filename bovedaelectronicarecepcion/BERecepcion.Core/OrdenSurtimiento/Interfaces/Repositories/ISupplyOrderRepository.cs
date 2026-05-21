@@ -25,6 +25,11 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
             SupplyOrderPagedRequest request,
             CancellationToken cancellationToken
             );
+        Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderByProveedorAsync(
+            ProvedorSupplyOrderPagedRequest request,
+            CancellationToken cancellationToken
+            );
+
 
     }
 }

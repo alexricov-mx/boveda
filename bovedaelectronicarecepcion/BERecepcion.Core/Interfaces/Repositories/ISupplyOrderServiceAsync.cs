@@ -12,7 +12,7 @@ public interface ISupplyOrderServiceAsync
         CancellationToken cancellationToken
         );
     Task<Result<PagedResult<SupplyOrderDto>>> GetPaginatedSupplyOrderByProveedorAsync(
-        SupplyOrderPagedRequest request,
+        ProvedorSupplyOrderPagedRequest request,
         CancellationToken cancellationToken
         );
 }

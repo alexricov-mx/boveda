@@ -32,8 +32,16 @@ public class SupplyOrderServiceAsync
         return Result.Success(result);
     }
 
-    public Task<Result<PagedResult<SupplyOrderDto>>> GetPaginatedSupplyOrderByProveedorAsync(SupplyOrderPagedRequest request, CancellationToken cancellationToken)
+    public async Task<Result<PagedResult<SupplyOrderDto>>> GetPaginatedSupplyOrderByProveedorAsync(
+        ProvedorSupplyOrderPagedRequest request, 
+        CancellationToken cancellationToken
+        )
     {
-        throw new NotImplementedException();
+        var result = await _supplyOrderRepositoryAsync
+            .GetListPaginatedSupplyOrderByProveedorAsync(
+            request,
+            cancellationToken);
+        return Result.Success(result);
+
     }
 }
