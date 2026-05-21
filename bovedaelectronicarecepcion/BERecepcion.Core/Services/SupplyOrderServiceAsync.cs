@@ -31,4 +31,9 @@ public class SupplyOrderServiceAsync
             cancellationToken);
         return Result.Success(result);
     }
+
+    public Task<Result<PagedResult<SupplyOrderDto>>> GetPaginatedSupplyOrderByProveedorAsync(SupplyOrderPagedRequest request, CancellationToken cancellationToken)
+    {
+        throw new NotImplementedException();
+    }
 }
