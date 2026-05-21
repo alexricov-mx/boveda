@@ -1,9 +1,11 @@
-﻿using BERecepcion.Core.Dto;
+﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Dto;
 using BERecepcion.Core.Models;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
@@ -19,5 +21,10 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
         Task<Guid> GetOSSupplyOrderIdAsync(SupplyOrderDto dto);
         Task<DataResult<SupplyOrderDto>> SupplyOrderCorreo1Async(Guid SupplyOrderID, string SignerEmail);
         Task<DataResult<SupplyOrderDto>> SupplyOrderCorreo2Async(Guid SupplyOrderID, string SignerEmail);
+        Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderAsync(
+            SupplyOrderPagedRequest request,
+            CancellationToken cancellationToken
+            );
+
     }
 }

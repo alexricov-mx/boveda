@@ -1,5 +1,6 @@
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.Interfaces.Repositories;
 using BERecepcion.Core.Options;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Services;
@@ -40,6 +41,7 @@ public static class InfrastructureServiceExtensions
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();
         services.AddScoped<IConsultaServiceAsync, ConsultaServiceAsync>();
+        services.AddScoped<ISupplyOrderServiceAsync, SupplyOrderServiceAsync>();
         return services;
     }
 }

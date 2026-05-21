@@ -24,6 +24,9 @@ using Serilog;
 using BERecepcion.Core.IntegracionEFirma;
 using BERecepcion.Infraestructura.FirmaDocumentos.Repositories;
 using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
+using System.Threading;
+using BERecepcion.Core.Interfaces.Repositories;
+using BERecepcion.Api.Extensions;
 
 // LGGD en proceso
 
@@ -44,13 +47,15 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         private readonly IUsuariosRepository _usuariosRepository;
         private readonly IDocumentoFirmadoRepository _documentoFirmadoRepository;
         private readonly IDocumentosRepository _documentosRepository;
+        private readonly ISupplyOrderServiceAsync _supplyOrderServiceAsync;
 
         public SupplyOrdersController(ISupplyOrderRepository supplyOrderRepository, IConfiguration configuration, 
                                       IHostEnvironment env, IESignRepository eSignRepository, 
                                       ISAPPIRepository sAPPIRepository, IBitacoraRepository bitacoraRepository, 
                                       IUsuariosRepository usuariosRepository, ICorreoRepository correoRepository, 
                                       IDocumentoFirmadoRepository documentoFirmadoRepository, 
-                                      IDocumentosRepository documentosRepository)
+                                      IDocumentosRepository documentosRepository,
+                                      ISupplyOrderServiceAsync supplyOrderServiceAsync)
         {
             _supplyOrderRepository = supplyOrderRepository;
             _configuration = configuration;
@@ -61,6 +66,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             _usuariosRepository = usuariosRepository;
             _correoRepository = correoRepository;
             _documentoFirmadoRepository = documentoFirmadoRepository;
+            _supplyOrderServiceAsync = supplyOrderServiceAsync;
             _documentosRepository = documentosRepository;
         }
         // GET: api/SupplyOrders/GetOSInternoAsync
@@ -81,6 +87,16 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 Log.Error("GetOSInternoAsync: {error}", ex.ToString());
                 return Problem(null, null, 500, "Error interno", null);
             }
+        }
+        [HttpGet("GetSupplyOrderInternoAsync")]
+        public async Task<IActionResult> GetSupplyOrderInternoAsync(
+            [FromQuery] SupplyOrderPagedRequest request,
+            CancellationToken cancellationToken
+            )
+        {
+            var result = await _supplyOrderServiceAsync
+                .GetPaginatedSupplyOrderAsync(request, cancellationToken);
+            return result.ToActionResult(this);
         }
         // GET: api/SupplyOrders/GetOSProveedorAsync
         [HttpGet("GetOSProveedorAsync")]
