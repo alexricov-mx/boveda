@@ -1,5 +1,6 @@
 ﻿using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Dto;
+using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
@@ -10,6 +11,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Data;
+using System.Drawing.Printing;
 using System.Linq;
 using System.Net;
 using System.Threading;
@@ -487,6 +489,34 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                 resultItem.Status = HttpStatusCode.BadRequest;
                 return resultItem;
             }
+        }
+
+        public async Task<PagedResult<SOEstimationDto>> GetSOEProveedorPaginatorAsync(SOEstimationProveedorRequestDto request, CancellationToken cancellationToken = default)
+        {
+            if (request.PageNumber < 1) request.PageNumber = 1;
+            if (request.PageSize < 1) request.PageSize = 5;
+
+            using IDbConnection db = GetConnection();
+
+            DynamicParameters par = new();
+            par.Add("@CreditorNumber", request.CreditorNumber);
+            par.Add("@pagenum", request.PageNumber);
+            par.Add("@pagesize", request.PageSize);
+
+            var result = await db.QueryMultipleAsync(
+                sql: "SP_SOEstimation_Proveedor_selecciona ", 
+                param: par, 
+                commandType: CommandType.StoredProcedure
+                );
+
+            var paging = (await result.ReadAsync<Pager>()).FirstOrDefault();
+            var items = (await result.ReadAsync<SOEstimationDto>()).ToList();
+
+            return new PagedResult<SOEstimationDto>(
+                items,
+                totalItems: paging?.TotalItems ?? items.Count,
+                pageNumber: paging?.CurrentPage ?? request.PageNumber,
+                pageSize: paging?.PageSize ?? request.PageSize);
         }
     }
 }

@@ -1,6 +1,7 @@
 ﻿using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using System.Linq;
 using System.Threading;
@@ -42,5 +43,18 @@ public class SoEstimacionServiceAsync(ISOEstimationRepository estimationReposito
         return Result.Success(
             new PagedResult<SOEstimationInternoDto>(
                 dtos, paged.TotalItems, paged.PageNumber, paged.PageSize));
+    }
+
+    public async Task<Result<PagedResult<SOEstimationDto>>> GetSOEProveedorPaginationAsync(
+        SOEstimationProveedorRequestDto request, 
+        CancellationToken cancellationToken = default
+        )
+    {
+        var result = await _estimationRepository.GetSOEProveedorPaginatorAsync(
+            request, 
+            cancellationToken 
+            );
+
+        return Result.Success(result);
     }
 }

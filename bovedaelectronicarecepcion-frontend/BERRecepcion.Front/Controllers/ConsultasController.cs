@@ -715,10 +715,13 @@ namespace BERRecepcion.Front.Controllers
                 param.Add(new CustomHttpParameter("UserID", _generals.User.UserID));
                 param.Add(new CustomHttpParameter("esDescarga", false));
                 List<string> cleanedSearchList = new List<string>();
-                foreach (var item in search)
+                if (search != null && search.Any())
                 {
-                    string removed = _generals.RemoveSpecialCharacters(item);
-                    cleanedSearchList.Add(removed);
+                    foreach (var item in search)
+                    {
+                        string removed = _generals.RemoveSpecialCharacters(item);
+                        cleanedSearchList.Add(removed);
+                    }
                 }
                 string _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
                 param.Add(new CustomHttpParameter("search", _search));

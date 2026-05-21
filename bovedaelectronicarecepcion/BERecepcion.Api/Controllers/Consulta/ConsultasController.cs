@@ -217,7 +217,7 @@ namespace BERecepcion.Api.Controllers.Consulta
         }
 
 
-        [HttpGet("GetPagedEstimacionesBancariasAsync")]
+        [HttpGet("GetPagedOrdenesBancariasAsync")]
 
         public async Task<IActionResult> GetPagedEstimacionesBancariasAsync(
             [FromQuery] EstimacionBancariaRequest request,

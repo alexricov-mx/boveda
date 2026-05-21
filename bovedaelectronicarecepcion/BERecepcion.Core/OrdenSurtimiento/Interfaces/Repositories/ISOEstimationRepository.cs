@@ -1,11 +1,9 @@
 ﻿using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Dto;
-using BERecepcion.Core.eSignDto;
+using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
-using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -31,5 +29,10 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
         Task<DataResult<SupplyOrderDto>> EstimacionCorreo1Async(Guid EstimacionID, string SignerEmail);
         Task<DataResult<SupplyOrderDto>> EstimacionCorreo2Async(Guid EstimacionID, string SignerEmail);
         Task<DataResult<IEnumerable<SupplyOrderDto>>> GetListaOrdenesBancariasAsync(DateTime start, DateTime end, string search, string UserID, string claveOrganismo, string creditorNumber, int pageSize, int pageNum = 1, bool esDescarga = false);
+        Task<PagedResult<SOEstimationDto>> GetSOEProveedorPaginatorAsync(
+            SOEstimationProveedorRequestDto request,
+            CancellationToken cancellationToken = default
+            );
+
     }
 }

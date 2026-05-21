@@ -139,7 +139,17 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 return Problem(null, null, 500, "Error interno", null);
             }
         }
-
+        [HttpGet("GetSOEProveedorPaginatorAsync")]
+        public async Task<IActionResult> GetSOEProveedorPaginatorAsync(
+            [FromQuery] SOEstimationProveedorRequestDto request,
+            CancellationToken cancellationToken = default
+            )
+        {
+            var result = await _soEstimacionService.GetSOEProveedorPaginationAsync(
+                request, cancellationToken
+                ); 
+            return result.ToActionResult(this);
+        }
 
         [HttpPost("Firma2")]
         [ProducesResponseType(typeof(DataResult<ExternosDto>), StatusCodes.Status200OK)]
