@@ -101,7 +101,13 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
                 ["SAPOrder", "Creditor", "DocumentType", "Currency", "Clave", "Contract"]);
         var result = await _consultasRepository
             .GetOrdenesSurtimientoAsync(request, cancellationToken);
-        return Result.Success(result);
+        return Result.Success(
+            new PagedResult<SupplyOrderDto>(
+                result.Items,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize
+            ));
 
     }
 }

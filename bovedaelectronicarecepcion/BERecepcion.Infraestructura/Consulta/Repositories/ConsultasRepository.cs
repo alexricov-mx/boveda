@@ -219,15 +219,15 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
                 param: par,
                 commandType: CommandType.StoredProcedure);
 
-            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var totalItems = (await multi.ReadAsync<int>()).FirstOrDefault();
             var items = (await multi.ReadAsync<SupplyOrderDto>()).ToList();
+            var pager = new Pager(totalItems, request.PageNumber, request.PageSize);
 
             return new PagedResult<SupplyOrderDto>(
                 items: items,
-                totalItems: pager?.TotalItems ?? items.Count,
-                pageNumber: pager?.CurrentPage ?? request.PageNumber,
-                pageSize: pager?.PageSize ?? request.PageSize
-                );
+                totalItems: pager.TotalItems,
+                pageNumber: pager.CurrentPage,
+                pageSize: pager.PageSize);
         }
 
         public async Task<PagedResult<SOEstimationDto>> GetEstimacionesBancariasAsync(
