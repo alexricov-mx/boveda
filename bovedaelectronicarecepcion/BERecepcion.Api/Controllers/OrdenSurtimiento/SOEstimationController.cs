@@ -139,8 +139,8 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 return Problem(null, null, 500, "Error interno", null);
             }
         }
-        [HttpGet("GetSOEProveedorPaginatorAsync")]
-        public async Task<IActionResult> GetSOEProveedorPaginatorAsync(
+        [HttpGet("GetSupplyOrderEstimationProveedorAsync")]
+        public async Task<IActionResult> GetSupplyOrderEstimationProveedorAsync(
             [FromQuery] SOEstimationProveedorRequestDto request,
             CancellationToken cancellationToken = default
             )
