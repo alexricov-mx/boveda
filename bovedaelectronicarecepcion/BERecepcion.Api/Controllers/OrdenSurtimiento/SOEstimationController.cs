@@ -108,11 +108,11 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         /// Obtiene estimaciones internas paginadas usando la capa de servicio con Result&lt;T&gt;.
         /// Las respuestas de error siguen ProblemDetails RFC 7807.
         /// </summary>
-        [HttpGet("GetSOEInternoRefactorAsync")]
+        [HttpGet("GetSupplyOrderEstimacionesInternoAsync")]
         [ProducesResponseType(typeof(PagedResult<SOEstimationInternoDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status400BadRequest)]
         [ProducesResponseType(typeof(ProblemDetails), StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetSOEInternoRefactorAsync(
+        public async Task<IActionResult> GetSupplyOrderEstimacionesInternoAsync(
             [FromQuery] SOEstimationInternoRequestDto request,
             CancellationToken cancellationToken = default)
         {
