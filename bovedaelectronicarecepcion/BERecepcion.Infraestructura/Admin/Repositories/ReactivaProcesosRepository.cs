@@ -45,7 +45,7 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
                 //using para levantar la conexion al BD
                 using (IDbConnection db = GetConnection())
                 {
-                    var result = await db.QueryFirstAsync<ReactivaProcesosDto>(sql: "SP_envio_firma_selecciona ", param: par, commandType: CommandType.StoredProcedure);
+                    var result = await db.QueryFirstOrDefaultAsync<ReactivaProcesosDto>(sql: "SP_envio_firma_selecciona", param: par, commandType: CommandType.StoredProcedure);
                     resultItem.Data = result;
 
                     return resultItem;
