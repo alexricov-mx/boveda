@@ -1,23 +1,30 @@
-﻿using BERecepcion.Core.Dto;
+﻿using BERecepcion.Core.Admin.Dto;
+using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Dto;
+using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.SAPPI.Interfaces.Repositories;
+using BERecepcion.Infraestructura.Repositories;
 using Dapper;
-using Newtonsoft.Json;
 using RestSharp;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using Serilog;
-using BERecepcion.Core.SAPPI.Interfaces.Repositories;
-using BERecepcion.Infraestructura.Repositories;
-using BERecepcion.Core.Admin.Interfaces.Repositories;
-using BERecepcion.Core.Admin.Dto;
 
 namespace BERecepcion.Infraestructura.Admin.Repositories
 {
-    public class ReactivaProcesosRepository : BaseSQLServerSqlRepository, IReactivaProcesosRepository
+    public class ReactivaProcesosRepository 
+        : BaseSQLServerSqlRepository, IReactivaProcesosRepository
     {
         private readonly ISAPPIRepository _sapPIRepository;
+        public ReactivaProcesosRepository(IDbConnectionFactory connectionFactory)
+            : base(connectionFactory)
+        {
+
+        }
         public ReactivaProcesosRepository(string cnnString, ISAPPIRepository sAPPIRepository) : base(cnnString)
         {
             _sapPIRepository = sAPPIRepository;
@@ -131,6 +138,31 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
 
                 return resultItemIenum;
             }
+
+        }
+
+        public async Task<IEnumerable<ReactivaProcesosResponseDto>> GetReactivaProcesosBySAPOrderAsync(string OrderSAP, CancellationToken cancellationToken)
+        {
+
+                using IDbConnection db = GetConnection();
+
+                DynamicParameters par = new();
+                par.Add("@SAPOrder", OrderSAP);
+
+                var result = await db.QueryAsync<ReactivaProcesosResponseDto>(
+                    sql: "SP_envio_ReactivaProcesos_selecciona ", 
+                    param: par, 
+                    commandType: CommandType.StoredProcedure 
+                    );
+                if (result != null)
+                {
+                    foreach (var r in result)
+                    {
+                        if (!string.IsNullOrEmpty(r.ResultadoTarea1)) r.ResultadoTarea1 = r.ResultadoTarea1.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
+                        if (!string.IsNullOrEmpty(r.ResultadoTarea2)) r.ResultadoTarea2 = r.ResultadoTarea2.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
+                    }
+                }
+            return result;
 
         }
 

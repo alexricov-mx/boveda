@@ -184,7 +184,6 @@ try
     builder.Services.AddTransient<IAdmonGRMRepository>(x => new AdmonGRMRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<ICentrosGestoresRepository>(x => new CentrosGestoresRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<ICatalogosRepository>(x => new CatalogosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IReactivaProcesosRepository>(x => new ReactivaProcesosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], new SAPPIRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration)));
     builder.Services.AddTransient<ICatalogosRepository>(x => new CatalogosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPerfilesRepository>(x => new PerfilesRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IRolesCatalogoRepository>(x => new RolesCatalogoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));

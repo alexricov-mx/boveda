@@ -1,8 +1,7 @@
 ﻿using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Dto;
-using System;
 using System.Collections.Generic;
-using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Core.Admin.Interfaces.Repositories
@@ -11,7 +10,8 @@ namespace BERecepcion.Core.Admin.Interfaces.Repositories
     {
         Task<DataResult<ReactivaProcesosDto>> GetEnvioFirmaAsync(string SAPOrder);
         Task<DataResult<JsonRP>> PIEnvioReactivaProcesosAsync(DataResult<JsonRP> datosRect);
-        Task<DataResult<IEnumerable<ReactivaProcesosResponseDto>>> GetReactivaProcesosAsync(string OrderSAP);        
-        
+        Task<DataResult<IEnumerable<ReactivaProcesosResponseDto>>> GetReactivaProcesosAsync(string OrderSAP);
+        Task<IEnumerable<ReactivaProcesosResponseDto>> GetReactivaProcesosBySAPOrderAsync(string OrderSAP, CancellationToken cancellationToken);
+
     }
 }

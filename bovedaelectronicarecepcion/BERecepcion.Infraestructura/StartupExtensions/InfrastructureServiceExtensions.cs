@@ -1,9 +1,11 @@
+using BERecepcion.Core.Admin.Interfaces.Repositories;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.Interfaces.Repositories;
 using BERecepcion.Core.Options;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Services;
+using BERecepcion.Infraestructura.Admin.Repositories;
 using BERecepcion.Infraestructura.Consulta.Repositories;
 using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
 using BERecepcion.Infraestructura.Repositories;
@@ -37,11 +39,13 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ISOEstimationRepository, SOEstimacionRepository>();
         services.AddScoped<ISupplyOrderRepository, SupplyOrderRepository>();
         services.AddScoped<IConsultasRepository, ConsultasRepository>();
+        services.AddScoped<IReactivaProcesosRepository, ReactivaProcesosRepository>();
 
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();
         services.AddScoped<IConsultaServiceAsync, ConsultaServiceAsync>();
         services.AddScoped<ISupplyOrderServiceAsync, SupplyOrderServiceAsync>();
+        services.AddScoped<IReactivaProcesoServiceAsync, ReactivaProcesoServiceAsync>();
         return services;
     }
 }
