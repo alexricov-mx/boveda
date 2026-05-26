@@ -4,7 +4,6 @@ using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.Utils;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -17,7 +16,7 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
     private readonly IConsultasRepository _consultasRepository = consultasRepository;
 
     public async Task<Result<PagedResult<SOEstimationDto>>> GetEstimacionesBancariasAsync(
-        EstimacionBancariaRequest request, 
+        EstimacionBancariaRequest request,
         CancellationToken cancellationToken = default
         )
     {
@@ -26,7 +25,14 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
 
         var result = await _consultasRepository.GetEstimacionesBancariasAsync(request, cancellationToken);
 
-        return Result.Success(result);
+        //return Result.Success(result);
+        return Result.Success(
+            new PagedResult<SOEstimationDto>(
+                result.Items,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize
+            ));
     }
 
     public async Task<Result<PagedResult<EstimacionObraResponseDto>>> GetEstimacionesObraAsync(

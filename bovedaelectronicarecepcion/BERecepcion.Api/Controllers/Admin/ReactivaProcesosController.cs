@@ -6,11 +6,6 @@ using BERecepcion.Core.Dto;
 using BERecepcion.Core.SAPPI.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers.Admin

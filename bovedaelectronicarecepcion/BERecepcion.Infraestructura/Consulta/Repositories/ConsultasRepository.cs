@@ -183,15 +183,15 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
                 commandType: CommandType.StoredProcedure
                 );
 
-            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var totalItems = (await multi.ReadAsync<int>()).FirstOrDefault();
             var items = (await multi.ReadAsync<SOEstimationDto>()).ToList();
-
+            var pager = new Pager(totalItems, request.PageNumber, request.PageSize);
 
             return new PagedResult<SOEstimationDto>(
                 items: items,
-                totalItems: pager?.TotalItems ?? items.Count,
-                pageNumber: pager?.CurrentPage ?? request.PageNumber,
-                pageSize: pager?.PageSize ?? request.PageSize
+                totalItems: pager.TotalItems,
+                pageNumber: pager.CurrentPage,
+                pageSize: pager.PageSize
                 );
 
         }
@@ -254,15 +254,16 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
                 sql: "SP_SOEstimation_bancario_tabla_seleccion", 
                 param: par, commandType: CommandType.StoredProcedure
                 );
-            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
-            var items = (await multi.ReadAsync<SOEstimationDto>()).ToList();
 
+            var totalItems = (await multi.ReadAsync<int>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<SOEstimationDto>()).ToList();
+            var pager = new Pager(totalItems, request.PageNumber, request.PageSize);
 
             return new PagedResult<SOEstimationDto>(
                 items: items,
-                totalItems: pager?.TotalItems ?? items.Count,
-                pageNumber: pager?.CurrentPage ?? request.PageNumber,
-                pageSize: pager?.PageSize ?? request.PageSize
+                totalItems: pager.TotalItems,
+                pageNumber: pager.CurrentPage,
+                pageSize: pager.PageSize
                 );
         }
     }
