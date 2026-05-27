@@ -33,12 +33,12 @@ function updateSearch() {
 
 var OrdenSurtimientoConsultaTable = function (pageNum = 1, fechaInicial = null, fechaFinal = null, search = []) {
     $.ajax({
-        type: "POST",
-        url: "Consultas/OrdenSurtimientoConsultaTable",
+        type: "GET",
+        url: "OrdenSurtimiento/GetOrdenSurtimientoPorFechas",
         data: { fechaInicial: fechaInicial, fechaFinal : fechaFinal, pageNum : pageNum, search: search },
         success: function (data) {
-            if (!isNull(data.success) && !data.success)
-                return errorAlert(data.message);
+            // if (!isNull(data.success) && !data.success)
+            //     return errorAlert(data.message);
             $("#os-consulta-table").empty();
             $("#os-consulta-table").append(data);
             darkMode(getCookie("dark-mode") == "true");
@@ -47,6 +47,8 @@ var OrdenSurtimientoConsultaTable = function (pageNum = 1, fechaInicial = null, 
             else
                 $("#Excel").show();
         }
+    }).fail(function () {   
+        
     });
 }
 //Buscar órdenes de surtimiento

@@ -323,21 +323,15 @@ namespace BERRecepcion.Front
             // app.UseMiddleware<PreventDoublePostMiddleware>();
 
             app.UseRouting();
-
-            // ========================================
-            // FIX CRÍTICO: UseSession DEBE ir ANTES de UseAuthentication/UseAuthorization
-            // ========================================
-            // ValidateUserAttribute lee HttpContext.Session["UserMenu"].
-            // Si UseSession() está después de UseAuthorization(), la sesión NO existe
-            // cuando los filtros de autorización se ejecutan, causando comportamiento impredecible.
             app.UseSession();
-            // if (env.IsDevelopment())
-            // {
-            //     app.UseCors("VueDevOrigin");
-            // }
-
+            if (env.IsDevelopment())
+            {
+                app.UseCors("VueDevOrigin");
+            }
             app.UseAuthentication();
             app.UseAuthorization();
+            
+            
 
             app.UseEndpoints(endpoints =>
             {

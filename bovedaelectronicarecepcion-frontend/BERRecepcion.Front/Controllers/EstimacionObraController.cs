@@ -10,6 +10,8 @@ using System;
 using System.Linq;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BERRecepcion.Front.Interfaces.Services.BackEndApi.EstimacionObra;
+using BERRecepcion.Front.Services.Uris;
 using static BERRecepcion.Front.Models.CrearPaquete;
 
 namespace BERRecepcion.Front.Controllers
@@ -17,16 +19,7 @@ namespace BERRecepcion.Front.Controllers
     [ValidateUser]
     public class EstimacionObraController : Controller
     {
-        #region Servicios
-        private static readonly string GetSOEInterno = "SOEstimation/GetSOEInternoAsync";
-        private static readonly string GetSOEProveedor = "SOEstimation/GetSOEProveedorAsync";
-        private static readonly string GetDocumentoFirmadoEO = "DocumentoFirmado/GetDocumentoFirmadoAsync";
-        private static readonly string GetListaFiltroCopadesEO = "Copade/GetListaFiltroCopadesAsync";
-        private static readonly string PostValidaOCreaUsuarios = "ESign/ValidaOCreaUsuarios";
-        private static readonly string PostFirmaUnoEO = "SOEstimation/FirmaUnoAsync";
-        private static readonly string PostFirmaDosEO = "SOEstimation/FirmaDosAsync";
-        private static readonly string PostCompletaFirmaEO = "SOEstimation/CompletaFirmaAsync";
-        #endregion
+ 
 
         #region Paginado
         private static readonly string PageSize = "pageSize";
@@ -51,6 +44,9 @@ namespace BERRecepcion.Front.Controllers
         protected readonly IConfiguration _configuration;
         protected readonly IRestUtility _utility;
         protected readonly IGenerals _generals;
+        private readonly IEstimacionObra _estimacionObra;
+        
+        
         private static readonly int FirmateUnico = 1;
         private static readonly int DosFirmates = 2;
         private readonly static string TipoDocumento = "ES";
@@ -59,11 +55,12 @@ namespace BERRecepcion.Front.Controllers
 
         #endregion
 
-        public EstimacionObraController(IConfiguration configuration, IRestUtility utility, IGenerals generals)
+        public EstimacionObraController(IConfiguration configuration, IRestUtility utility, IGenerals generals, IEstimacionObra estimacionObra)
         {
             _configuration = configuration;
             _utility = utility;
             _generals = generals;
+            _estimacionObra = estimacionObra;
         }
         [RoleFilter(Roles: "ReceptionSignSOEstimations")]
         [UserTypeFilter("UserTypeS,UserTypeA,UserTypeF,UserTypeP")]
@@ -73,47 +70,47 @@ namespace BERRecepcion.Front.Controllers
         }
 
         [HttpGet]
-        public async Task<IActionResult> EstimacionObraTable(int pageNum = 1)
-        {
-            try
-            {
-                var param = new List<CustomHttpParameter>();
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
-                param.Add(new CustomHttpParameter(PageSize, pageSize));
-                param.Add(new CustomHttpParameter(PageNumber, pageNum));
-
-                var estimacionObra = new DataResult<IEnumerable<SOEstimationDto>>();
-                if (_generals.User.UserType != UserTypEO)                    
-                {
-                    param.Add(new CustomHttpParameter(TokenEO, _generals.User.Token));
-                   
-                    estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(GetSOEInterno, param);
-                }
-                else
-                {
-                    param.Add(new CustomHttpParameter(CreditorNumberEO, _generals.User.CreditorNumber));
-                    estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(GetSOEProveedor, param);
-                }
-                
-                if (estimacionObra.Pager == null)
-                {
-                    Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
-                    estimacionObra.Pager = new Pager(estimacionObra?.Data?.Count() ?? 0, pageNum, pageSize);
-                }
-                else
-                {
-                    Log.Information($"✓ Pager recibido: TotalItems={estimacionObra.Pager.TotalItems}");
-                    estimacionObra.Pager = new Pager(estimacionObra.Pager.TotalItems, pageNum, pageSize);
-                }
-                ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
-                return PartialView("_EstimacionObraTable", estimacionObra);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return Json(new { Success = false, Message = ErrorCargaEstimacionObra });
-            }
-        }
+        // public async Task<IActionResult> EstimacionObraTable(int pageNum = 1)
+        // {
+        //     try
+        //     {
+        //         var param = new List<CustomHttpParameter>();
+        //         int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
+        //         param.Add(new CustomHttpParameter(PageSize, pageSize));
+        //         param.Add(new CustomHttpParameter(PageNumber, pageNum));
+        //
+        //         var estimacionObra = new DataResult<IEnumerable<SOEstimationDto>>();
+        //         if (_generals.User.UserType != UserTypEO)                    
+        //         {
+        //             param.Add(new CustomHttpParameter(TokenEO, _generals.User.Token));
+        //            
+        //             estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(UrisEstimacionObra.GetSOEInterno, param);
+        //         }
+        //         else
+        //         {
+        //             param.Add(new CustomHttpParameter(CreditorNumberEO, _generals.User.CreditorNumber));
+        //             estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(UrisEstimacionObra.GetSOEProveedor, param);
+        //         }
+        //         
+        //         if (estimacionObra.Pager == null)
+        //         {
+        //             Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
+        //             estimacionObra.Pager = new Pager(estimacionObra?.Data?.Count() ?? 0, pageNum, pageSize);
+        //         }
+        //         else
+        //         {
+        //             Log.Information($"✓ Pager recibido: TotalItems={estimacionObra.Pager.TotalItems}");
+        //             estimacionObra.Pager = new Pager(estimacionObra.Pager.TotalItems, pageNum, pageSize);
+        //         }
+        //         ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
+        //         return PartialView("_EstimacionObraTable", estimacionObra);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Log.Error(ex.Message);
+        //         return Json(new { Success = false, Message = ErrorCargaEstimacionObra });
+        //     }
+        // }
 
         [HttpPost]
         public async Task<IActionResult> Firmar([FromBody] SOEstimationDto model)
@@ -124,7 +121,7 @@ namespace BERRecepcion.Front.Controllers
                 {
                     Data = _generals.Usuario
                 };
-                DataResult<UsuarioDto> responseUsuario = await _utility.Post(responseExternos, PostValidaOCreaUsuarios);
+                DataResult<UsuarioDto> responseUsuario = await _utility.Post(responseExternos, UrisEstimacionObra.PostValidaOCreaUsuarios);
 
                 if (responseUsuario.Status != System.Net.HttpStatusCode.OK || responseUsuario.Data == null)
                     return Json(new { success = false, message = responseUsuario.Message });
@@ -165,12 +162,12 @@ namespace BERRecepcion.Front.Controllers
                 };
 
                 if (string.IsNullOrWhiteSpace(model.ProviderSignDate.ToString()))
-                    documentoResult = await _utility.Post(dataResult, PostFirmaUnoEO);
+                    documentoResult = await _utility.Post(dataResult, UrisEstimacionObra.PostFirmaUnoEO);
                 else
                 {
                     List<CustomHttpParameter> param = new List<CustomHttpParameter>();
                     param.Add(new CustomHttpParameter(DoctoBE, model.EstimacionID));
-                    DataResult<DocumentoFirmadoDto> documentoFirmado = await _utility.GetItem<DataResult<DocumentoFirmadoDto>>(GetDocumentoFirmadoEO, param);
+                    DataResult<DocumentoFirmadoDto> documentoFirmado = await _utility.GetItem<DataResult<DocumentoFirmadoDto>>(UrisEstimacionObra.GetDocumentoFirmadoEO, param);
                     if (documentoFirmado.Status != System.Net.HttpStatusCode.OK)
                         return Json(new { success = false, message = documentoFirmado.Message });
 
@@ -183,7 +180,7 @@ namespace BERRecepcion.Front.Controllers
                         }
                     };
 
-                    documentoResult = await _utility.Post(dataResult, PostFirmaDosEO);
+                    documentoResult = await _utility.Post(dataResult, UrisEstimacionObra.PostFirmaDosEO);
 
                 }
                 return Json(new { success = true, message = FirmaExitosa, documentoResult.Data });
@@ -224,7 +221,7 @@ namespace BERRecepcion.Front.Controllers
                         }
                     }
                 };
-                var Completafirma = await _utility.Post(externosCompletaFirma, PostCompletaFirmaEO);
+                var Completafirma = await _utility.Post(externosCompletaFirma, UrisEstimacionObra.PostCompletaFirmaEO);
                 if (Completafirma.Status != System.Net.HttpStatusCode.OK)
                     return Json(new { success = false, message = Completafirma.Message });
 
@@ -250,17 +247,28 @@ namespace BERRecepcion.Front.Controllers
             if (_generals.User.UserType != UserTypEO)
             {
                 param.Add(new CustomHttpParameter(TokenEO, _generals.User.Token));
-                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(GetListaFiltroCopadesEO, param);
+                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(UrisEstimacionObra.GetListaFiltroCopadesEO, param);
             }
             else
             {
                 param.Add(new CustomHttpParameter(FiltroEO, filtro));
-                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(GetListaFiltroCopadesEO, param);
+                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(UrisEstimacionObra.GetListaFiltroCopadesEO, param);
 
             }
 
             CopadeSeguimiento.Pager = new Pager(0, pageNum, pageSize);
             return PartialView("GenerarTablaCopade", CopadeSeguimiento);
         }
+        
+        #region Refactor
+         [HttpGet]
+        public async Task<IActionResult> GetEstimacionObraTable(int pageNum = 1)
+        {
+                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
+                ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
+                return PartialView("_EstimacionObraTable", await _estimacionObra.GetPage(pageNum, pageSize));
+           
+        }
+        #endregion refactor
     }
 }

@@ -48,6 +48,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="logs\" />
+    <Folder Include="Services\BackEndApi\Consultas\OrdenSurtimiento\" />
     <Folder Include="TemporalPDF\" />
     <Folder Include="wwwroot\css\DatetimePicker\" />
   </ItemGroup>

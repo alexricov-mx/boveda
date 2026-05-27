@@ -1,9 +1,10 @@
 ﻿@using BERRecepcion.Front.Models.Dto
+@using BERRecepcion.Front.Models
 @using Newtonsoft.Json
 
-@model DataResult<IEnumerable<SOEstimationDto>>
+@model PagedResult<SOEstimationDto>
 @{
-    bool contieneEstimaciones = Model != null && Model.Data != null && Model.Data.Count() > 0;
+    bool contieneEstimaciones = Model != null && Model.items != null && Model.items.Count > 0;
 }
 
 <div class="card">
@@ -35,7 +36,7 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Data)
+                    @foreach (var item in Model.items)
                     {
                         <tr>
                             <td scope="row" class="text-center">
@@ -82,7 +83,7 @@
                     </button>
                 </div>
                 <div class="col-12 col-sm-9 col-md-10 col-lg-10 col-xl-10">
-                    <partial name="_Pagination" model="@Model.Pager" />
+                    <partial name="_Pagination" model="@(new Pager(Model.totalItems, Model.pageNumber, Model.pageSize))" />
                 </div>
             </div>
             <script>

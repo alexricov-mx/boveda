@@ -9,6 +9,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenSurtimiento;
 using BERRecepcion.Front.Models.IntegracionEFirma;
@@ -24,12 +25,12 @@ namespace BERRecepcion.Front.Controllers
     {
         #region Paginado
 
-        private static readonly string PageSize = "pageSize";
-        private static readonly string PageNumber = "pageNum";
-        private static readonly string Search = "search";
-        private static readonly string UserTypeOS = "UserTypeP";
-        private static readonly string TokenOS = "Token";
-        private static readonly string CreditorNumberOS = "CreditorNumber";
+        // private static readonly string PageSize = "pageSize";
+        // private static readonly string PageNumber = "pageNum";
+        // private static readonly string Search = "search";
+        // private static readonly string UserTypeOS = "UserTypeP";
+        // private static readonly string TokenOS = "Token";
+        // private static readonly string CreditorNumberOS = "CreditorNumber";
 
         #endregion
 
@@ -83,54 +84,54 @@ namespace BERRecepcion.Front.Controllers
             return View();
         }
 
-        [HttpGet]
-        public async Task<IActionResult> OrdenSurtimientoCard(int pageNum = 1, string search = null)
-        {
-            try
-            {
-                var param = new List<CustomHttpParameter>();
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
-                param.Add(new CustomHttpParameter(PageSize, pageSize));
-                param.Add(new CustomHttpParameter(PageNumber, pageNum));
-                param.Add(new CustomHttpParameter(Search, search));
-
-                var ordenSurtimiento = new DataResult<IEnumerable<SupplyOrderDto>>();
-                if (_generals.User.UserType != UserTypeOS)
-                {
-                    param.Add(new CustomHttpParameter(TokenOS, _generals.User.Token));
-                    ordenSurtimiento =
-                        await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>(
-                            UrisOrdenSurtimiento.GetListOSInterno, param);
-                }
-                else
-                {
-                    param.Add(new CustomHttpParameter(CreditorNumberOS, _generals.User.CreditorNumber));
-                    ordenSurtimiento =
-                        await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>(
-                            UrisOrdenSurtimiento.GetListOSProveedor, param);
-                }
-
-                if (ordenSurtimiento.Pager == null)
-                {
-                    Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
-                    ordenSurtimiento.Pager = new Pager(ordenSurtimiento?.Data?.Count() ?? 0, pageNum, pageSize);
-                }
-                else
-                {
-                    Log.Information($"✓ Pager recibido: TotalItems={ordenSurtimiento.Pager.TotalItems}");
-                    ordenSurtimiento.Pager = new Pager(ordenSurtimiento.Pager.TotalItems, pageNum, pageSize);
-                }
-
-                ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
-                ViewBag.Search = search;
-                return PartialView("_OrdenSurtimientoCard", ordenSurtimiento);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return Json(new { success = false, message = ErrorOrdenSurtimientoCard });
-            }
-        }
+        // [HttpGet]
+        // public async Task<IActionResult> OrdenSurtimientoCard(int pageNum = 1, string search = null)
+        // {
+        //     try
+        //     {
+        //         var param = new List<CustomHttpParameter>();
+        //         int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
+        //         param.Add(new CustomHttpParameter(PageSize, pageSize));
+        //         param.Add(new CustomHttpParameter(PageNumber, pageNum));
+        //         param.Add(new CustomHttpParameter(Search, search));
+        //
+        //         var ordenSurtimiento = new DataResult<IEnumerable<SupplyOrderDto>>();
+        //         if (_generals.User.UserType != UserTypeOS)
+        //         {
+        //             param.Add(new CustomHttpParameter(TokenOS, _generals.User.Token));
+        //             ordenSurtimiento =
+        //                 await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>(
+        //                     UrisOrdenSurtimiento.GetListOSInterno, param);
+        //         }
+        //         else
+        //         {
+        //             param.Add(new CustomHttpParameter(CreditorNumberOS, _generals.User.CreditorNumber));
+        //             ordenSurtimiento =
+        //                 await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>(
+        //                     UrisOrdenSurtimiento.GetListOSProveedor, param);
+        //         }
+        //
+        //         if (ordenSurtimiento.Pager == null)
+        //         {
+        //             Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
+        //             ordenSurtimiento.Pager = new Pager(ordenSurtimiento?.Data?.Count() ?? 0, pageNum, pageSize);
+        //         }
+        //         else
+        //         {
+        //             Log.Information($"✓ Pager recibido: TotalItems={ordenSurtimiento.Pager.TotalItems}");
+        //             ordenSurtimiento.Pager = new Pager(ordenSurtimiento.Pager.TotalItems, pageNum, pageSize);
+        //         }
+        //
+        //         ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
+        //         ViewBag.Search = search;
+        //         return PartialView("_OrdenSurtimientoCard", ordenSurtimiento);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Log.Error(ex.Message);
+        //         return Json(new { success = false, message = ErrorOrdenSurtimientoCard });
+        //     }
+        // }
 
         [HttpPost]
         public async Task<IActionResult> Firmar([FromBody] SupplyOrderDto model)
@@ -240,20 +241,32 @@ namespace BERRecepcion.Front.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrdenSurtimiento(int pageNum = 1, string search = null)
         {
-            // try
-            // {
                 int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
                 ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
                 ViewBag.Search = search;
-                return PartialView("_OrdenSurtimientoCard", _ordenSurtimiento.GetPage(pageNum, pageSize, search));
-            // }
-            // catch (Exception ex)
-            // {
-            //     Log.Error(ex.Message);
-            //     return Json(new { success = false, message = ErrorOrdenSurtimientoCard });
-            // }
+                return PartialView("_OrdenSurtimientoCard", await _ordenSurtimiento.GetPage(pageNum, pageSize, search));
         }
-
+        
+        [HttpGet]
+        public async Task<IActionResult> GetOrdenSurtimientoPorFechas(DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, string[] search = null)
+        {
+                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
+                string _search = string.Empty;
+                fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
+                fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
+                if (search != null)
+                {
+                    List<string> cleanedSearchList = new List<string>();
+                    foreach (var item in search)
+                    {
+                        string removed = _generals.RemoveSpecialCharacters(item);
+                        cleanedSearchList.Add(removed);
+                    }
+                    _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
+                }
+               
+                return PartialView("~/Views/Consultas/OrdenSurtimiento/_OrdenSurtimientoConsultaTable.cshtml", await _ordenSurtimiento.GetPageByDateRange( fechaInicial, fechaFinal, pageNum, pageSize, _search));
+        }
         #endregion Refactor
     }
 }

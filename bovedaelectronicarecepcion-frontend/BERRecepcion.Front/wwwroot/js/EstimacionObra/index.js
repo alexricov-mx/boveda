@@ -34,11 +34,11 @@
 function EstimacionObraTable(pageNum = 1) {
     $.ajax({
         type: "GET",
-        url: "EstimacionObra/EstimacionObraTable",
+        url: "EstimacionObra/GetEstimacionObraTable",
         data: { pageNum: pageNum },
         success: function (data) {
-            if (!isNull(data.success) && !data.success)
-                return errorAlert(data.message);
+            // if (!isNull(data.success) && !data.success)
+            //     return errorAlert(data.message);
             $("#estimacion-card").empty();
             $("#estimacion-card").append(data);
             darkMode(getCookie("dark-mode") == "true");

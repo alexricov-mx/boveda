@@ -39,17 +39,33 @@
     });
 });
 
+// function OrdenSurtimientoCard(pageNum = 1, search = "") {
+//     $.ajax({
+//         url: "OrdenSurtimiento/OrdenSurtimientoCard",
+//         data: { pageNum: pageNum, search: search },
+//     }).then(function (data) {
+//         if (!isNull(data.success) && !data.success)
+//             return errorAlert(data.message);
+//         $("#ordenSurtimiento-card").empty();
+//         $("#ordenSurtimiento-card").append(data);
+//         darkMode(getCookie("dark-mode") == "true");
+//     });
+// }
+
+
 function OrdenSurtimientoCard(pageNum = 1, search = "") {
     $.ajax({
-        url: "OrdenSurtimiento/OrdenSurtimientoCard",
+        url: "OrdenSurtimiento/GetOrdenSurtimiento",
         data: { pageNum: pageNum, search: search },
     }).then(function (data) {
-        if (!isNull(data.success) && !data.success)
-            return errorAlert(data.message);
-        $("#ordenSurtimiento-card").empty();
-        $("#ordenSurtimiento-card").append(data);
+         $("#ordenSurtimiento-card").empty();
+         $("#ordenSurtimiento-card").append(data);
         darkMode(getCookie("dark-mode") == "true");
+    }).fail(function (xhr) {
+        console.error(xhr);
+        //return errorAlert(data.message);
     });
 }
+
 
 

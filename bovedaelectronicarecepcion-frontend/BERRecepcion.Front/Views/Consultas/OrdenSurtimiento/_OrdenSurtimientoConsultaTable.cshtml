@@ -1,8 +1,9 @@
 ﻿@using BERRecepcion.Front.Models.Dto
+@using BERRecepcion.Front.Models
 @using Newtonsoft.Json
-@model DataResult<IEnumerable<SupplyOrderDto>>
+@model PagedResult<SupplyOrderDto>
 @{
-    bool hasData = Model != null && Model.Data != null && Model.Data.Count() > 0;
+    bool hasData = Model != null && Model.items != null && Model.items.Count > 0;
 }
 @if (hasData)
 {
@@ -34,7 +35,7 @@
             </tr>
         </thead>
         <tbody>
-            @foreach (var item in Model.Data)
+            @foreach (var item in Model.items)
             {
                 <tr>
                     <td class="text-center">
@@ -69,7 +70,7 @@
     </table>
     <div class="row mt-2">
         <div class="col-12">
-            <partial name="_Pagination" model="@Model.Pager" />
+            <partial name="_Pagination" model="@(new Pager(Model.totalItems, Model.pageNumber, Model.pageSize))" />
         </div>
     </div>
     <script>

@@ -1125,50 +1125,50 @@ namespace BERRecepcion.Front.Controllers
             ViewBag.Search = cleanedSearchList.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             return View("OrdenSurtimiento/index");
         }
-        [HttpPost]
-        public async Task<IActionResult> OrdenSurtimientoConsultaTable(DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, IEnumerable<string> search = null)
-        {
-            try
-            {
-                fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
-                fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
-                var param = new List<CustomHttpParameter>();
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
-                param.Add(new CustomHttpParameter("pageSize", pageSize));
-                param.Add(new CustomHttpParameter("userId", _generals.User.UserID));
-                param.Add(new CustomHttpParameter("fechaInicial", fechaInicial.Value.ToString("yyyy-MM-dd")));
-                param.Add(new CustomHttpParameter("fechaFinal", fechaFinal.Value.ToString("yyyy-MM-dd")));
-                param.Add(new CustomHttpParameter("pageNum", pageNum));
-                List<string> cleanedSearchList = new List<string>();
-                foreach (var item in search)
-                {
-                    string removed = _generals.RemoveSpecialCharacters(item);
-                    cleanedSearchList.Add(removed);
-                }
-                string _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
-                param.Add(new CustomHttpParameter("search", _search));
-                var ordenSurtimiento = await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>("SupplyOrders/Consulta/GetOSAsync", param);
-                if (ordenSurtimiento.Status != System.Net.HttpStatusCode.OK)
-                    return Json(new { success = false, message = "Ocurrió un error al consultar la información, por favor intente mas tarde." });
-                
-                if (ordenSurtimiento.Pager == null)
-                {
-                    Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
-                    ordenSurtimiento.Pager = new Pager(ordenSurtimiento?.Data?.Count() ?? 0, pageNum, pageSize);
-                }
-                else
-                {
-                    Log.Information($"✓ Pager recibido: TotalItems={ordenSurtimiento.Pager.TotalItems}");
-                    ordenSurtimiento.Pager = new Pager(ordenSurtimiento.Pager.TotalItems, pageNum, pageSize);
-                }
-                return PartialView("OrdenSurtimiento/_OrdenSurtimientoConsultaTable", ordenSurtimiento);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return Json(new { success = false, message = "Ocurrió un error al consultar la información, por favor intente mas tarde." });
-            }
-        }
+        // [HttpPost]
+        // public async Task<IActionResult> OrdenSurtimientoConsultaTable(DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, IEnumerable<string> search = null)
+        // {
+        //     try
+        //     {
+        //         fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
+        //         fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
+        //         var param = new List<CustomHttpParameter>();
+        //         int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
+        //         param.Add(new CustomHttpParameter("pageSize", pageSize));
+        //         param.Add(new CustomHttpParameter("userId", _generals.User.UserID));
+        //         param.Add(new CustomHttpParameter("fechaInicial", fechaInicial.Value.ToString("yyyy-MM-dd")));
+        //         param.Add(new CustomHttpParameter("fechaFinal", fechaFinal.Value.ToString("yyyy-MM-dd")));
+        //         param.Add(new CustomHttpParameter("pageNum", pageNum));
+        //         List<string> cleanedSearchList = new List<string>();
+        //         foreach (var item in search)
+        //         {
+        //             string removed = _generals.RemoveSpecialCharacters(item);
+        //             cleanedSearchList.Add(removed);
+        //         }
+        //         string _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
+        //         param.Add(new CustomHttpParameter("search", _search));
+        //         var ordenSurtimiento = await _utility.GetItem<DataResult<IEnumerable<SupplyOrderDto>>>("SupplyOrders/Consulta/GetOSAsync", param);
+        //         if (ordenSurtimiento.Status != System.Net.HttpStatusCode.OK)
+        //             return Json(new { success = false, message = "Ocurrió un error al consultar la información, por favor intente mas tarde." });
+        //         
+        //         if (ordenSurtimiento.Pager == null)
+        //         {
+        //             Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
+        //             ordenSurtimiento.Pager = new Pager(ordenSurtimiento?.Data?.Count() ?? 0, pageNum, pageSize);
+        //         }
+        //         else
+        //         {
+        //             Log.Information($"✓ Pager recibido: TotalItems={ordenSurtimiento.Pager.TotalItems}");
+        //             ordenSurtimiento.Pager = new Pager(ordenSurtimiento.Pager.TotalItems, pageNum, pageSize);
+        //         }
+        //         return PartialView("OrdenSurtimiento/_OrdenSurtimientoConsultaTable", ordenSurtimiento);
+        //     }
+        //     catch (Exception ex)
+        //     {
+        //         Log.Error(ex.Message);
+        //         return Json(new { success = false, message = "Ocurrió un error al consultar la información, por favor intente mas tarde." });
+        //     }
+        // }
         
         [HttpPost]
         [Route("Consultas/OrdenSurtimiento/ExpedienteElectronico")]
