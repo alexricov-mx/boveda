@@ -38,6 +38,15 @@ namespace BERecepcion.Api.Controllers.Admin
             return result.ToActionResult();
         }
 
+        [HttpGet("GetEnvioSAPFirma/{SAPOrder}")]
+        public async Task<IActionResult> GetEnvioSAPFirmaAsync(
+            [FromRoute] string SAPOrder,
+            CancellationToken cancellationToken
+            )
+        {
+            var result = await _reactivaProcesoServiceAsync.GetSAPFirmaAsync(SAPOrder, cancellationToken);
+            return result.ToActionResult(this);
+        }
         [HttpPost]
         [ProducesResponseType(typeof(JsonRP), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]

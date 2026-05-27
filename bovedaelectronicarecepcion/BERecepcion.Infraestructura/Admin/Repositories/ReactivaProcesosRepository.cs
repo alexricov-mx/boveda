@@ -1,6 +1,5 @@
 ﻿using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
-using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.SAPPI.Interfaces.Repositories;
@@ -16,7 +15,7 @@ using System.Threading.Tasks;
 
 namespace BERecepcion.Infraestructura.Admin.Repositories
 {
-    public class ReactivaProcesosRepository 
+    public class ReactivaProcesosRepository
         : BaseSQLServerSqlRepository, IReactivaProcesosRepository
     {
         private readonly ISAPPIRepository _sapPIRepository;
@@ -144,27 +143,41 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
         public async Task<IEnumerable<ReactivaProcesosResponseDto>> GetReactivaProcesosBySAPOrderAsync(string OrderSAP, CancellationToken cancellationToken)
         {
 
-                using IDbConnection db = GetConnection();
+            using IDbConnection db = GetConnection();
 
-                DynamicParameters par = new();
-                par.Add("@SAPOrder", OrderSAP);
+            DynamicParameters par = new();
+            par.Add("@SAPOrder", OrderSAP);
 
-                var result = await db.QueryAsync<ReactivaProcesosResponseDto>(
-                    sql: "SP_envio_ReactivaProcesos_selecciona ", 
-                    param: par, 
-                    commandType: CommandType.StoredProcedure 
-                    );
-                if (result != null)
+            var result = await db.QueryAsync<ReactivaProcesosResponseDto>(
+                sql: "SP_envio_ReactivaProcesos_selecciona ",
+                param: par,
+                commandType: CommandType.StoredProcedure
+                );
+            if (result != null)
+            {
+                foreach (var r in result)
                 {
-                    foreach (var r in result)
-                    {
-                        if (!string.IsNullOrEmpty(r.ResultadoTarea1)) r.ResultadoTarea1 = r.ResultadoTarea1.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
-                        if (!string.IsNullOrEmpty(r.ResultadoTarea2)) r.ResultadoTarea2 = r.ResultadoTarea2.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
-                    }
+                    if (!string.IsNullOrEmpty(r.ResultadoTarea1)) r.ResultadoTarea1 = r.ResultadoTarea1.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
+                    if (!string.IsNullOrEmpty(r.ResultadoTarea2)) r.ResultadoTarea2 = r.ResultadoTarea2.Replace("Ocurrio un problema. Contacta a tu administrador.", "").Trim();
                 }
+            }
             return result;
 
         }
 
+        public async Task<ReactivaProcesosDto> GetEnvioFirmaSAPOrderAsync(string SAPOrder, CancellationToken cancellationToken)
+        {
+            using IDbConnection db = GetConnection();
+            DynamicParameters par = new();
+            par.Add("@SAPOrder", SAPOrder);
+            //using para levantar la conexion al BD
+            var result = await db.QueryFirstOrDefaultAsync<ReactivaProcesosDto>(
+                sql: "SP_envio_firma_selecciona", 
+                param: par, 
+                commandType: CommandType.StoredProcedure
+                );
+
+            return result;
+        }
     }
 }

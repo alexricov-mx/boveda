@@ -25,4 +25,10 @@ public class ReactivaProcesoServiceAsync
 
         return Result.Success(result);
     }
+
+    public async Task<Result<ReactivaProcesosDto>> GetSAPFirmaAsync(string SAPOrder, CancellationToken cancellationToken)
+    {
+        var result = await _reactivaProcesosRepository.GetEnvioFirmaSAPOrderAsync(SAPOrder, cancellationToken);
+        return Result.Success(result);
+    }
 }

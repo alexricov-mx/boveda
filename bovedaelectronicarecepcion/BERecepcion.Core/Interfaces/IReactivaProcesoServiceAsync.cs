@@ -11,4 +11,6 @@ namespace BERecepcion.Core.Interfaces;
 public interface IReactivaProcesoServiceAsync
 {
     Task<Result<IEnumerable<ReactivaProcesosResponseDto>>> GetReactivaProcessAsync(string SAPOrder, CancellationToken cancellationToken);
+    Task<Result<ReactivaProcesosDto>> GetSAPFirmaAsync(string SAPOrder, CancellationToken cancellationToken);
+
 }

@@ -12,6 +12,8 @@ namespace BERecepcion.Core.Admin.Interfaces.Repositories
         Task<DataResult<JsonRP>> PIEnvioReactivaProcesosAsync(DataResult<JsonRP> datosRect);
         Task<DataResult<IEnumerable<ReactivaProcesosResponseDto>>> GetReactivaProcesosAsync(string OrderSAP);
         Task<IEnumerable<ReactivaProcesosResponseDto>> GetReactivaProcesosBySAPOrderAsync(string OrderSAP, CancellationToken cancellationToken);
+        Task<ReactivaProcesosDto> GetEnvioFirmaSAPOrderAsync(string SAPOrder, CancellationToken cancellationToken);
+
 
     }
 }
