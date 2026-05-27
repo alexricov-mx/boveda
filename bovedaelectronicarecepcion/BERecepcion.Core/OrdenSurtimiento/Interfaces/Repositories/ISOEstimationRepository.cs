@@ -1,4 +1,5 @@
 ﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
@@ -33,6 +34,7 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
             SOEstimationProveedorRequestDto request,
             CancellationToken cancellationToken = default
             );
+        Task<PagedResult<SupplyOrderDto>> GetPagedOrdenesBancariasAsync(OrdenBancariaRequest request, CancellationToken cancellationToken = default);
 
     }
 }

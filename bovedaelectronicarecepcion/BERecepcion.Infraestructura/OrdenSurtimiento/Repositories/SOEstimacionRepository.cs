@@ -1,4 +1,5 @@
 ﻿using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
@@ -517,6 +518,48 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                 totalItems: paging?.TotalItems ?? items.Count,
                 pageNumber: paging?.CurrentPage ?? request.PageNumber,
                 pageSize: paging?.PageSize ?? request.PageSize);
+        }
+
+        public async Task<PagedResult<SupplyOrderDto>> GetPagedOrdenesBancariasAsync(
+            OrdenBancariaRequest request, 
+            CancellationToken cancellationToken = default)
+        {
+
+                if (request.PageNumber < 1) request.PageNumber = 1;
+                if (request.PageSize < 1) request.PageSize = 5;
+
+                using IDbConnection db = GetConnection();
+
+                {
+                    DynamicParameters par = new ();
+                    par.Add("UserID", request.UserId);
+                    par.Add("@start", request.FechaInicial);
+                    par.Add("@end", request.FechaFinal);
+                    par.Add("@search", request.Search);
+                    par.Add("@pagenum", request.PageNumber);
+                    par.Add("@pagesize", request.PageSize);
+                    par.Add("@claveOrganismo", request.ClaveOrganismo);
+                    par.Add("@creditorNumber", request.CreditorNumber);
+                    par.Add("@esDescarga", request.EsDescarga);
+
+                    var result = await db.QueryMultipleAsync(
+                        sql: "SP_SupplyOrder_representante_tabla_seleccion", 
+                        param: par, 
+                        commandType: CommandType.StoredProcedure
+                        );
+
+                    var totalItems = (await result.ReadAsync<int>()).FirstOrDefault();
+                    var items = (await result.ReadAsync<SupplyOrderDto>()).ToList();
+                    var pager = new Pager(totalItems, request.PageNumber, request.PageSize);
+
+                    return new PagedResult<SupplyOrderDto>(
+                        items: items,
+                        totalItems: pager.TotalItems,
+                        pageNumber: pager.CurrentPage,
+                        pageSize: pager.PageSize
+                        );
+                }
+            
         }
     }
 }

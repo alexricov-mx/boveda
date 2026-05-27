@@ -20,4 +20,8 @@ public interface IConsultaServiceAsync
     Task<Result<PagedResult<SOEstimationDto>>> GetEstimacionesBancariasAsync(
         EstimacionBancariaRequest request,
         CancellationToken cancellationToken = default);
+
+    Task<Result<PagedResult<SupplyOrderDto>>> GetOrdenesBancariasAsync(
+    OrdenBancariaRequest request,
+    CancellationToken cancellationToken = default);
 }

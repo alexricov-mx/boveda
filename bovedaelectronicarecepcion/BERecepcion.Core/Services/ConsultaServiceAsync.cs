@@ -3,17 +3,23 @@ using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
+using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Utils;
+using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Core.Services;
 
-public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
+public class ConsultaServiceAsync(
+    IConsultasRepository consultasRepository,
+    ISOEstimationRepository sOEstimationRepository
+    )
     : IConsultaServiceAsync
 {
     private readonly IConsultasRepository _consultasRepository = consultasRepository;
+    private readonly ISOEstimationRepository _sOEstimationRepository = sOEstimationRepository;
 
     public async Task<Result<PagedResult<SOEstimationDto>>> GetEstimacionesBancariasAsync(
         EstimacionBancariaRequest request,
@@ -96,6 +102,27 @@ public class ConsultaServiceAsync(IConsultasRepository consultasRepository)
             result.PageNumber,
             result.PageSize
         ));
+    }
+
+    public async Task<Result<PagedResult<SupplyOrderDto>>> GetOrdenesBancariasAsync(
+        OrdenBancariaRequest request,
+        CancellationToken cancellationToken = default
+        )
+    {
+        if (!string.IsNullOrWhiteSpace(request.Search))
+            request.Search = Core.Utils.SearchText.GetWhereClause(request.Search, ["OrganismClave", "Contract", "saporder", "CreditorNumber"]);
+
+        var result = await _sOEstimationRepository
+            .GetPagedOrdenesBancariasAsync(request, cancellationToken);
+
+        //return Result.Success(result);
+        return Result.Success(
+            new PagedResult<SupplyOrderDto>(
+                result.Items,
+                result.TotalItems,
+                result.PageNumber,
+                result.PageSize
+            ));
     }
 
     public async Task<Result<PagedResult<SupplyOrderDto>>> GetOrdenesSurtimientoAsync(
