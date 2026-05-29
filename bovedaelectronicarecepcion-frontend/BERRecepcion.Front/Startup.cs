@@ -99,8 +99,11 @@ namespace BERRecepcion.Front
             
             services.Configure<CookiePolicyOptions>(options =>
             {
-                options.CheckConsentNeeded = context => true;
-                options.MinimumSameSitePolicy = SameSiteMode.None;
+                // Sin UI de consentimiento GDPR, CheckConsentNeeded debe ser false
+                // para no bloquear cookies de sesión y AntiForgery.
+                // Las cookies de autenticación ya tienen IsEssential=true en el framework.
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
             });
 
             // ========================================
@@ -145,15 +148,20 @@ namespace BERRecepcion.Front
                 // Validar que el usuario pertenezca al grupo de Azure AD permitido
                 var allowedGroups = Configuration["AzureAd:AllowedGroups"]?.Split(',') ?? Array.Empty<string>();
                 
-                options.Events = new OpenIdConnectEvents
+                // CRÍTICO: No reemplazar options.Events — MSAL ya registró OnAuthorizationCodeReceived
+                // en EnableTokenAcquisitionToCallDownstreamApi. Reemplazarlo vaciaría el caché de tokens
+                // y causaría MsalUiRequiredException (user_null) en cada request post-login.
+                options.Events ??= new OpenIdConnectEvents();
+                var msalOnRemoteFailure  = options.Events.OnRemoteFailure;
+                var msalOnTokenValidated = options.Events.OnTokenValidated;
+
+                // ========================================
+                // MANEJO TEMPORAL de AADSTS54005
+                // ========================================
+                // Este evento se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
+                // Actualmente maneja el duplicado POST que NetScaler sigue enviando.
+                options.Events.OnRemoteFailure = context =>
                 {
-                    // ========================================
-                    // MANEJO TEMPORAL de AADSTS54005
-                    // ========================================
-                    // Este evento se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
-                    // Actualmente maneja el duplicado POST que NetScaler sigue enviando.
-                    OnRemoteFailure = context =>
-                    {
                         if (context.Failure?.Message != null && 
                             (context.Failure.Message.Contains("AADSTS54005") || 
                              context.Failure.Message.Contains("already redeemed")))
@@ -176,13 +184,18 @@ namespace BERRecepcion.Front
                         context.HandleResponse();
                         context.Response.Redirect("/Home/Error");
                         return Task.CompletedTask;
-                    },
-                    
-                    // ========================================
-                    // LÓGICA DE NEGOCIO (permanente)
-                    // ========================================
-                    OnTokenValidated = async ctx =>
-                    {
+                };
+
+                // ========================================
+                // LÓGICA DE NEGOCIO (permanente)
+                // ========================================
+                options.Events.OnTokenValidated = async ctx =>
+                {
+                    // MSAL primero: puebla el caché de tokens antes de nuestra lógica de negocio.
+                    // Sin esto, GetAccessTokenForUserAsync falla con user_null en cada request.
+                    if (msalOnTokenValidated != null)
+                        await msalOnTokenValidated(ctx);
+
                         Serilog.Log.Information($"✓ Token validado exitosamente");
 
                         var email = ctx.Principal.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value 
@@ -196,8 +209,8 @@ namespace BERRecepcion.Front
                         }
                         Serilog.Log.Information("========================================");
 
-                        // Obtener el access token del contexto de autenticación
-                        var accessToken = ctx.SecurityToken?.RawData;
+                        // Obtener el access token del token endpoint (no el ID token de ctx.SecurityToken)
+                        var accessToken = ctx.TokenEndpointResponse?.AccessToken ?? ctx.SecurityToken?.RawData;
 
                         // Validar grupo de Azure AD
                         if (allowedGroups.Length > 0 && !allowedGroups.Any(string.IsNullOrWhiteSpace))
@@ -339,12 +352,13 @@ namespace BERRecepcion.Front
                                     new Claim("IsSapInterfaceEnabled", loginDto.Data.IsSapInterfaceEnabled.ToString()),
                                 };
                                 
-                                // Crear identidad principal autenticada con TODOS los claims
-                                // AuthenticationType "Cookies" es CRÍTICO para User.Identity.IsAuthenticated
-                                var identity = new ClaimsIdentity(claims, "Cookies");
-                                
-                                // Reemplazar el principal completamente
-                                ctx.Principal = new ClaimsPrincipal(identity);
+                                // "ValidationClaims" es el AuthenticationType que ValidateUserAttribute busca.
+                                // IsAuthenticated la provee la identidad Azure AD (primera en el principal).
+                                var identity = new ClaimsIdentity(claims, "ValidationClaims");
+
+                                // AGREGAR al principal en vez de reemplazarlo: reemplazar pierde OID/sub/tid
+                                // que MSAL necesita como clave del caché de tokens para adquisición silenciosa.
+                                ctx.Principal.AddIdentity(identity);
                                 
                                 // LOGS DE DIAGNÓSTICO - ver valores de validación
                                 Serilog.Log.Information($"Claims de validación creados: UserExists={loginDto.Data.UserExists}, UserIsBlocked={loginDto.Data.IsBlocked}, UserIsDeleted={loginDto.Data.IsDeleted}, UserdateIsValid={loginDto.Data.UserdateIsValid}, IsSapInterfaceEnabled={loginDto.Data.IsSapInterfaceEnabled}");
@@ -404,8 +418,6 @@ namespace BERRecepcion.Front
                             Serilog.Log.Error($"Se ha producido un error al consultar al usuario {email} en la BD: {ex.Message}");
                             ctx.Success();
                         }
-                    },
-
                 };
             });
             services.AddDistributedMemoryCache();
@@ -426,7 +438,7 @@ namespace BERRecepcion.Front
             services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
             services.AddRazorPages().AddMicrosoftIdentityUI();
 
-            services.AddTransient<IRestUtility, RestUtility>();
+            services.AddScoped<IRestUtility, RestUtility>();
             services.AddTransient<IGenerals, Generals>();
         }
 

@@ -55,10 +55,13 @@ namespace BERRecepcion.Front.Filters
 
             var validationClaims = context.HttpContext.User.Identities.Where(x => x.AuthenticationType.Equals("ValidationClaims")).FirstOrDefault();
 
-            // Si no hay identidad separada ValidationClaims, buscar en la identidad principal
+            // Si no hay identidad ValidationClaims, es un estado inesperado → redirigir a login
             if (validationClaims == null)
             {
-                validationClaims = context.HttpContext.User.Identities.FirstOrDefault();
+                Serilog.Log.Warning("ValidateUserAttribute - No se encontró identidad ValidationClaims, redirigiendo a login");
+                context.Result = new RedirectToRouteResult(new RouteValueDictionary(
+                    new { area = "MicrosoftIdentity", controller = "Account", action = "SignIn" }));
+                return;
             }
 
             if (validationClaims != null)
@@ -69,28 +72,29 @@ namespace BERRecepcion.Front.Filters
                 // DIAGNÓSTICO: Loggear valores de claims
                 Serilog.Log.Information($"ValidateUserAttribute - UserExists claim: {(userExists != null ? userExists.Value : "NULL")}, UserdateIsValid claim: {(UserdateIsValid != null ? UserdateIsValid.Value : "NULL")}");
 
-                if (!Convert.ToBoolean(userExists.Value) || !Convert.ToBoolean(UserdateIsValid.Value))
+                if (userExists == null || UserdateIsValid == null
+                    || !Convert.ToBoolean(userExists.Value) || !Convert.ToBoolean(UserdateIsValid.Value))
                 {
                     Serilog.Log.Warning($"ValidateUserAttribute - Validación FALLIDA: UserExists={userExists.Value}, UserdateIsValid={UserdateIsValid.Value} - Redirigiendo a NoPermissions");
                     context.Result = new RedirectToRouteResult( new RouteValueDictionary(new { controller = "Error", action = "NoPermissions" }));
                     return;
                 }
                 var userIsBlocked = validationClaims.Claims.Where(x => x.Type.Equals("UserIsBlocked")).FirstOrDefault();
-                if (Convert.ToBoolean(userIsBlocked.Value))
+                if (userIsBlocked != null && Convert.ToBoolean(userIsBlocked.Value))
                 {
                     Serilog.Log.Warning($"ValidateUserAttribute - Usuario bloqueado, redirigiendo a Blocked");
                     context.Result = new RedirectToRouteResult( new RouteValueDictionary(new { controller = "Error", action = "Blocked" }));
                     return;
                 }
                 var userIsDeleted = validationClaims.Claims.Where(x => x.Type.Equals("UserIsDeleted")).FirstOrDefault();
-                if (Convert.ToBoolean(userIsDeleted.Value))
+                if (userIsDeleted != null && Convert.ToBoolean(userIsDeleted.Value))
                 {
                     Serilog.Log.Warning($"ValidateUserAttribute - Usuario eliminado, redirigiendo a Deleted");
                     context.Result = new RedirectToRouteResult( new RouteValueDictionary(new { controller = "Error", action = "Deleted" }));
                     return;
                 }
                 var IsSapInterfaceEnabled = validationClaims.Claims.Where(x => x.Type.Equals("IsSapInterfaceEnabled")).FirstOrDefault();
-                if (!Convert.ToBoolean(IsSapInterfaceEnabled.Value))
+                if (IsSapInterfaceEnabled == null || !Convert.ToBoolean(IsSapInterfaceEnabled.Value))
                 {
                     Serilog.Log.Warning($"ValidateUserAttribute - Interfaz SAP deshabilitada, redirigiendo a Maintenance");
                     context.Result = new RedirectToRouteResult( new RouteValueDictionary(new { controller = "Error", action = "Maintenance" }));

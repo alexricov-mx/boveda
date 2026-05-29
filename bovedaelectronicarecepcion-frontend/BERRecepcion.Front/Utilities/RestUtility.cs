@@ -13,7 +13,7 @@ using Serilog;
 using System.Net.Http;
 using System.Net.Security;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Authentication;
+using Microsoft.Identity.Web;
 
 namespace BERRecepcion.Front.Utilities
 {
@@ -21,11 +21,13 @@ namespace BERRecepcion.Front.Utilities
     {
         private readonly IConfiguration _configuration;
         private readonly RestClient _client;
+        private readonly ITokenAcquisition _tokenAcquisition;
         private readonly IHttpContextAccessor _httpContextAccessor;
-        
-        public RestUtility(IConfiguration configuration, IHttpContextAccessor httpContextAccessor = null)
+
+        public RestUtility(IConfiguration configuration, ITokenAcquisition tokenAcquisition, IHttpContextAccessor httpContextAccessor = null)
         {
             _configuration = configuration;
+            _tokenAcquisition = tokenAcquisition;
             _httpContextAccessor = httpContextAccessor;
             // bloque de codigo temporal para ignorar el certificado vencido
             var handler = new HttpClientHandler
@@ -41,63 +43,30 @@ namespace BERRecepcion.Front.Utilities
         }
   
         /// <summary>
-        /// Obtiene el JWT token del usuario autenticado de Azure AD
+        /// Obtiene el JWT access token via MSAL (ITokenAcquisition).
+        /// Maneja renovación silenciosa automática cuando el token expira.
         /// </summary>
         private async Task<string> GetAccessTokenAsync()
         {
             try
             {
-                if (_httpContextAccessor?.HttpContext?.User?.Identity?.IsAuthenticated == true)
-                {
-                    Log.Information("Usuario autenticado - Intentando obtener access token");
-                    
-                    // Logging de claims del usuario
-                    var userClaims = _httpContextAccessor.HttpContext.User.Claims;
-                    Log.Information($"========== CLAIMS DISPONIBLES (Total: {userClaims.Count()}) ==========");
-                    foreach (var claim in userClaims)
-                    {
-                        // Ocultar valores sensibles parcialmente
-                        var value = claim.Value;
-                        if (claim.Type.Contains("token", StringComparison.OrdinalIgnoreCase) && value.Length > 20)
-                        {
-                            value = value.Substring(0, 20) + "...";
-                        }
-                        Log.Information($"  - {claim.Type}: {value}");
-                    }
-                    Log.Information("========================================");
-                    
-                    // Intentar obtener el access token del contexto
-                    var accessToken = await _httpContextAccessor.HttpContext.GetTokenAsync("access_token");
-                    
-                    if (!string.IsNullOrEmpty(accessToken))
-                    {
-                        Log.Information($"✓ Access token obtenido exitosamente (longitud: {accessToken.Length})");
-                        return accessToken;
-                    }
-                    else
-                    {
-                        Log.Warning("Access token está vacío o null");
-                        
-                        // Intentar obtener el id_token como fallback
-                        var idToken = await _httpContextAccessor.HttpContext.GetTokenAsync("id_token");
-                        if (!string.IsNullOrEmpty(idToken))
-                        {
-                            Log.Information($"✓ Usando id_token como fallback (longitud: {idToken.Length})");
-                            return idToken;
-                        }
-                    }
-                }
-                else
-                {
-                    Log.Warning("Usuario NO autenticado o HttpContext no disponible");
-                }
+                var scopes = new[] { _configuration["AzureAd:Scopes"] };
+                Log.Information($"Solicitando access token via MSAL para scope: {scopes[0]}");
+                var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
+                Log.Information($"✓ Access token obtenido via MSAL (longitud: {accessToken?.Length ?? 0})");
+                return accessToken;
+            }
+            catch (MicrosoftIdentityWebChallengeUserException ex)
+            {
+                Log.Warning($"Re-autenticacion requerida (refresh token expirado): {ex.Message}");
+                throw;
             }
             catch (Exception ex)
             {
-                Log.Error($"Error obteniendo access token: {ex.Message}");
+                Log.Error($"Error obteniendo access token via MSAL: {ex.Message}");
                 Log.Error($"StackTrace: {ex.StackTrace}");
+                return null;
             }
-            return null;
         }
   
         /// <summary>
@@ -123,8 +92,8 @@ namespace BERRecepcion.Front.Utilities
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
                 {
-                    request.AddHeader("Authorization", $"Bearer {accessToken.Substring(0, Math.Min(20, accessToken.Length))}...");
-                    Log.Information("Token de autorización agregado");
+                    request.AddHeader("Authorization", $"Bearer {accessToken}");
+                    Log.Information($"Token de autorización agregado (longitud: {accessToken.Length})");
                 }
                 else
                 {
