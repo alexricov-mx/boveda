@@ -9,6 +9,7 @@ using Serilog;
 using System;
 using System.Linq;
 using System.Collections.Generic;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.EstimacionObra;
 using BERRecepcion.Front.Services.Uris;
@@ -19,9 +20,8 @@ namespace BERRecepcion.Front.Controllers
     [ValidateUser]
     public class EstimacionObraController : Controller
     {
- 
-
         #region Paginado
+
         private static readonly string PageSize = "pageSize";
         private static readonly string PageNumber = "pageNum";
         private static readonly string UserTypEO = "UserTypeP";
@@ -32,21 +32,27 @@ namespace BERRecepcion.Front.Controllers
         #endregion
 
         #region Mensajes
+
         private static readonly string FirmaExitosa = "Firma exitosa";
         private static readonly string ErrorFirmado = "Ocurrió un error al firmar, por favor intente más tarde";
-        private static readonly string ErrorCargaEstimacionObra = "Ocurrió un error al cargar la estimación de obra, por favor intente mas tarde";
+
+        private static readonly string ErrorCargaEstimacionObra =
+            "Ocurrió un error al cargar la estimación de obra, por favor intente mas tarde";
+
         private static readonly string DescripcionEO = "Firma de Estimación de obra ";
+
         #endregion
 
         #region Identificadores
+
         private static readonly string DoctoBE = "DocumentoBEId";
         private static readonly string PDFCheck = "PDFCheckDisabled:EstimacionObra";
         protected readonly IConfiguration _configuration;
         protected readonly IRestUtility _utility;
         protected readonly IGenerals _generals;
         private readonly IEstimacionObra _estimacionObra;
-        
-        
+
+
         private static readonly int FirmateUnico = 1;
         private static readonly int DosFirmates = 2;
         private readonly static string TipoDocumento = "ES";
@@ -55,63 +61,21 @@ namespace BERRecepcion.Front.Controllers
 
         #endregion
 
-        public EstimacionObraController(IConfiguration configuration, IRestUtility utility, IGenerals generals, IEstimacionObra estimacionObra)
+        public EstimacionObraController(IConfiguration configuration, IRestUtility utility, IGenerals generals,
+            IEstimacionObra estimacionObra)
         {
             _configuration = configuration;
             _utility = utility;
             _generals = generals;
             _estimacionObra = estimacionObra;
         }
+
         [RoleFilter(Roles: "ReceptionSignSOEstimations")]
         [UserTypeFilter("UserTypeS,UserTypeA,UserTypeF,UserTypeP")]
         public IActionResult Index()
         {
             return View();
         }
-
-        [HttpGet]
-        // public async Task<IActionResult> EstimacionObraTable(int pageNum = 1)
-        // {
-        //     try
-        //     {
-        //         var param = new List<CustomHttpParameter>();
-        //         int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
-        //         param.Add(new CustomHttpParameter(PageSize, pageSize));
-        //         param.Add(new CustomHttpParameter(PageNumber, pageNum));
-        //
-        //         var estimacionObra = new DataResult<IEnumerable<SOEstimationDto>>();
-        //         if (_generals.User.UserType != UserTypEO)                    
-        //         {
-        //             param.Add(new CustomHttpParameter(TokenEO, _generals.User.Token));
-        //            
-        //             estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(UrisEstimacionObra.GetSOEInterno, param);
-        //         }
-        //         else
-        //         {
-        //             param.Add(new CustomHttpParameter(CreditorNumberEO, _generals.User.CreditorNumber));
-        //             estimacionObra = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(UrisEstimacionObra.GetSOEProveedor, param);
-        //         }
-        //         
-        //         if (estimacionObra.Pager == null)
-        //         {
-        //             Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
-        //             estimacionObra.Pager = new Pager(estimacionObra?.Data?.Count() ?? 0, pageNum, pageSize);
-        //         }
-        //         else
-        //         {
-        //             Log.Information($"✓ Pager recibido: TotalItems={estimacionObra.Pager.TotalItems}");
-        //             estimacionObra.Pager = new Pager(estimacionObra.Pager.TotalItems, pageNum, pageSize);
-        //         }
-        //         ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
-        //         return PartialView("_EstimacionObraTable", estimacionObra);
-        //     }
-        //     catch (Exception ex)
-        //     {
-        //         Log.Error(ex.Message);
-        //         return Json(new { Success = false, Message = ErrorCargaEstimacionObra });
-        //     }
-        // }
-
         [HttpPost]
         public async Task<IActionResult> Firmar([FromBody] SOEstimationDto model)
         {
@@ -121,7 +85,8 @@ namespace BERRecepcion.Front.Controllers
                 {
                     Data = _generals.Usuario
                 };
-                DataResult<UsuarioDto> responseUsuario = await _utility.Post(responseExternos, UrisEstimacionObra.PostValidaOCreaUsuarios);
+                DataResult<UsuarioDto> responseUsuario =
+                    await _utility.Post(responseExternos, UrisEstimacionObra.PostValidaOCreaUsuarios);
 
                 if (responseUsuario.Status != System.Net.HttpStatusCode.OK || responseUsuario.Data == null)
                     return Json(new { success = false, message = responseUsuario.Message });
@@ -142,7 +107,8 @@ namespace BERRecepcion.Front.Controllers
                         EnProcesoFirma = true,
                         TotalFirmantes = DosFirmates,
 
-                        Documentos = new List<Documento> {
+                        Documentos = new List<Documento>
+                        {
                             new Documento
                             {
                                 Descripcion = $"{TipoDocumento.ToUpper()} {model.SapOrder.ToString()}",
@@ -154,8 +120,9 @@ namespace BERRecepcion.Front.Controllers
                             new Firmante
                             {
                                 IdUsuario = responseUsuario.Data.Id,
-                                Figura = string.IsNullOrWhiteSpace(model.ProviderSignDate.ToString()) ?
-                                                                    FirmateUnico.ToString() : DosFirmates.ToString()
+                                Figura = string.IsNullOrWhiteSpace(model.ProviderSignDate.ToString())
+                                    ? FirmateUnico.ToString()
+                                    : DosFirmates.ToString()
                             }
                         }
                     }
@@ -167,13 +134,16 @@ namespace BERRecepcion.Front.Controllers
                 {
                     List<CustomHttpParameter> param = new List<CustomHttpParameter>();
                     param.Add(new CustomHttpParameter(DoctoBE, model.EstimacionID));
-                    DataResult<DocumentoFirmadoDto> documentoFirmado = await _utility.GetItem<DataResult<DocumentoFirmadoDto>>(UrisEstimacionObra.GetDocumentoFirmadoEO, param);
+                    DataResult<DocumentoFirmadoDto> documentoFirmado =
+                        await _utility.GetItem<DataResult<DocumentoFirmadoDto>>(
+                            UrisEstimacionObra.GetDocumentoFirmadoEO, param);
                     if (documentoFirmado.Status != System.Net.HttpStatusCode.OK)
                         return Json(new { success = false, message = documentoFirmado.Message });
 
                     dataResult.Data.agregarFirmante = new AgregaFirmante();
-                    dataResult.Data.agregarFirmante.Firmantes = new List<Firmante>() {
-                        new Firmante ()
+                    dataResult.Data.agregarFirmante.Firmantes = new List<Firmante>()
+                    {
+                        new Firmante()
                         {
                             IdUsuario = responseUsuario.Data.Id,
                             Figura = DosFirmates.ToString()
@@ -181,10 +151,9 @@ namespace BERRecepcion.Front.Controllers
                     };
 
                     documentoResult = await _utility.Post(dataResult, UrisEstimacionObra.PostFirmaDosEO);
-
                 }
-                return Json(new { success = true, message = FirmaExitosa, documentoResult.Data });
 
+                return Json(new { success = true, message = FirmaExitosa, documentoResult.Data });
             }
             catch (Exception ex)
             {
@@ -198,7 +167,8 @@ namespace BERRecepcion.Front.Controllers
         {
             try
             {
-                DataResult<Externos2Dto> responseExternos = new DataResult<Externos2Dto> { Data = new Externos2Dto { usuario = _generals.Usuario } };
+                DataResult<Externos2Dto> responseExternos = new DataResult<Externos2Dto>
+                    { Data = new Externos2Dto { usuario = _generals.Usuario } };
                 DataResult<Externos2Dto> externosCompletaFirma = new DataResult<Externos2Dto>();
                 externosCompletaFirma.Data = externos;
                 externosCompletaFirma.Data.usuarioBEId = _generals.User.UserID;
@@ -247,28 +217,58 @@ namespace BERRecepcion.Front.Controllers
             if (_generals.User.UserType != UserTypEO)
             {
                 param.Add(new CustomHttpParameter(TokenEO, _generals.User.Token));
-                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(UrisEstimacionObra.GetListaFiltroCopadesEO, param);
+                CopadeSeguimiento =
+                    await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(
+                        UrisEstimacionObra.GetListaFiltroCopadesEO, param);
             }
             else
             {
                 param.Add(new CustomHttpParameter(FiltroEO, filtro));
-                CopadeSeguimiento = await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(UrisEstimacionObra.GetListaFiltroCopadesEO, param);
-
+                CopadeSeguimiento =
+                    await _utility.GetItem<DataResult<IEnumerable<CopadeDto>>>(
+                        UrisEstimacionObra.GetListaFiltroCopadesEO, param);
             }
 
             CopadeSeguimiento.Pager = new Pager(0, pageNum, pageSize);
             return PartialView("GenerarTablaCopade", CopadeSeguimiento);
         }
-        
+
         #region Refactor
-         [HttpGet]
+
+        [HttpGet]
         public async Task<IActionResult> GetEstimacionObraTable(int pageNum = 1)
         {
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
-                ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
-                return PartialView("_EstimacionObraTable", await _estimacionObra.GetPage(pageNum, pageSize));
-           
+            int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
+            ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
+            return PartialView("_EstimacionObraTable", await _estimacionObra.GetPage(pageNum, pageSize));
         }
+
+        [HttpGet]
+        public async Task<IActionResult> GetEstimacionObraPorFechas(DateTime? fechaInicial = null,
+            DateTime? fechaFinal = null, int pageNum = 1, string[] search = null)
+        {
+            int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
+            string _search = string.Empty;
+            fechaInicial = fechaInicial == null
+                ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"])
+                : fechaInicial;
+            fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
+            if (search != null)
+            {
+                List<string> cleanedSearchList = new List<string>();
+                foreach (var item in search)
+                {
+                    string removed = _generals.RemoveSpecialCharacters(item);
+                    cleanedSearchList.Add(removed);
+                }
+
+                _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
+            }
+
+            return PartialView("~/Views/Consultas/EstimacionObra/_EstimacionesTable.cshtml",
+                await _estimacionObra.GetPageByDateRange(fechaInicial, fechaFinal, pageNum, pageSize, _search));
+        }
+
         #endregion refactor
     }
 }

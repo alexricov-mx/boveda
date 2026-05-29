@@ -77,6 +77,7 @@ function setAnimation(icon, isMouseOver) {
 }
 //Ver expediente
 $(document).on("click", "i[name='btnExpediente']", function (e) {
+    debugger;
     e.preventDefault();
     var saporder = $(this).data("saporder");
     var url = "Consultas/OrdenSurtimiento/ExpedienteElectronico";

@@ -33,12 +33,12 @@ function updateSearch() {
 
 var ConsultaEstimacionesTable = function (pageNum = 1, fechaInicial = null, fechaFinal = null, search = []) {
     $.ajax({
-        type: "POST",
-        url: "Consultas/EstimacionConsultaTable",
-        data: { fechaInicial: fechaInicial, fechaFinal: fechaFinal, pageNum: pageNum, search: search },
+        type: "GET",
+        url: "EstimacionObra/GetEstimacionObraPorFechas",
+        data: { startDate: fechaInicial??"", endDate: fechaFinal??"", pageNum: pageNum, search: search },
         success: function (data) {
-            if (!isNull(data.success) && !data.success)
-                return errorAlert(data.message);
+            // if (!isNull(data.success) && !data.success)
+            //     return errorAlert(data.message);
             $("#tabla-consulta").empty();
             $("#tabla-consulta").append(data);
             darkMode(getCookie("dark-mode") == "true");

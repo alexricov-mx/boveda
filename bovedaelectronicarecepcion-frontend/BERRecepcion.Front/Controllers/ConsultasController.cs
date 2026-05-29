@@ -17,6 +17,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using BERRecepcion.Front.Services.Uris;
 
 namespace BERRecepcion.Front.Controllers
 {
@@ -577,7 +578,7 @@ namespace BERRecepcion.Front.Controllers
                 string claveOrganismo = "";
                 if (org != null) claveOrganismo = org.Clave;
                 param.Add(new CustomHttpParameter("claveOrganismo", claveOrganismo));
-                EstimacionSeguimiento = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>("Consultas/GetListaEstimacionesBancariasAsync", param);
+                EstimacionSeguimiento = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>(UrisOrdenBancaria.GetListaEstimacionesBancarias, param);
                 
                 if (EstimacionSeguimiento.Pager == null)
                 {
@@ -1301,55 +1302,6 @@ namespace BERRecepcion.Front.Controllers
 
             ViewBag.Search = cleanedSearchList.Where(x => !string.IsNullOrWhiteSpace(x)).ToList();
             return View("EstimacionObra/Index");
-        }
-        [HttpPost]
-        public async Task<IActionResult> EstimacionConsultaTable(DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, IEnumerable<string> search = null)
-        {
-            try
-            {
-                fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
-                fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
-                var param = new List<CustomHttpParameter>();
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:EstimacionObra").Value);
-                param.Add(new CustomHttpParameter("pageSize", pageSize));
-                param.Add(new CustomHttpParameter("userId", _generals.User.UserID));
-                param.Add(new CustomHttpParameter("fechaInicial", fechaInicial.Value.ToString("yyyy-MM-dd")));
-                param.Add(new CustomHttpParameter("fechaFinal", fechaFinal.Value.ToString("yyyy-MM-dd")));
-                param.Add(new CustomHttpParameter("pageNum", pageNum));
-                param.Add(new CustomHttpParameter("esDescarga", false));
-                List<string> cleanedSearchList = new List<string>();
-                if (search != null && search.Any())
-                {
-                    foreach (var item in search)
-                    {
-                        string removed = _generals.RemoveSpecialCharacters(item);
-                        cleanedSearchList.Add(removed);
-                    }
-                }
-                string _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
-                param.Add(new CustomHttpParameter("search", _search));
-
-                var result = await _utility.GetItem<DataResult<IEnumerable<SOEstimationDto>>>("SOEstimation/Consulta/GetESAsync", param);
-                if (result.Status != System.Net.HttpStatusCode.OK)
-                    return Json(new { success = false, message = "Ocurrió un error al realizar la búsqueda, por favor intente mas tarde" });
-                
-                if (result.Pager == null)
-                {
-                    Log.Warning("⚠️ Backend no retornó Pager, creando uno por defecto");
-                    result.Pager = new Pager(result?.Data?.Count() ?? 0, pageNum, pageSize);
-                }
-                else
-                {
-                    Log.Information($"✓ Pager recibido: TotalItems={result.Pager.TotalItems}");
-                    result.Pager = new Pager(result.Pager.TotalItems, pageNum, pageSize);
-                }
-                return PartialView("EstimacionObra/_EstimacionesTable", result);
-            }
-            catch (Exception ex)
-            {
-                Log.Error(ex.Message);
-                return Json(new { success = false, message = "Ocurrió un error al realizar la búsqueda, por favor intente mas tarde" });
-            }
         }
 
         [Route("Consultas/EstimacionObra/ExpedienteElectronico")]

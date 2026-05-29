@@ -21,5 +21,6 @@ namespace BERRecepcion.Front.Interfaces
         DataResult<ComprobanteBE> GetComprobante1(Stream factura, bool? esFactura = null);
         public string GenerateQRCode(string value);
         public string RemoveSpecialCharacters(string str);
+        string GetStringSearch(IEnumerable<string> search = null);
     }
 }

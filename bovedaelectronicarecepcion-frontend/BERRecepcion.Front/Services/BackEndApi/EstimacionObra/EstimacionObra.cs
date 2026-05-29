@@ -1,3 +1,4 @@
+using System;
 using System.Threading.Tasks;
 using BERRecepcion.Front.Interfaces;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.EstimacionObra;
@@ -28,5 +29,13 @@ public class EstimacionObra: IEstimacionObra
             result = await _utility.GetItem<PagedResult<SOEstimationDto>>(string.Format(
                 UrisEstimacionObra.GetSupplyOrderEstimationProveedor, _generals.User.CreditorNumber, pageSize, pageNum));
         return result;
+    }
+    
+    public async Task<PagedResult<SOEstimationDto>> GetPageByDateRange(DateTime? fechaInicial,
+        DateTime? fechaFinal, int pageNum, int pageSize, string search)
+    {
+        return await _utility.GetItem<PagedResult<SOEstimationDto>>(string.Format(
+            UrisEstimacionObra.GetPageByDateRange, search, fechaInicial?.ToString("yyyy-MM-dd"),
+            fechaFinal?.ToString("yyyy-MM-dd"),  pageNum, pageSize,_generals.User.UserID, "false"));
     }
 }

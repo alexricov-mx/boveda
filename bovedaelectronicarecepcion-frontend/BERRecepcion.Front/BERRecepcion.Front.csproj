@@ -48,10 +48,10 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="logs\" />
-    <Folder Include="Services\BackEndApi\Consultas\OrdenSurtimiento\" />
     <Folder Include="TemporalPDF\" />
     <Folder Include="wwwroot\css\DatetimePicker\" />
   </ItemGroup>
+
 <ProjectExtensions>
     <VisualStudio>
       <UserProperties appsettings_1json__JsonSchema="" wwwroot_4dist_4css_4alt_4adminlte_1core_1css_1map__JsonSchema="" />

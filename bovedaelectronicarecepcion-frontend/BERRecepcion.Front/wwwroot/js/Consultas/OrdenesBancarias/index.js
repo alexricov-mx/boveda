@@ -104,11 +104,11 @@ function obtenerordensurtimientoTable(pageNum) {
     var dataValid = validateData();
     if (dataValid.isValid) {
         $.ajax({
-            type: "POST",
-            url: "Consultas/obtenerOrdenesBancariasTable",
+            type: "GET",
+            url: "OrdenBancaria/GetPageByDateRange",
             data: {
-                start: start,
-                end: end,
+                startDate: start?? null,
+                endDate: end??null,
                 search: search,
                 pageNum: pageNum
             },

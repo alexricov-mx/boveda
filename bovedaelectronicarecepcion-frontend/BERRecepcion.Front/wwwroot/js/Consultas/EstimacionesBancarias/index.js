@@ -103,25 +103,30 @@ function obtenerordensurtimientoTable(pageNum) {
     var dataValid = validateData();
     if (dataValid.isValid) {
         $.ajax({
-            type: "POST",
-            url: "Consultas/obtenerEstimacionesBancariasTable",
+            type: "GET",
+            url: "OrdenBancaria/GetEstimacionesBancariasTable",
             data: {
-                start: start,
-                end: end,
+                startDate: start??null,
+                endDate: end??null,
                 search: search,
                 pageNum: pageNum
             },
             success: function (data) {
-                if (!isNull(data.success) && !data.success) {
-                    return errorAlert(data.message);
-                }
-                else {
-                    $("#ExportExcelAll").show();
-                }
+                // if (!isNull(data.success) && !data.success) {
+                //     return errorAlert(data.message);
+                // }
+                // else {
+                //     $("#ExportExcelAll").show();
+                // }
                 $("#ordensurtimiento-card").empty();
                 $("#ordensurtimiento-card").append(data);
                 darkMode(getCookie("dark-mode") == "true");
             },
+            fail: function (xhr, status, error) {
+                console.log(xhr.responseText);
+                console.log(status);
+                console.log(error);
+            }
         });
     }
     else {

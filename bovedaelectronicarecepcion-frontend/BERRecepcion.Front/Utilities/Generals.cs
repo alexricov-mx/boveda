@@ -1,7 +1,6 @@
 ﻿using BERRecepcion.Front.Interfaces;
 using BERRecepcion.Front.Models;
 using BERRecepcion.Front.Models.Dto;
-using BERRecepcion.Front.Infrastructure.Auth;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using QRCoder;
@@ -331,6 +330,20 @@ namespace BERRecepcion.Front.Utilities
                 }
             }
             return sb.ToString();
+        }
+
+        public string GetStringSearch(IEnumerable<string> search = null)
+        {
+            if (search == null || !search.Any()) return string.Empty;
+
+            List<string> cleanedSearchList = new List<string>();
+            foreach (var item in search)
+            {
+                string removed = RemoveSpecialCharacters(item);
+                cleanedSearchList.Add(removed);
+            }
+
+            return Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
         }
     }
 }

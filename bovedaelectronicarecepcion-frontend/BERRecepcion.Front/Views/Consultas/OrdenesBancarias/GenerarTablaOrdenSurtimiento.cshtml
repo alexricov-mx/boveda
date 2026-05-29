@@ -1,9 +1,10 @@
-﻿@using BERRecepcion.Front.Models.Dto
+﻿@using BERRecepcion.Front.Models
+@using BERRecepcion.Front.Models.Dto
 @using Newtonsoft.Json
-@model DataResult<IEnumerable<SupplyOrderDto>>
+@model PagedResult<SOEstimationDto>
 
 @{
-    bool contieneOSs = Model != null && Model.Data != null && Model.Data.Count() > 0;
+    bool contieneOSs = Model != null && Model.items != null && Model.items.Count > 0;
 }
 
 
@@ -24,17 +25,17 @@
                     </tr>
                 </thead>
                 <tbody>
-                    @foreach (var item in Model.Data)
+                    @foreach (var item in Model.items)
                     {
 
                         <tr>
                             <td scope="row" class="text-center">
-                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.SAPOrder" data-sapOrder="@item.SAPOrder" data-organismClave="@item.OrganismClave" data-functionarysigndate="@item.FunctionarySignDate"></i>
+                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.SapOrder" data-sapOrder="@item.SapOrder" data-organismClave="@item.OrganismClave" data-functionarysigndate="@item.FunctionarySignDate"></i>
                             </td>
-                            <td scope="row">@item.SAPOrder</td>
+                            <td scope="row">@item.SapOrder</td>
                             <td scope="row">@item.Contract</td>
                             <td scope="row">@item.OrganismClave</td>
-                            <td scope="row">@Convert.ToDateTime(item.ReceptionDate).ToString("dd/MM/yyyy hh:mm")</td>
+                            <td scope="row">@item.ReceptionDate.ToString("dd/MM/yyyy hh:mm")</td>
                             <td scope="row">@(item.DocumentType == "M" ? "Medicamentos" : "Obras")</td>
                             <td scope="row">@item.CreditorNumber</td>
                             <td scope="row">$@item.Total</td>
@@ -45,7 +46,7 @@
             </table>
             <div class="row mt-2">
                 <div class="col-12">
-                    <partial name="_Pagination" model="@Model.Pager" />
+                    <partial name="_Pagination" model="@(new Pager(Model.totalItems, Model.pageNumber, Model.pageSize))" />
                 </div>
             </div>
             <script>
