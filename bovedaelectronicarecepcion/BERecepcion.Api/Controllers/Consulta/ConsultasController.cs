@@ -142,7 +142,17 @@ namespace BERecepcion.Api.Controllers.Consulta
         [ProducesResponseType(typeof(DataResult<List<SOEstimationDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetListaEstimacionesBancariasAsync(string start, string end, string search, string UserID, string claveOrganismo, string creditorNumber, int pageSize, int pageNum = 1, bool esDescarga = false)
+        public async Task<IActionResult> GetListaEstimacionesBancariasAsync(
+            string start, 
+            string end, 
+            string search, 
+            string UserID, 
+            string claveOrganismo, 
+            string creditorNumber, 
+            int pageSize, 
+            int pageNum = 1, 
+            bool esDescarga = false
+            )
         {
             try
             {
@@ -161,7 +171,17 @@ namespace BERecepcion.Api.Controllers.Consulta
         [ProducesResponseType(typeof(DataResult<List<SOEstimationDto>>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetListaOrdenesBancariasAsync(string start, string end, string search, string UserID, string claveOrganismo, string creditorNumber, int pageSize, int pageNum = 1, bool esDescarga = false)
+        public async Task<IActionResult> GetListaOrdenesBancariasAsync(
+            string start, 
+            string end, 
+            string search, 
+            string UserID, 
+            string claveOrganismo, 
+            string creditorNumber, 
+            int pageSize, 
+            int pageNum = 1, 
+            bool esDescarga = false
+            )
         {
             try
             {

@@ -505,7 +505,15 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         [ProducesResponseType(typeof(IEnumerable<SOEstimationDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetESAsync(int pageSize, Guid userId, DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, string search = null, bool esDescarga = false)
+        public async Task<IActionResult> GetESAsync(
+            int pageSize, 
+            Guid userId, 
+            DateTime? fechaInicial = null, 
+            DateTime? fechaFinal = null, 
+            int pageNum = 1, 
+            string search = null, 
+            bool esDescarga = false
+            )
         {
             try
             {
