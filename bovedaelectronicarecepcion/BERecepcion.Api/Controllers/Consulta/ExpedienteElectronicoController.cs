@@ -1,13 +1,11 @@
-﻿using BERecepcion.Api.Filters;
+﻿using BERecepcion.Api.Extensions;
+using BERecepcion.Api.Filters;
 using BERecepcion.Core.Consulta.Dto;
-using BERecepcion.Core.Consulta.Interfaces.Repositories;
-using BERecepcion.Core.Dto;
+using BERecepcion.Core.Consulta.ExpedienteElectronico.Dto;
+using BERecepcion.Core.Interfaces;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-using Serilog;
-using System;
-using System.Collections.Generic;
-using System.Linq;
+using System.Threading;
 using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers.Consulta
@@ -15,29 +13,24 @@ namespace BERecepcion.Api.Controllers.Consulta
     [Route("api/[controller]")]
     [ApiController]
     [ApiKeyAuth]
-    public class ExpedienteElectronicoController : Controller
+    public class ExpedienteElectronicoController : ControllerBase
     {
-        private readonly IExpedienteElectronicoRepository _expedienteElectronicoRepository;
-        public ExpedienteElectronicoController(IExpedienteElectronicoRepository expedienteElectronicoRepository)
+        private readonly IExpedienteElectronicoServiceAsync _expedienteElectronicoService;
+
+        public ExpedienteElectronicoController(IExpedienteElectronicoServiceAsync expedienteElectronicoService)
         {
-            _expedienteElectronicoRepository = expedienteElectronicoRepository;
+            _expedienteElectronicoService = expedienteElectronicoService;
         }
 
         [HttpGet("GetExpediente")]
-        [ProducesResponseType(typeof(DataResult<ExpedienteEViewModel>), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
-        public async Task<IActionResult> GetExpediente(string SAPOrder = null, Guid? CopadeID = null, Guid? AnaliticoPagoID = null)
+        public async Task<IActionResult> GetExpediente(
+            [FromQuery] ExpedienteElectronicoRequest request,
+            CancellationToken cancellationToken = default)
         {
-            try
-            {
-                return Ok(await _expedienteElectronicoRepository.ExpedienteElectronico(SAPOrder, CopadeID, AnaliticoPagoID));
-            }
-            catch (Exception ex)
-            {
-                Log.Error("ExpedienteElectronico: {error}", ex.ToString());
-                return Problem(null, null, 500, "Error interno", null);
-            }
+            var result = await _expedienteElectronicoService
+                .GetExpedienteAsync(request, cancellationToken);
+
+            return result.ToActionResult(this);
         }
     }
 }
