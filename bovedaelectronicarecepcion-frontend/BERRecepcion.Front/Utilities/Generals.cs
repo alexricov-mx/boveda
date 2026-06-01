@@ -1,6 +1,7 @@
 ﻿using BERRecepcion.Front.Interfaces;
 using BERRecepcion.Front.Models;
 using BERRecepcion.Front.Models.Dto;
+using BERRecepcion.Front.Infrastructure.Auth;
 using Microsoft.AspNetCore.Http;
 using Newtonsoft.Json;
 using QRCoder;
@@ -22,13 +23,42 @@ namespace BERRecepcion.Front.Utilities
     public class Generals : IGenerals
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
-        public Generals(IHttpContextAccessor httpContextAccessor)
+        private readonly ICurrentUserService _currentUserService;
+
+        public Generals(IHttpContextAccessor httpContextAccessor, ICurrentUserService currentUserService)
         {
             _httpContextAccessor = httpContextAccessor;
+            _currentUserService = currentUserService;
         }
-        public UsersDto User => _httpContextAccessor.HttpContext.User.FindFirst("User") != null ? JsonConvert.DeserializeObject<UsersDto>(_httpContextAccessor.HttpContext.User.FindFirst("User").Value) : null;
 
-        public UsuarioDto Usuario => new UsuarioDto { Rfc = User.RFC, Ficha = User.UserType.Equals("UserTypeP") ? 0 : int.Parse(User.Token), Nombre = User.Name, Correo = User.Email };
+        /// <summary>
+        /// Obtiene el usuario autenticado actual.
+        /// REFACTOR: Ahora delega a ICurrentUserService para aprovechar caché y null-safety.
+        /// </summary>
+        public UsersDto User => _currentUserService.GetCurrentUser();
+
+        /// <summary>
+        /// Crea un DTO de usuario legacy. Requiere que User no sea null.
+        /// </summary>
+        public UsuarioDto Usuario
+        {
+            get
+            {
+                var user = User;
+                if (user == null)
+                {
+                    throw new InvalidOperationException("No hay usuario autenticado. Verifica [Authorize] o ValidateUser antes de acceder a Usuario.");
+                }
+
+                return new UsuarioDto
+                {
+                    Rfc = user.RFC,
+                    Ficha = user.UserType.Equals("UserTypeP") ? 0 : int.Parse(user.Token),
+                    Nombre = user.Name,
+                    Correo = user.Email
+                };
+            }
+        }
 
         public byte[] GetBytesFromFile(IFormFile file)
         {

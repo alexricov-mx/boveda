@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Hosting;
+﻿using BERecepcion.Api.Infrastructure.Auth;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.Extensions.Configuration;
@@ -12,78 +13,66 @@ using System.Threading.Tasks;
 namespace BERecepcion.Api.Filters
 {
     /// <summary>
-    /// Filtro de autenticación dual: JWT Bearer Token (preferido) o ApiKey (fallback)
+    /// Filtro de autenticación dual: JWT Bearer Token (preferido) o ApiKey (fallback).
+    /// Responsabilidad única: verificar que la request esté autenticada por alguno de los dos mecanismos.
+    /// La autorización por rol se delega a las políticas de ASP.NET Core ([Authorize(Policy=...)]).
     /// </summary>
     [AttributeUsage(AttributeTargets.Method | AttributeTargets.Class)]
     public class ApiKeyAuthAttribute : Attribute, IAsyncActionFilter
     {
-        private const string ApiKeyName = "ApiKey";
-
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            var logger = context.HttpContext.RequestServices.GetService<ILogger<ApiKeyAuthAttribute>>();
+            var logger      = context.HttpContext.RequestServices.GetService<ILogger<ApiKeyAuthAttribute>>();
             var environment = context.HttpContext.RequestServices.GetService<IWebHostEnvironment>();
-            
+
             // En desarrollo, permitir sin autenticación
             if (environment.IsDevelopment())
             {
-                logger?.LogInformation("Ambiente de desarrollo - Autenticación bypass");
+                logger?.LogInformation("Ambiente de desarrollo — autenticación bypass.");
                 await next();
                 return;
             }
 
-            // Verificar si hay un JWT Bearer Token (preferido)
-            if (context.HttpContext.Request.Headers.TryGetValue("Authorization", out var authHeader))
+            // ── Opción 1: JWT Bearer Token (preferido) ───────────────────────────
+            if (context.HttpContext.Request.Headers.TryGetValue(ApiAuthConstants.AuthorizationHeader, out var authHeader)
+                && authHeader.ToString().StartsWith(ApiAuthConstants.BearerPrefix, StringComparison.OrdinalIgnoreCase))
             {
-                var authHeaderValue = authHeader.ToString();
-                if (authHeaderValue.StartsWith("Bearer ", StringComparison.OrdinalIgnoreCase))
+                if (context.HttpContext.User?.Identity?.IsAuthenticated == true)
                 {
-                    // Verificar si el usuario está autenticado por el middleware de JWT
-                    if (context.HttpContext.User?.Identity?.IsAuthenticated == true)
-                    {
-                        var userName = context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "preferred_username")?.Value 
-                                       ?? context.HttpContext.User.Claims.FirstOrDefault(c => c.Type == "email")?.Value;
-                        logger?.LogInformation($"✓ Autenticado con JWT Bearer Token - Usuario: {userName}");
-                        
-                        // Logging de claims del usuario autenticado
-                        var claims = context.HttpContext.User.Claims;
-                        logger?.LogInformation($"========== CLAIMS BACKEND (Total: {claims.Count()}) ==========");
-                        foreach (var claim in claims)
-                        {
-                            logger?.LogInformation($"  - {claim.Type}: {claim.Value}");
-                        }
-                        logger?.LogInformation("========================================");
-                        
-                        await next();
-                        return;
-                    }
-                    else
-                    {
-                        logger?.LogWarning("✗ Bearer Token presente pero usuario no autenticado - Token inválido o expirado");
-                        context.Result = new UnauthorizedObjectResult(new { message = "Token inválido o expirado" });
-                        return;
-                    }
-                }
-            }
+                    var userName = context.HttpContext.User.Claims
+                        .FirstOrDefault(c => c.Type == ApiAuthConstants.PreferredUsernameClaim)?.Value
+                        ?? context.HttpContext.User.Claims
+                        .FirstOrDefault(c => c.Type == ApiAuthConstants.EmailClaim)?.Value;
 
-            // Fallback: Verificar ApiKey
-            if (!context.HttpContext.Request.Headers.TryGetValue(ApiKeyName, out var posibleApiKey))
-            {
-                logger?.LogWarning("✗ No se encontró ni Bearer Token ni ApiKey");
-                context.Result = new UnauthorizedObjectResult(new { message = "Autenticación requerida - Bearer Token o ApiKey" });
+                    logger?.LogInformation("✓ Autenticado con JWT Bearer — Usuario: {UserName}", userName);
+                    await next();
+                    return;
+                }
+
+                logger?.LogWarning("✗ Bearer Token presente pero usuario no autenticado — Token inválido o expirado.");
+                context.Result = new UnauthorizedObjectResult(new { message = "Token inválido o expirado." });
                 return;
             }
-            
-            var configuration = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
-            var consultaApiKey = configuration["Seguridad:ApiKey"];
+
+            // ── Opción 2: ApiKey fallback ─────────────────────────────────────────
+            if (!context.HttpContext.Request.Headers.TryGetValue(ApiAuthConstants.ApiKeyHeaderName, out var posibleApiKey))
+            {
+                logger?.LogWarning("✗ No se encontró ni Bearer Token ni ApiKey.");
+                context.Result = new UnauthorizedObjectResult(new { message = "Autenticación requerida — Bearer Token o ApiKey." });
+                return;
+            }
+
+            var configuration  = context.HttpContext.RequestServices.GetRequiredService<IConfiguration>();
+            var consultaApiKey = configuration[ApiAuthConstants.ApiKeyConfigKey];
+
             if (!consultaApiKey.Equals(posibleApiKey))
             {
-                logger?.LogWarning($"✗ ApiKey inválido: {posibleApiKey}");
-                context.Result = new UnauthorizedObjectResult(new { message = "ApiKey inválido" });
+                logger?.LogWarning("✗ ApiKey inválido.");
+                context.Result = new UnauthorizedObjectResult(new { message = "ApiKey inválido." });
                 return;
             }
 
-            logger?.LogInformation("✓ Autenticado con ApiKey (fallback)");
+            logger?.LogInformation("✓ Autenticado con ApiKey (fallback).");
             await next();
         }
     }

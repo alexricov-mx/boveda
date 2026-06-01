@@ -1,4 +1,5 @@
 ﻿using BERRecepcion.Front.Models.Dto;
+using BERRecepcion.Front.Infrastructure.Auth;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.Routing;
@@ -19,12 +20,12 @@ namespace BERRecepcion.Front.Filters
         }
         public async Task OnActionExecutionAsync(ActionExecutingContext context, ActionExecutionDelegate next)
         {
-            if (context.HttpContext.User.FindFirst("Roles") == null || _roles.Count == 0)
+            if (context.HttpContext.User.FindFirst(ClaimConstants.RolesClaim) == null || _roles.Count == 0)
             {
                 context.Result = new RedirectToRouteResult(new RouteValueDictionary(new { controller = "Error", action = "Disabled" }));
                 return;
             }
-            var roles = context.HttpContext.User.FindFirst("Roles").Value.Split(",").ToList();
+            var roles = context.HttpContext.User.FindFirst(ClaimConstants.RolesClaim).Value.Split(",").ToList();
 
             if (roles.Count == 0)
             {

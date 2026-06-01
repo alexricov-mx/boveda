@@ -1,4 +1,5 @@
-﻿using BERecepcion.Core.Admin.Dto;
+﻿using BERecepcion.Api.Filters;
+using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Interfaces.Repositories;
 using Microsoft.AspNetCore.Http;
@@ -19,6 +20,7 @@ namespace BERecepcion.Api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKeyAuth]
     public class LoginController : ControllerBase
     {
         private readonly ILoginRepository _loginRepository;

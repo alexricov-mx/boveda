@@ -47,7 +47,9 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.OpenApi.Models;
 using Serilog;
+using BERecepcion.Api.Infrastructure.Auth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.Identity.Web;
 using Microsoft.IdentityModel.Tokens;
 
@@ -90,19 +92,62 @@ try
         },
         options => { builder.Configuration.Bind("AzureAd", options); });
     
-    // Agregar políticas de autorización basadas en grupos de Azure AD
+    // Políticas de autorización: una por cada rol de BD + política base de usuario autenticado
     builder.Services.AddAuthorization(options =>
     {
-        var allowedGroups = builder.Configuration["AzureAd:AllowedGroups"]?.Split(',') ?? Array.Empty<string>();
-        if (allowedGroups.Length > 0 && !allowedGroups.Any(string.IsNullOrWhiteSpace))
-        {
-            options.AddPolicy("RequireAzureGroup", policy =>
-            {
-                policy.RequireAuthenticatedUser();
-                policy.RequireClaim("groups", allowedGroups);
-            });
-        }
+        // Política base: solo requiere JWT válido (sin rol específico de BD)
+        options.AddPolicy(PolicyConstants.RequireAuthenticatedUser, policy =>
+            policy.RequireAuthenticatedUser());
+
+        // ── Administración ──────────────────────────────────────────────
+        options.AddPolicy(PolicyConstants.RequireAdministrationUsers, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.AdministrationUsers));
+
+        options.AddPolicy(PolicyConstants.RequireAdministrationProfiles, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.AdministrationProfiles));
+
+        options.AddPolicy(PolicyConstants.RequireAdministrationInterfaces, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.AdministrationInterfaces));
+
+        // ── Recepción ────────────────────────────────────────────────────
+        options.AddPolicy(PolicyConstants.RequireReceptionElectronicInvoice, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ReceptionElectronicInvoice));
+
+        options.AddPolicy(PolicyConstants.RequireReceptionDocumentalInvoice, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ReceptionDocumentalInvoice));
+
+        options.AddPolicy(PolicyConstants.RequireReceptionSignReception, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ReceptionSignReception));
+
+        options.AddPolicy(PolicyConstants.RequireReceptionSignCopade, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ReceptionSignCopade));
+
+        options.AddPolicy(PolicyConstants.RequireReceptionSignSupplyOrders, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ReceptionSignSupplyOrders));
+
+        // ── Desvíos ──────────────────────────────────────────────────────
+        options.AddPolicy(PolicyConstants.RequireDeviationSigns, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.DeviationSigns));
+
+        // ── Contratos ────────────────────────────────────────────────────
+        options.AddPolicy(PolicyConstants.RequireContractsRegister, policy =>
+            policy.RequireAuthenticatedUser()
+                  .RequireClaim(ApiAuthConstants.RoleBdClaim, RoleConstants.ContractsRegister));
     });
+
+    // Registrar servicios de infraestructura de autenticación (SOLID: SRP + DIP)
+    // Scoped: ciclo de vida por request, alineado con IClaimsTransformation y los repositorios
+    builder.Services.AddScoped<IBackendUserService, BackendUserService>();
+    builder.Services.AddScoped<IClaimsTransformation, UserClaimsTransformation>();
     
     builder.Services.AddHealthChecksConfig(builder.Configuration);
     

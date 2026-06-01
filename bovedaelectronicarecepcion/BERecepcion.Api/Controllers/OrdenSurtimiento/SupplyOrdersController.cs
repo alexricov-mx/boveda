@@ -1,32 +1,30 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using BERecepcion.Api.Extensions;
 using BERecepcion.Api.Filters;
+using BERecepcion.Api.Infrastructure.Auth;
 using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
 using BERecepcion.Core.Correos.Interfaces.Repositories;
 using BERecepcion.Core.Dto;
-using BERecepcion.Core.eSignDto;
 using BERecepcion.Core.FirmaDocumentos.Dto;
 using BERecepcion.Core.FirmaDocumentos.Interfaces.Repositories;
-using BERecepcion.Core.Models;
+using BERecepcion.Core.IntegracionEFirma;
+using BERecepcion.Core.Interfaces.Repositories;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.SAPPI.Dto;
 using BERecepcion.Core.SAPPI.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Serilog;
-using BERecepcion.Core.IntegracionEFirma;
-using BERecepcion.Infraestructura.FirmaDocumentos.Repositories;
-using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Threading;
-using BERecepcion.Core.Interfaces.Repositories;
-using BERecepcion.Api.Extensions;
+using System.Threading.Tasks;
 
 // LGGD en proceso
 
@@ -35,6 +33,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
     [Route("api/[controller]")]
     [ApiController]
     [ApiKeyAuth]
+    [Authorize(Policy = PolicyConstants.RequireAdministrationUsers)]
     public class SupplyOrdersController : ControllerBase
     {
         private readonly ISupplyOrderRepository _supplyOrderRepository;
@@ -49,11 +48,11 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         private readonly IDocumentosRepository _documentosRepository;
         private readonly ISupplyOrderServiceAsync _supplyOrderServiceAsync;
 
-        public SupplyOrdersController(ISupplyOrderRepository supplyOrderRepository, IConfiguration configuration, 
-                                      IHostEnvironment env, IESignRepository eSignRepository, 
-                                      ISAPPIRepository sAPPIRepository, IBitacoraRepository bitacoraRepository, 
-                                      IUsuariosRepository usuariosRepository, ICorreoRepository correoRepository, 
-                                      IDocumentoFirmadoRepository documentoFirmadoRepository, 
+        public SupplyOrdersController(ISupplyOrderRepository supplyOrderRepository, IConfiguration configuration,
+                                      IHostEnvironment env, IESignRepository eSignRepository,
+                                      ISAPPIRepository sAPPIRepository, IBitacoraRepository bitacoraRepository,
+                                      IUsuariosRepository usuariosRepository, ICorreoRepository correoRepository,
+                                      IDocumentoFirmadoRepository documentoFirmadoRepository,
                                       IDocumentosRepository documentosRepository,
                                       ISupplyOrderServiceAsync supplyOrderServiceAsync)
         {
@@ -187,7 +186,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 bool basePathExists = System.IO.Directory.Exists(basePath);
                 if (!basePathExists) Directory.CreateDirectory(basePath);
 
-                archivoPDF = await _documentosRepository.GetDocumentoAsync(model.Data.supplyOrder.SAPOrder, 
+                archivoPDF = await _documentosRepository.GetDocumentoAsync(model.Data.supplyOrder.SAPOrder,
                                                                            model.Data.supplyOrder.OrganismClave);
                 if (archivoPDF.Status != System.Net.HttpStatusCode.OK)
                 {
@@ -263,14 +262,14 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             };
             try
             {
-                  model.Data.agregarFirmante.IdCorrelacion = await _documentoFirmadoRepository.CreaPaqueteInicialAsync(
-                  model.Data.usuario.Id.ToString(),
-                  model.Data.paquete.Documentos.FirstOrDefault().CodigoTipoDocumento,
-                  model.Data.usuarioBEId,
-                  model.Data.documentoBEId,
-                  model.Data.paquete.Firmantes.FirstOrDefault().Figura
-              );
-                                                                 
+                model.Data.agregarFirmante.IdCorrelacion = await _documentoFirmadoRepository.CreaPaqueteInicialAsync(
+                model.Data.usuario.Id.ToString(),
+                model.Data.paquete.Documentos.FirstOrDefault().CodigoTipoDocumento,
+                model.Data.usuarioBEId,
+                model.Data.documentoBEId,
+                model.Data.paquete.Firmantes.FirstOrDefault().Figura
+            );
+
                 var resultAgregaFirmante = await _eSignRepository.PostAgregaFirmanteEFirmaAsync(model.Data.agregarFirmante);
                 if (resultAgregaFirmante.Status != System.Net.HttpStatusCode.OK)
                 {
@@ -343,8 +342,8 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 {
                     // Se envio NO exitoso a SAP
                     // escribir en bitacora que no se pudo notificar a SAP
-                    await _bitacoraRepository.InsertaBitacoraAsync(new BitacoraDto 
-                    { 
+                    await _bitacoraRepository.InsertaBitacoraAsync(new BitacoraDto
+                    {
                         Accion = "Notificacion SAP",
                         Descripcion = $"Error al enviar cambio de status Orden Surtimiento {externos.Data.supplyOrder.SAPOrder}",
                         Seccion = "OrdenSurtimiento",
@@ -364,7 +363,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                     });
                 }
                 // cambiamos estatus a la siguiente firma
-                await _supplyOrderRepository.SupplyOrderFirmaAsync(externos.Data.supplyOrder.SupplyOrderID, externos.User.UserType, 
+                await _supplyOrderRepository.SupplyOrderFirmaAsync(externos.Data.supplyOrder.SupplyOrderID, externos.User.UserType,
                                                                    externos.User.Token);
                 // escribimos en bitacora que se realizo la accion de firma
                 await _bitacoraRepository.InsertaBitacoraAsync(new BitacoraDto
@@ -387,7 +386,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
 
                     //envio del correo
                     var mail = await _correoRepository.NotificacionOSAsync(users.Data, externos.Data.supplyOrder, "Firma de Órden de Surtimiento");
-                    if (mail) 
+                    if (mail)
                     {
                         await _bitacoraRepository.InsertaBitacoraAsync(new BitacoraDto
                         {
@@ -410,7 +409,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                         });
                     }
                     firmaPaqueteResult.Status = mail ? System.Net.HttpStatusCode.OK : System.Net.HttpStatusCode.Conflict;
-                }                
+                }
 
                 resultItem.Data.firmaPaqueteResult = firmaPaqueteResult.Data;
                 return Ok(resultItem);
@@ -432,18 +431,18 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetOSAsync(
-            int pageSize, 
-            Guid userId, 
-            DateTime? fechaInicial = null, 
-            DateTime? fechaFinal = null, 
-            int pageNum = 1, 
-            string search = null, 
+            int pageSize,
+            Guid userId,
+            DateTime? fechaInicial = null,
+            DateTime? fechaFinal = null,
+            int pageNum = 1,
+            string search = null,
             bool esDescarga = false
             )
         {
             try
             {
-                return Ok(await _supplyOrderRepository.GetOSAsync(pageSize, userId, pageNum, fechaInicial, fechaFinal , search, esDescarga));
+                return Ok(await _supplyOrderRepository.GetOSAsync(pageSize, userId, pageNum, fechaInicial, fechaFinal, search, esDescarga));
             }
             catch (Exception ex)
             {

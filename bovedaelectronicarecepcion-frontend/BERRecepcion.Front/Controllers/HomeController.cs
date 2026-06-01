@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
-using RestSharp;
 using Serilog;
 using System;
 using System.Collections.Generic;
@@ -33,7 +32,6 @@ namespace BERRecepcion.Front.Controllers
             _configuration = configuration;
         }
         [ValidateUser]
-        [AllowAnonymous]
         public async Task<IActionResult> Index()
         {
             try
@@ -68,7 +66,7 @@ namespace BERRecepcion.Front.Controllers
                     HttpContext.Session.SetString("InfoAplicativo", JsonConvert.SerializeObject(infoAplicativo));
 
                     //Bitacora de accesos
-                    string descripcion = $"Inicio de sesión del usuario: { _generals.User.Name }, con correo electrónico: { _generals.User.Email }" + (!string.IsNullOrWhiteSpace(_generals.User.Token) ? string.Concat(" y ficha ", _generals.User.Token) : string.Concat(" y número de acreedor ", _generals.User.CreditorNumber));
+                    string descripcion = $"Inicio de sesión del usuario: {_generals.User.Name}, con correo electrónico: {_generals.User.Email}" + (!string.IsNullOrWhiteSpace(_generals.User.Token) ? string.Concat(" y ficha ", _generals.User.Token) : string.Concat(" y número de acreedor ", _generals.User.CreditorNumber));
                     DataResult<BitacoraDto> bitacora = new DataResult<BitacoraDto>
                     {
                         Data = new BitacoraDto(_generals.User.UserID, "Acceso", "Acceso", descripcion)
@@ -89,16 +87,16 @@ namespace BERRecepcion.Front.Controllers
             HttpContext.Session.Clear();
             return RedirectToRoute(new { area = "MicrosoftIdentity", controller = "Account", action = "SignOut" });
         }
-        
+
         [AllowAnonymous]
         [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
         public IActionResult Error()
         {
             // NO limpiar cookies automáticamente aquí
             // Solo registrar el acceso a la página de error
-            
+
             Serilog.Log.Warning($"Usuario accedió a página de error. Request ID: {Activity.Current?.Id ?? HttpContext.TraceIdentifier}");
-            
+
             ViewBag.Message = "No pudo iniciar sesión. Por favor, intente nuevamente.";
             ViewBag.RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
             return View();
