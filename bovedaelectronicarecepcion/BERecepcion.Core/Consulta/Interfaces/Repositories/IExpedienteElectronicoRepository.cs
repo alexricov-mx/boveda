@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace BERecepcion.Core.Consulta.Interfaces.Repositories
 {
-    public interface IExpedienteElectronicoRepository
+    public interface IExpedienteElectronicoRepositoryAsync
     {
         Task<DataResult<ExpedienteEViewModel>> ExpedienteElectronico(string SAPOrder = null, Guid? CopadeID = null, Guid? AnaliticoPagoID = null);
     }

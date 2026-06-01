@@ -46,6 +46,9 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IConsultaServiceAsync, ConsultaServiceAsync>();
         services.AddScoped<ISupplyOrderServiceAsync, SupplyOrderServiceAsync>();
         services.AddScoped<IReactivaProcesoServiceAsync, ReactivaProcesoServiceAsync>();
+
+        // 6. Services — Módulo ExpedienteElectronico
+        services.AddScoped<IExpedienteElectronicoServiceAsync, ExpedienteElectronicoServiceAsync>();
         return services;
     }
 }
