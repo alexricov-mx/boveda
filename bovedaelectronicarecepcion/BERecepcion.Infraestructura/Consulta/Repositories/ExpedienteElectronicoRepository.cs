@@ -14,7 +14,7 @@ using System.Threading.Tasks;
 
 namespace BERecepcion.Infraestructura.Consulta.Repositories
 {
-    public class ExpedienteElectronicoRepository : BaseSQLServerSqlRepository, IExpedienteElectronicoRepository
+    public class ExpedienteElectronicoRepository : BaseSQLServerSqlRepository, IExpedienteElectronicoRepositoryAsync
     {
         public ExpedienteElectronicoRepository(string cnnString) : base(cnnString)
         {

@@ -23,9 +23,6 @@ namespace BERecepcion.Api.Controllers.Consulta
         }
 
         [HttpGet("GetExpediente")]
-        [ProducesResponseType(typeof(ExpedienteEViewModel), StatusCodes.Status200OK)]
-        [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        [ProducesResponseType(StatusCodes.Status500InternalServerError)]
         public async Task<IActionResult> GetExpediente(
             [FromQuery] ExpedienteElectronicoRequest request,
             CancellationToken cancellationToken = default)
