@@ -1,11 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Globalization;
-using System.Linq;
-using System.Reflection;
-using System.Threading.Tasks;
-using BERecepcion.Api;
-using BERecepcion.Api.Controllers;
+﻿using BERecepcion.Api.Infrastructure.Auth;
 using BERecepcion.Api.ModelBinding;
 using BERecepcion.Api.StartupExtensions;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
@@ -34,36 +27,35 @@ using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using BERecepcion.Infraestructura.SAPPI.Repositories;
 using BERecepcion.Infraestructura.SAT.Repositories;
-using BERecepcion.Core.Exceptions;
 using BERecepcion.Infraestructura.StartupExtensions;
 using FluentValidation;
-using Google.Protobuf.WellKnownTypes;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Extensions.Logging;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using Serilog;
-using BERecepcion.Api.Infrastructure.Auth;
-using Microsoft.AspNetCore.Authentication.JwtBearer;
-using Microsoft.AspNetCore.Authentication;
-using Microsoft.Identity.Web;
-using Microsoft.IdentityModel.Tokens;
+using System;
+using System.Globalization;
+using System.Linq;
+using System.Reflection;
 
 try
 {
-    string MyAllowSpecificOrigins = "_myAllowSpecificOrigins"; 
+    string MyAllowSpecificOrigins = "_myAllowSpecificOrigins";
     var builder = WebApplication.CreateBuilder(args);
 
     Log.Logger = new LoggerConfiguration()
                 .ReadFrom.Configuration(builder.Configuration)
                 .CreateLogger();
-    
+
     builder.Host.UseSerilog();
-    
+
     builder.Services.AddCors(options =>
     {
         options.AddPolicy(name: MyAllowSpecificOrigins,
@@ -74,13 +66,13 @@ try
                                      .AllowAnyHeader();
                           });
     });
-    
+
     // Configurar autenticación JWT con Azure Entra ID
     builder.Services.AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
         .AddMicrosoftIdentityWebApi(options =>
         {
             builder.Configuration.Bind("AzureAd", options);
-            
+
             // Configurar validación de audience para aceptar ambos formatos
             options.TokenValidationParameters.ValidateAudience = true;
             var clientId = builder.Configuration["AzureAd:ClientId"];
@@ -91,7 +83,7 @@ try
             };
         },
         options => { builder.Configuration.Bind("AzureAd", options); });
-    
+
     // Políticas de autorización: una por cada rol de BD + política base de usuario autenticado
     builder.Services.AddAuthorization(options =>
     {
@@ -148,15 +140,15 @@ try
     // Scoped: ciclo de vida por request, alineado con IClaimsTransformation y los repositorios
     builder.Services.AddScoped<IBackendUserService, BackendUserService>();
     builder.Services.AddScoped<IClaimsTransformation, UserClaimsTransformation>();
-    
+
     builder.Services.AddHealthChecksConfig(builder.Configuration);
-    
+
     // Agregar el filtro global de excepciones para manejo de errores HTTP apropiados
     builder.Services.AddControllers(options =>
     {
         options.Filters.Add<BERecepcion.Api.Filters.GlobalExceptionFilter>();
-    // [FV12] Registrar filtro de auto-validación (reemplaza AddFluentValidationAutoValidation de FV11)
-    options.Filters.Add<BERecepcion.Api.Filters.FluentValidationActionFilter>();
+        // [FV12] Registrar filtro de auto-validación (reemplaza AddFluentValidationAutoValidation de FV11)
+        options.Filters.Add<BERecepcion.Api.Filters.FluentValidationActionFilter>();
     });
 
     // [FV12] Escaneo de validators — BERecepcion.Api
@@ -180,7 +172,7 @@ try
 
             return new BadRequestObjectResult(new ValidationProblemDetails(errors)
             {
-                Title  = "Errores de validación",
+                Title = "Errores de validación",
                 Detail = "Uno o más errores de validación ocurrieron.",
                 Status = 400
             });
@@ -189,7 +181,7 @@ try
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo { Title = "API - Boveda Electronica Recepcion", Version = "v1" });
-        
+
         // Configurar JWT Bearer en Swagger UI
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
@@ -200,7 +192,7 @@ try
             Scheme = "bearer",
             BearerFormat = "JWT"
         });
-        
+
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
             {
@@ -219,12 +211,12 @@ try
     // Infraestructura — Módulo OrdenSurtimiento migrado a DI limpio con IDbConnectionFactory
     builder.Services.AddInfrastructure(builder.Configuration);
 
-    builder.Services.AddTransient<IAdefasRepository>(x => new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));    builder.Services.AddTransient<IDesvioFirmasRepository>(x => new DesvioFirmasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
+    builder.Services.AddTransient<IAdefasRepository>(x => new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])); builder.Services.AddTransient<IDesvioFirmasRepository>(x => new DesvioFirmasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IUsuariosRepository>(x => new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
 
     builder.Services.AddTransient<IOldUsuariosRepository>(x => new OldUsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
 
-    builder.Services.AddTransient<ILoginRepository>(x =>  new LoginRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration));
+    builder.Services.AddTransient<ILoginRepository>(x => new LoginRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration));
     builder.Services.AddTransient<ICorreoRepository>(x => new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
     builder.Services.AddTransient<IAdmonGRMRepository>(x => new AdmonGRMRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<ICentrosGestoresRepository>(x => new CentrosGestoresRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
