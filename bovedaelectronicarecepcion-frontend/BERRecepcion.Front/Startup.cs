@@ -1,37 +1,31 @@
-using BERRecepcion.Front.Interfaces;
-using BERRecepcion.Front.Models;
 using BERRecepcion.Front.Services;
 using BERRecepcion.Front.Models.Dto;
 using BERRecepcion.Front.Utilities;
 using BERRecepcion.Front.Middleware;
 using BERRecepcion.Front.Infrastructure.Auth;
 using FluentValidation.AspNetCore;
-using Microsoft.AspNetCore.Authentication.OpenIdConnect;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Components.Forms.Mapping;
-using Microsoft.AspNetCore.DataProtection;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Mvc.Authorization;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using Microsoft.Identity.Web;
 using Microsoft.Identity.Web.UI;
-using Newtonsoft.Json;
-using RestSharp;
 using Serilog;
 using System;
-using System.Collections.Generic;
-using System.Configuration;
 using System.Globalization;
 using System.IO;
-using System.Linq;
-using System.Security.Claims;
 using System.Threading.Tasks;
-using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenSurtimiento;
-using BERRecepcion.Front.Services.BackEndApi.OrdenSurtimiento;
+using BERRecepcion.Front.Modules.Authentication;
+using BERRecepcion.Front.Modules.Cookie;
+using BERRecepcion.Front.Modules.Directories;
+using BERRecepcion.Front.Modules.Injection;
+using BERRecepcion.Front.Modules.RolesPermissions;
+using Microsoft.AspNetCore.Authentication.OpenIdConnect;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.DataProtection;
+using Microsoft.AspNetCore.Mvc.Authorization;
+using Microsoft.Identity.Web;
 
 namespace BERRecepcion.Front
 {
@@ -68,7 +62,8 @@ namespace BERRecepcion.Front
             // ========================================
             // DATA PROTECTION: Persistencia de claves para autenticación
             // ========================================
-            
+
+            // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
             // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
             DirectoryInfo keysDirectory = null;
             var keysPaths = new[]
@@ -111,9 +106,7 @@ namespace BERRecepcion.Front
                 services.AddDataProtection()
                     .SetApplicationName("BERRecepcion.Front");
             }
-            
-            // ========================================
-            
+
             services.Configure<CookiePolicyOptions>(options =>
             {
                 // Sin UI de consentimiento GDPR, CheckConsentNeeded debe ser false
@@ -123,6 +116,21 @@ namespace BERRecepcion.Front
                 options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
             });
 
+            // ========================================
+            // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
+            // ========================================
+            // El Proxy funciona perfectamente con NetScaler sin ningún middleware
+            // ni configuración especial de eventos. La solución para AADSTS54005
+            // es Cookie Persistence/Sticky Sessions en NetScaler, NO en código.
+
+            // Configurar autenticación con Microsoft Identity Web (Azure Entra ID)
+
+
+            // ========================================
+            // LÓGICA DE NEGOCIO: Validación de grupos y roles
+            // DATA PROTECTION: Persistencia de claves para autenticación
+            // ========================================
+            
             // ========================================
             // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
             // ========================================
@@ -243,13 +251,27 @@ namespace BERRecepcion.Front
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
             });//.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
+            // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
+            services.AddAuthenticationExtensions(Configuration);
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
             services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
             services.AddRazorPages().AddMicrosoftIdentityUI();
 
-            services.AddScoped<IRestUtility, RestUtility>();
-            services.AddTransient<IGenerals, Generals>();
-            services.AddTransient<IOrdenSurtimiento, OrdenSurtimiento>();
-            
+            // services.AddInjection();
 
             // CORS para el servidor de desarrollo de Vue (solo en Development)
             // Permite que http://localhost:4000 llame a /BerFront/Token con credenciales
@@ -260,9 +282,9 @@ namespace BERRecepcion.Front
                     options.AddPolicy("VueDevOrigin", policy =>
                     {
                         policy.WithOrigins("http://localhost:4000", "https://localhost:4000")
-                              .AllowAnyMethod()
-                              .AllowAnyHeader()
-                              .AllowCredentials();
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
                     });
                 });
             }
@@ -306,6 +328,7 @@ namespace BERRecepcion.Front
                         return;
                     }
                 }
+
                 await next();
             });
 
@@ -321,13 +344,21 @@ namespace BERRecepcion.Front
             // porque NetScaler está configurado para rutear al mismo servidor durante OAuth.
             //
             // app.UseMiddleware<PreventDoublePostMiddleware>();
-
-            app.UseRouting();
-            app.UseSession();
             if (env.IsDevelopment())
             {
                 app.UseCors("VueDevOrigin");
             }
+
+            app.UseRouting();
+
+            // ========================================
+            // FIX CRÍTICO: UseSession DEBE ir ANTES de UseAuthentication/UseAuthorization
+            // ========================================
+            // ValidateUserAttribute lee HttpContext.Session["UserMenu"].
+            // Si UseSession() está después de UseAuthorization(), la sesión NO existe
+            // cuando los filtros de autorización se ejecutan, causando comportamiento impredecible.
+            app.UseSession();
+
             app.UseAuthentication();
             app.UseAuthorization();
             

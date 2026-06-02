@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Xml;
 using System.Xml.Linq;
 using System.Xml.Serialization;
+using BERRecepcion.Front.Infrastructure.Auth;
 using Serilog;
 
 namespace BERRecepcion.Front.Utilities

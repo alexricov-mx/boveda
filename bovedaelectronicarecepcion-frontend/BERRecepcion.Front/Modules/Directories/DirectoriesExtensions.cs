@@ -16,7 +16,7 @@ public static class DirectoriesExtensions
             Path.Combine(AppContext.BaseDirectory, "DataProtectionKeys"),
             Path.Combine(Path.GetTempPath(), "BERRecepcion", "DataProtectionKeys")
         };
-            
+
         foreach (var path in keysPaths)
         {
             try
@@ -26,7 +26,7 @@ public static class DirectoriesExtensions
                 var testFile = Path.Combine(path, "test.txt");
                 File.WriteAllText(testFile, "test");
                 File.Delete(testFile);
-                    
+
                 keysDirectory = new DirectoryInfo(path);
                 Serilog.Log.Information($"✓ Data Protection Keys configuradas en: {path}");
                 break;
@@ -36,7 +36,7 @@ public static class DirectoriesExtensions
                 Serilog.Log.Warning($"✗ No se pudo usar {path}: {ex.Message}");
             }
         }
-            
+
         if (keysDirectory != null)
         {
             services.AddDataProtection()
