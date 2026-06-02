@@ -154,6 +154,10 @@ namespace BERRecepcion.Front
                     }
                 }
                 
+                // FIX: Aumentar expiración de la correlation cookie de 15 min (default) a 30 min.
+                // Evita "Correlation failed" cuando el usuario tarda en completar el login de Azure AD.
+                options.CorrelationCookie.Expiration = TimeSpan.FromMinutes(30);
+
                 // Configurar redirect después de cerrar sesión
                 options.SignedOutRedirectUri = "/";
                 
@@ -168,34 +172,38 @@ namespace BERRecepcion.Front
                 var msalOnTokenValidated = options.Events.OnTokenValidated;
 
                 // ========================================
-                // MANEJO TEMPORAL de AADSTS54005
+                // MANEJO DE FALLOS DE AUTENTICACIÓN REMOTA
                 // ========================================
-                // Este evento se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
-                // Actualmente maneja el duplicado POST que NetScaler sigue enviando.
                 options.Events.OnRemoteFailure = context =>
                 {
-                        if (context.Failure?.Message != null && 
-                            (context.Failure.Message.Contains("AADSTS54005") || 
-                             context.Failure.Message.Contains("already redeemed")))
-                        {
-                            Serilog.Log.Warning($"⚠ AADSTS54005 detectado - Duplicate POST del NetScaler");
-                            
-                            // IMPORTANTE: Este duplicado es inevitable sin Cookie Persistence en NetScaler.
-                            // Simplemente ignorarlo y dejar que el primer POST complete la autenticación.
-                            Serilog.Log.Information($"→ Ignorando POST duplicado. Usuario debería ser autenticado por el primer POST.");
-                            context.HandleResponse();
-                            
-                            // Redirigir a home - si el primer POST fue exitoso, el usuario estará autenticado
-                            // Si falló, el [Authorize] lo enviará al login de nuevo
-                            context.Response.Redirect("/");
-                            return Task.CompletedTask;
-                        }
-                        
-                        // Otros errores - mostrar página de error
-                        Serilog.Log.Error($"❌ Error de autenticación: {context.Failure?.Message}");
+                    var errorMsg = context.Failure?.Message ?? string.Empty;
+
+                    // AADSTS54005: código de autorización ya canjeado (duplicate POST de NetScaler).
+                    // Se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
+                    if (errorMsg.Contains("AADSTS54005") || errorMsg.Contains("already redeemed"))
+                    {
+                        Serilog.Log.Warning("⚠ AADSTS54005 detectado - Duplicate POST del NetScaler. Redirigiendo a home.");
                         context.HandleResponse();
-                        context.Response.Redirect("/Home/Error");
+                        context.Response.Redirect("/");
                         return Task.CompletedTask;
+                    }
+
+                    // FIX: Correlation failed — la correlation cookie expiró o no se encontró
+                    // (timeout > 15 min, recarga del browser, o proceso reiniciado).
+                    // En lugar de mostrar página de error, reiniciar el flujo de login.
+                    if (errorMsg.Contains("Correlation failed"))
+                    {
+                        Serilog.Log.Warning("⚠ Correlation failed — reiniciando flujo de login.");
+                        context.HandleResponse();
+                        context.Response.Redirect("/");
+                        return Task.CompletedTask;
+                    }
+
+                    // Otros errores inesperados — mostrar página de error
+                    Serilog.Log.Error($"❌ Error de autenticación: {errorMsg}");
+                    context.HandleResponse();
+                    context.Response.Redirect("/Home/Error");
+                    return Task.CompletedTask;
                 };
 
                 // ========================================
