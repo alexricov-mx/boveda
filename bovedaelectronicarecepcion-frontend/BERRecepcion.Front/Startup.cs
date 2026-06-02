@@ -53,267 +53,260 @@ namespace BERRecepcion.Front
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
-            try
+            services.AddHttpContextAccessor();
+
+            // ========================================
+            // HTTP CLIENT FACTORY: Mejora gestión de HttpClient según best practices
+            // ========================================
+            services.AddHttpClient();
+
+            // ========================================
+            // SERVICIOS DE AUTENTICACIÓN/AUTORIZACIÓN
+            // ========================================
+            services.AddScoped<IUserLoginService, UserLoginService>();
+            services.AddScoped<ICurrentUserService, CurrentUserService>();
+            services.AddTransient<IRestUtility, RestUtility>();
+            services.AddTransient<IGenerals, Generals>();
+            services.AddScoped<IOrdenSurtimiento, OrdenSurtimiento>();
+            services.AddScoped<IEstimacionObra, EstimacionObra>();
+            services.AddScoped<IOrdenBancaria, OrdenBancaria>();
+
+            // ========================================
+            // DATA PROTECTION: Persistencia de claves para autenticación
+            // ========================================
+
+            // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
+            // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
+            DirectoryInfo keysDirectory = null;
+            var keysPaths = new[]
             {
-                services.AddHttpContextAccessor();
+                Path.Combine(AppContext.BaseDirectory, "App_Data", "DataProtectionKeys"),
+                Path.Combine(AppContext.BaseDirectory, "DataProtectionKeys"),
+                Path.Combine(Path.GetTempPath(), "BERRecepcion", "DataProtectionKeys")
+            };
 
-                // ========================================
-                // HTTP CLIENT FACTORY: Mejora gestión de HttpClient según best practices
-                // ========================================
-                services.AddHttpClient();
-
-                // ========================================
-                // SERVICIOS DE AUTENTICACIÓN/AUTORIZACIÓN
-                // ========================================
-                services.AddScoped<IUserLoginService, UserLoginService>();
-                services.AddScoped<ICurrentUserService, CurrentUserService>();
-                services.AddTransient<IRestUtility, RestUtility>();
-                services.AddTransient<IGenerals, Generals>();
-                services.AddScoped<IOrdenSurtimiento, OrdenSurtimiento>();
-                services.AddScoped<IEstimacionObra, EstimacionObra>();
-                services.AddScoped<IOrdenBancaria, OrdenBancaria>();
-
-                // ========================================
-                // DATA PROTECTION: Persistencia de claves para autenticación
-                // ========================================
-
-                // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
-                // SOLUCIÓN: Intentar múltiples ubicaciones para Data Protection
-                DirectoryInfo keysDirectory = null;
-                var keysPaths = new[]
+            foreach (var path in keysPaths)
+            {
+                try
                 {
-                    Path.Combine(AppContext.BaseDirectory, "App_Data", "DataProtectionKeys"),
-                    Path.Combine(AppContext.BaseDirectory, "DataProtectionKeys"),
-                    Path.Combine(Path.GetTempPath(), "BERRecepcion", "DataProtectionKeys")
-                };
+                    Directory.CreateDirectory(path);
+                    // Intentar escribir un archivo de prueba
+                    var testFile = Path.Combine(path, "test.txt");
+                    File.WriteAllText(testFile, "test");
+                    File.Delete(testFile);
 
-                foreach (var path in keysPaths)
-                {
-                    try
-                    {
-                        Directory.CreateDirectory(path);
-                        // Intentar escribir un archivo de prueba
-                        var testFile = Path.Combine(path, "test.txt");
-                        File.WriteAllText(testFile, "test");
-                        File.Delete(testFile);
-
-                        keysDirectory = new DirectoryInfo(path);
-                        Serilog.Log.Information($"✓ Data Protection Keys configuradas en: {path}");
-                        break;
-                    }
-                    catch (Exception ex)
-                    {
-                        Serilog.Log.Warning($"✗ No se pudo usar {path}: {ex.Message}");
-                    }
+                    keysDirectory = new DirectoryInfo(path);
+                    Serilog.Log.Information($"✓ Data Protection Keys configuradas en: {path}");
+                    break;
                 }
-
-                if (keysDirectory != null)
+                catch (Exception ex)
                 {
-                    services.AddDataProtection()
-                        .PersistKeysToFileSystem(keysDirectory)
-                        .SetApplicationName("BERRecepcion.Front")
-                        .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
-                }
-                else
-                {
-                    Serilog.Log.Error(
-                        "⚠ ADVERTENCIA: No se pudo configurar persistencia de claves. Usando protección en memoria (las sesiones se perderán al reciclar App Pool)");
-                    services.AddDataProtection()
-                        .SetApplicationName("BERRecepcion.Front");
-                }
-
-                services.Configure<CookiePolicyOptions>(options =>
-                {
-                    // Sin UI de consentimiento GDPR, CheckConsentNeeded debe ser false
-                    // para no bloquear cookies de sesión y AntiForgery.
-                    // Las cookies de autenticación ya tienen IsEssential=true en el framework.
-                    options.CheckConsentNeeded = context => false;
-                    options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
-                });
-
-                // ========================================
-                // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
-                // ========================================
-                // El Proxy funciona perfectamente con NetScaler sin ningún middleware
-                // ni configuración especial de eventos. La solución para AADSTS54005
-                // es Cookie Persistence/Sticky Sessions en NetScaler, NO en código.
-
-                // Configurar autenticación con Microsoft Identity Web (Azure Entra ID)
-
-
-                // ========================================
-                // LÓGICA DE NEGOCIO: Validación de grupos y roles
-                // DATA PROTECTION: Persistencia de claves para autenticación
-                // ========================================
-
-                // ========================================
-                // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
-                // ========================================
-                // El Proxy funciona perfectamente con NetScaler sin ningún middleware
-                // ni configuración especial de eventos. La solución para AADSTS54005
-                // es Cookie Persistence/Sticky Sessions en NetScaler, NO en código.
-
-                // Configurar autenticación con Microsoft Identity Web (Azure Entra ID)
-                services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
-                    .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
-                    .EnableTokenAcquisitionToCallDownstreamApi(new[] { Configuration["AzureAd:Scopes"] })
-                    .AddInMemoryTokenCaches();
-
-                // ========================================
-                // LÓGICA DE NEGOCIO: Validación de grupos y roles
-                // ========================================
-                // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
-                services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
-                {
-                    // IMPORTANTE: Guardar tokens para poder usarlos en llamadas al backend
-                    options.SaveTokens = true;
-
-                    // Solicitar scope para llamar al backend API
-                    var scopes = Configuration["AzureAd:Scopes"];
-                    if (!string.IsNullOrEmpty(scopes))
-                    {
-                        foreach (var scope in scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
-                        {
-                            if (!options.Scope.Contains(scope))
-                            {
-                                options.Scope.Add(scope);
-                                Serilog.Log.Information($"Agregado scope: {scope}");
-                            }
-                        }
-                    }
-
-                    // FIX: Aumentar expiración de la correlation cookie de 15 min (default) a 30 min.
-                    // Evita "Correlation failed" cuando el usuario tarda en completar el login de Azure AD.
-                    options.CorrelationCookie.Expiration = TimeSpan.FromMinutes(30);
-
-                    // Configurar redirect después de cerrar sesión
-                    options.SignedOutRedirectUri = "/";
-
-                    // Validar que el usuario pertenezca al grupo de Azure AD permitido
-                    var allowedGroups = Configuration["AzureAd:AllowedGroups"]?.Split(',') ?? Array.Empty<string>();
-
-                    // CRÍTICO: No reemplazar options.Events — MSAL ya registró OnAuthorizationCodeReceived
-                    // en EnableTokenAcquisitionToCallDownstreamApi. Reemplazarlo vaciaría el caché de tokens
-                    // y causaría MsalUiRequiredException (user_null) en cada request post-login.
-                    options.Events ??= new OpenIdConnectEvents();
-                    var msalOnRemoteFailure = options.Events.OnRemoteFailure;
-                    var msalOnTokenValidated = options.Events.OnTokenValidated;
-
-                    // ========================================
-                    // MANEJO DE FALLOS DE AUTENTICACIÓN REMOTA
-                    // ========================================
-                    options.Events.OnRemoteFailure = context =>
-                    {
-                        var errorMsg = context.Failure?.Message ?? string.Empty;
-
-                        // AADSTS54005: código de autorización ya canjeado (duplicate POST de NetScaler).
-                        // Se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
-                        if (errorMsg.Contains("AADSTS54005") || errorMsg.Contains("already redeemed"))
-                        {
-                            Serilog.Log.Warning(
-                                "⚠ AADSTS54005 detectado - Duplicate POST del NetScaler. Redirigiendo a home.");
-                            context.HandleResponse();
-                            context.Response.Redirect("/");
-                            return Task.CompletedTask;
-                        }
-
-                        // FIX: Correlation failed — la correlation cookie expiró o no se encontró
-                        // (timeout > 15 min, recarga del browser, o proceso reiniciado).
-                        // En lugar de mostrar página de error, reiniciar el flujo de login.
-                        if (errorMsg.Contains("Correlation failed"))
-                        {
-                            Serilog.Log.Warning("⚠ Correlation failed — reiniciando flujo de login.");
-                            context.HandleResponse();
-                            context.Response.Redirect("/");
-                            return Task.CompletedTask;
-                        }
-
-                        // Otros errores inesperados — mostrar página de error
-                        Serilog.Log.Error($"❌ Error de autenticación: {errorMsg}");
-                        context.HandleResponse();
-                        context.Response.Redirect("/Home/Error");
-                        return Task.CompletedTask;
-                    };
-
-                    // ========================================
-                    // LÓGICA DE NEGOCIO (permanente)
-                    // ========================================
-                    // REFACTOR: Lógica extraída a IUserLoginService para cumplir SRP
-                    // El servicio se obtiene del IServiceProvider del contexto
-                    options.Events.OnTokenValidated = async ctx =>
-                    {
-                        // MSAL primero: puebla el caché de tokens antes de nuestra lógica de negocio.
-                        // Sin esto, GetAccessTokenForUserAsync falla con user_null en cada request.
-                        if (msalOnTokenValidated != null)
-                            await msalOnTokenValidated(ctx);
-
-                        // Delegar al servicio de negocio inyectado
-                        var loginService = ctx.HttpContext.RequestServices.GetRequiredService<IUserLoginService>();
-                        await loginService.EnrichPrincipalAsync(ctx);
-                    };
-                });
-                services.AddDistributedMemoryCache();
-
-                services.AddSession(options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromHours(10);
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                });
-                services.AddControllersWithViews(options =>
-                {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-                }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
-                // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
-                // services.AddAuthenticationExtensions(Configuration);
-                // services.AddDistributedMemoryCache();
-
-                services.AddSession(options =>
-                {
-                    options.IdleTimeout = TimeSpan.FromHours(10);
-                    options.Cookie.HttpOnly = true;
-                    options.Cookie.IsEssential = true;
-                });
-                services.AddControllersWithViews(options =>
-                {
-                    var policy = new AuthorizationPolicyBuilder()
-                        .RequireAuthenticatedUser()
-                        .Build();
-                    options.Filters.Add(new AuthorizeFilter(policy));
-                }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
-                services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
-                services.AddRazorPages().AddMicrosoftIdentityUI();
-
-                // services.AddInjection();
-
-                // CORS para el servidor de desarrollo de Vue (solo en Development)
-                // Permite que http://localhost:4000 llame a /BerFront/Token con credenciales
-                if (_env.IsDevelopment())
-                {
-                    services.AddCors(options =>
-                    {
-                        options.AddPolicy("VueDevOrigin", policy =>
-                        {
-                            policy.WithOrigins("http://localhost:4000", "https://localhost:4000")
-                                .AllowAnyMethod()
-                                .AllowAnyHeader()
-                                .AllowCredentials();
-                        });
-                    });
-                }
-
-                // Levantar servidor Vue en desarrollo si está configurada la ruta
-                if (_env.IsDevelopment() && !string.IsNullOrWhiteSpace(Configuration["VueApp:FrontPath"]))
-                {
-                    services.AddHostedService<VueDevHostedService>();
+                    Serilog.Log.Warning($"✗ No se pudo usar {path}: {ex.Message}");
                 }
             }
-            catch (Exception ex)
+
+            if (keysDirectory != null)
             {
-                Serilog.Log.Error($"❌ Error de startup: {ex.Message}");
+                services.AddDataProtection()
+                    .PersistKeysToFileSystem(keysDirectory)
+                    .SetApplicationName("BERRecepcion.Front")
+                    .SetDefaultKeyLifetime(TimeSpan.FromDays(90));
+            }
+            else
+            {
+                Serilog.Log.Error(
+                    "⚠ ADVERTENCIA: No se pudo configurar persistencia de claves. Usando protección en memoria (las sesiones se perderán al reciclar App Pool)");
+                services.AddDataProtection()
+                    .SetApplicationName("BERRecepcion.Front");
+            }
+
+            services.Configure<CookiePolicyOptions>(options =>
+            {
+                // Sin UI de consentimiento GDPR, CheckConsentNeeded debe ser false
+                // para no bloquear cookies de sesión y AntiForgery.
+                // Las cookies de autenticación ya tienen IsEssential=true en el framework.
+                options.CheckConsentNeeded = context => false;
+                options.MinimumSameSitePolicy = SameSiteMode.Unspecified;
+            });
+
+            // ========================================
+            // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
+            // ========================================
+            // El Proxy funciona perfectamente con NetScaler sin ningún middleware
+            // ni configuración especial de eventos. La solución para AADSTS54005
+            // es Cookie Persistence/Sticky Sessions en NetScaler, NO en código.
+
+            // Configurar autenticación con Microsoft Identity Web (Azure Entra ID)
+
+
+            // ========================================
+            // LÓGICA DE NEGOCIO: Validación de grupos y roles
+            // DATA PROTECTION: Persistencia de claves para autenticación
+            // ========================================
+
+            // ========================================
+            // CONFIGURACIÓN SIMPLIFICADA - PATRÓN DEL PROXY (sigec-backend)
+            // ========================================
+            // El Proxy funciona perfectamente con NetScaler sin ningún middleware
+            // ni configuración especial de eventos. La solución para AADSTS54005
+            // es Cookie Persistence/Sticky Sessions en NetScaler, NO en código.
+
+            // Configurar autenticación con Microsoft Identity Web (Azure Entra ID)
+            services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
+                .AddMicrosoftIdentityWebApp(Configuration.GetSection("AzureAd"))
+                .EnableTokenAcquisitionToCallDownstreamApi(new[] { Configuration["AzureAd:Scopes"] })
+                .AddInMemoryTokenCaches();
+
+            // ========================================
+            // LÓGICA DE NEGOCIO: Validación de grupos y roles
+            // ========================================
+            // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
+            services.Configure<OpenIdConnectOptions>(OpenIdConnectDefaults.AuthenticationScheme, options =>
+            {
+                // IMPORTANTE: Guardar tokens para poder usarlos en llamadas al backend
+                options.SaveTokens = true;
+
+                // Solicitar scope para llamar al backend API
+                var scopes = Configuration["AzureAd:Scopes"];
+                if (!string.IsNullOrEmpty(scopes))
+                {
+                    foreach (var scope in scopes.Split(' ', StringSplitOptions.RemoveEmptyEntries))
+                    {
+                        if (!options.Scope.Contains(scope))
+                        {
+                            options.Scope.Add(scope);
+                            Serilog.Log.Information($"Agregado scope: {scope}");
+                        }
+                    }
+                }
+
+                // FIX: Aumentar expiración de la correlation cookie de 15 min (default) a 30 min.
+                // Evita "Correlation failed" cuando el usuario tarda en completar el login de Azure AD.
+                options.CorrelationCookie.Expiration = TimeSpan.FromMinutes(30);
+
+                // Configurar redirect después de cerrar sesión
+                options.SignedOutRedirectUri = "/";
+
+                // Validar que el usuario pertenezca al grupo de Azure AD permitido
+                var allowedGroups = Configuration["AzureAd:AllowedGroups"]?.Split(',') ?? Array.Empty<string>();
+
+                // CRÍTICO: No reemplazar options.Events — MSAL ya registró OnAuthorizationCodeReceived
+                // en EnableTokenAcquisitionToCallDownstreamApi. Reemplazarlo vaciaría el caché de tokens
+                // y causaría MsalUiRequiredException (user_null) en cada request post-login.
+                options.Events ??= new OpenIdConnectEvents();
+                var msalOnRemoteFailure = options.Events.OnRemoteFailure;
+                var msalOnTokenValidated = options.Events.OnTokenValidated;
+
+                // ========================================
+                // MANEJO DE FALLOS DE AUTENTICACIÓN REMOTA
+                // ========================================
+                options.Events.OnRemoteFailure = context =>
+                {
+                    var errorMsg = context.Failure?.Message ?? string.Empty;
+
+                    // AADSTS54005: código de autorización ya canjeado (duplicate POST de NetScaler).
+                    // Se puede ELIMINAR una vez que NetScaler tenga Cookie Persistence configurado.
+                    if (errorMsg.Contains("AADSTS54005") || errorMsg.Contains("already redeemed"))
+                    {
+                        Serilog.Log.Warning(
+                            "⚠ AADSTS54005 detectado - Duplicate POST del NetScaler. Redirigiendo a home.");
+                        context.HandleResponse();
+                        context.Response.Redirect("/");
+                        return Task.CompletedTask;
+                    }
+
+                    // FIX: Correlation failed — la correlation cookie expiró o no se encontró
+                    // (timeout > 15 min, recarga del browser, o proceso reiniciado).
+                    // En lugar de mostrar página de error, reiniciar el flujo de login.
+                    if (errorMsg.Contains("Correlation failed"))
+                    {
+                        Serilog.Log.Warning("⚠ Correlation failed — reiniciando flujo de login.");
+                        context.HandleResponse();
+                        context.Response.Redirect("/");
+                        return Task.CompletedTask;
+                    }
+
+                    // Otros errores inesperados — mostrar página de error
+                    Serilog.Log.Error($"❌ Error de autenticación: {errorMsg}");
+                    context.HandleResponse();
+                    context.Response.Redirect("/Home/Error");
+                    return Task.CompletedTask;
+                };
+
+                // ========================================
+                // LÓGICA DE NEGOCIO (permanente)
+                // ========================================
+                // REFACTOR: Lógica extraída a IUserLoginService para cumplir SRP
+                // El servicio se obtiene del IServiceProvider del contexto
+                options.Events.OnTokenValidated = async ctx =>
+                {
+                    // MSAL primero: puebla el caché de tokens antes de nuestra lógica de negocio.
+                    // Sin esto, GetAccessTokenForUserAsync falla con user_null en cada request.
+                    if (msalOnTokenValidated != null)
+                        await msalOnTokenValidated(ctx);
+
+                    // Delegar al servicio de negocio inyectado
+                    var loginService = ctx.HttpContext.RequestServices.GetRequiredService<IUserLoginService>();
+                    await loginService.EnrichPrincipalAsync(ctx);
+                };
+            });
+            services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
+            // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
+            // services.AddAuthenticationExtensions(Configuration);
+            // services.AddDistributedMemoryCache();
+
+            services.AddSession(options =>
+            {
+                options.IdleTimeout = TimeSpan.FromHours(10);
+                options.Cookie.HttpOnly = true;
+                options.Cookie.IsEssential = true;
+            });
+            services.AddControllersWithViews(options =>
+            {
+                var policy = new AuthorizationPolicyBuilder()
+                    .RequireAuthenticatedUser()
+                    .Build();
+                options.Filters.Add(new AuthorizeFilter(policy));
+            }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
+            services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
+            services.AddRazorPages().AddMicrosoftIdentityUI();
+
+            // services.AddInjection();
+
+            // CORS para el servidor de desarrollo de Vue (solo en Development)
+            // Permite que http://localhost:4000 llame a /BerFront/Token con credenciales
+            if (_env.IsDevelopment())
+            {
+                services.AddCors(options =>
+                {
+                    options.AddPolicy("VueDevOrigin", policy =>
+                    {
+                        policy.WithOrigins("http://localhost:4000", "https://localhost:4000")
+                            .AllowAnyMethod()
+                            .AllowAnyHeader()
+                            .AllowCredentials();
+                    });
+                });
+            }
+
+            // Levantar servidor Vue en desarrollo si está configurada la ruta
+            if (_env.IsDevelopment() && !string.IsNullOrWhiteSpace(Configuration["VueApp:FrontPath"]))
+            {
+                services.AddHostedService<VueDevHostedService>();
             }
         }
 
