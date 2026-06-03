@@ -19,8 +19,8 @@ public class ExpedienteElectronicoServiceAsync(
         CancellationToken cancellationToken = default)
     {
         var dataResult = await _expedienteElectronicoRepository
-            .ExpedienteElectronico(request.SAPOrder, request.CopadeID, request.AnaliticoPagoID);
+            .GetExpedienteElectronico(request, cancellationToken);
 
-        return Result.Success(dataResult.Data);
+        return Result.Success(dataResult);
     }
 }

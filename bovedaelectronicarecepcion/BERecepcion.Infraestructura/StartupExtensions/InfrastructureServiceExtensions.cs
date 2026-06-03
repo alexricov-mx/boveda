@@ -40,6 +40,8 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<ISupplyOrderRepository, SupplyOrderRepository>();
         services.AddScoped<IConsultasRepository, ConsultasRepository>();
         services.AddScoped<IReactivaProcesosRepository, ReactivaProcesosRepository>();
+        services.AddScoped<IExpedienteElectronicoRepositoryAsync, ExpedienteElectronicoRepository>();
+
 
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();

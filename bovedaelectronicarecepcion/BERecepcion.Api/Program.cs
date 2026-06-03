@@ -370,7 +370,6 @@ try
                 new CFDIValidationCartaPorteRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
                 new CFDIValidation40Repository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])))
         ));
-    builder.Services.AddTransient<IExpedienteElectronicoRepositoryAsync>(x => new ExpedienteElectronicoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPaymentScheduleRepository>(x => new PaymentScheduleRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
     builder.Services.AddTransient<IPaymentListRepository>(x => new PaymentListRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
 
