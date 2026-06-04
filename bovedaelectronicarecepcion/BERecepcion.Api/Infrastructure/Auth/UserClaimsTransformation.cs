@@ -1,3 +1,4 @@
+using BERecepcion.Core.Interfaces.Auth;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using System.Linq;
@@ -39,7 +40,9 @@ namespace BERecepcion.Api.Infrastructure.Auth
 
             var email = principal.Claims
                 .FirstOrDefault(c => c.Type == ApiAuthConstants.PreferredUsernameClaim)?.Value
-                ?? principal.Claims.FirstOrDefault(c => c.Type == ApiAuthConstants.EmailClaim)?.Value;
+                ?? principal.Claims.FirstOrDefault(c => c.Type == ApiAuthConstants.EmailSchemaClaim)?.Value
+                ?? principal.Claims.FirstOrDefault(c => c.Type == ApiAuthConstants.EmailClaim)?.Value
+                ?? principal.Claims.FirstOrDefault(c => c.Type == ApiAuthConstants.UniqueNameClaim)?.Value;
 
             if (string.IsNullOrWhiteSpace(email))
             {

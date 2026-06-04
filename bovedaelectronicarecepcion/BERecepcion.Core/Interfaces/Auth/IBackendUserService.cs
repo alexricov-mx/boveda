@@ -1,7 +1,8 @@
+using BERecepcion.Core.Admin.Dto;
 using System.Collections.Generic;
 using System.Threading.Tasks;
 
-namespace BERecepcion.Api.Infrastructure.Auth
+namespace BERecepcion.Core.Interfaces.Auth
 {
     /// <summary>
     /// Abstracción para obtener los roles de BD de un usuario autenticado.
@@ -15,5 +16,12 @@ namespace BERecepcion.Api.Infrastructure.Auth
         /// </summary>
         /// <param name="email">Email corporativo del usuario (preferred_username de Azure AD).</param>
         Task<IEnumerable<string>> GetUserRolesAsync(string email);
+
+        /// <summary>
+        /// Retorna los datos completos del usuario en BD (UserID, ManagementCenter, etc.).
+        /// Null si el usuario no existe, está inactivo o hay error de BD.
+        /// Se cachea por request para no consultar la BD dos veces.
+        /// </summary>
+        Task<UsersDto?> GetUserDataAsync(string email);
     }
 }

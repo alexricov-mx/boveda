@@ -1,3 +1,5 @@
+using BERecepcion.Core.Admin.Dto;
+using BERecepcion.Core.Interfaces.Auth;
 using BERecepcion.Core.Interfaces.Repositories;
 using Microsoft.Extensions.Logging;
 using System;
@@ -21,12 +23,60 @@ namespace BERecepcion.Api.Infrastructure.Auth
         // Caché por request: evita múltiples consultas a BD si IClaimsTransformation
         // se invoca más de una vez dentro de la misma request.
         private IEnumerable<string> _cachedRoles;
+        private UsersDto? _cachedUser;
         private string _cachedEmail;
 
         public BackendUserService(ILoginRepository loginRepository, ILogger<BackendUserService> logger)
         {
             _loginRepository = loginRepository;
             _logger          = logger;
+        }
+
+        public async Task<UsersDto?> GetUserDataAsync(string email)
+        {
+            if (string.IsNullOrWhiteSpace(email))
+                return null;
+
+            // Retornar caché si ya se consultó en esta request
+            if (_cachedEmail == email && _cachedUser is not null)
+                return _cachedUser;
+
+            try
+            {
+                var result = await _loginRepository.GetUsuarioAsync(email);
+
+                if (result?.Status != HttpStatusCode.OK || result.Data == null)
+                {
+                    _logger.LogWarning("BackendUserService: usuario {Email} no válido en BD (Status={Status}).",
+                        email, result?.Status);
+
+                    _cachedEmail = email;
+                    _cachedUser = null;
+                    _cachedRoles = Enumerable.Empty<string>();
+                    return null;
+                }
+
+                _cachedUser = result.Data;
+                _cachedEmail = email;
+                _cachedRoles = result.Data.Profile?.RolesCatalogo?
+                    .Select(r => r.Rol)
+                    .Where(r => !string.IsNullOrWhiteSpace(r))
+                    .ToList()
+                    ?? [];
+
+                _logger.LogDebug("BackendUserService: {Email} → DbUserId={DbUserId}, Roles={Count}.",
+                    email, _cachedUser.UserID, _cachedRoles.Count());
+
+                return _cachedUser;
+            }
+            catch (Exception ex)
+            {
+                _logger.LogError(ex, "BackendUserService: error consultando BD para {Email}.", email);
+                _cachedEmail = email;
+                _cachedUser = null;
+                _cachedRoles = Enumerable.Empty<string>();
+                return null;
+            }
         }
 
         /// <inheritdoc/>

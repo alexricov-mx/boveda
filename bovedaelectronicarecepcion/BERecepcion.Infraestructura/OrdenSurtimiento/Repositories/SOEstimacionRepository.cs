@@ -3,6 +3,7 @@ using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Estimaciones.Dtos;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.Interfaces.Auth;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Infraestructura.Repositories;
@@ -23,10 +24,14 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
 {
     public class SOEstimacionRepository : BaseSQLServerSqlRepository, ISOEstimationRepository
     {
-
-        public SOEstimacionRepository(IDbConnectionFactory connectionFactory)
+        private readonly ICurrentUserService _currentUserService;
+        public SOEstimacionRepository(
+            IDbConnectionFactory connectionFactory
+            , ICurrentUserService currentUserService
+            )
             : base(connectionFactory)
         {
+            _currentUserService = currentUserService;
         }
 
         DataResult<SOEstimationDto> resultItem = new DataResult<SOEstimationDto>()
@@ -532,7 +537,7 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
 
                 {
                     DynamicParameters par = new ();
-                    par.Add("UserID", request.UserId);
+                    par.Add("@UserID", _currentUserService.DbUserId);
                     par.Add("@start", request.FechaInicial);
                     par.Add("@end", request.FechaFinal);
                     par.Add("@search", request.Search);

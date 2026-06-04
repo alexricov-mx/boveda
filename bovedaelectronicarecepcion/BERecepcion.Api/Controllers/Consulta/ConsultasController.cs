@@ -1,5 +1,6 @@
 ﻿using BERecepcion.Api.Extensions;
 using BERecepcion.Api.Filters;
+using BERecepcion.Api.Infrastructure.Auth;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
 using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Consulta.Copades.Dto;
@@ -11,6 +12,7 @@ using BERecepcion.Core.Facturas.Dto;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
@@ -215,6 +217,7 @@ namespace BERecepcion.Api.Controllers.Consulta
             }
         }
         [HttpGet("GetEstimacionesObraAsync")]
+        [Authorize(Policy = PolicyConstants.RequireStatisticsSOEstimations)]
         public async Task<IActionResult> GetEstimacionesObraAsync(
             [FromQuery] EstimacionesObraRequest request,
             CancellationToken cancellationToken = default)
@@ -226,6 +229,7 @@ namespace BERecepcion.Api.Controllers.Consulta
         }
 
         [HttpGet("GetOrdenesSurtimientoAsync")]
+        [Authorize(Policy = PolicyConstants.RequireStatisticsSupplyOrders)]
         public async Task<IActionResult> GetOrdenesSurtimientoAsync(
             [FromQuery] OrdenSurtimientoRequest request,
             CancellationToken cancellationToken = default)
@@ -238,7 +242,7 @@ namespace BERecepcion.Api.Controllers.Consulta
 
 
         [HttpGet("GetPagedEstimacionesBancariasAsync")]
-
+        [Authorize(Policy = PolicyConstants.RequireStatisticsBankEstimate)]
         public async Task<IActionResult> GetPagedEstimacionesBancariasAsync(
             [FromQuery] EstimacionBancariaRequest request,
             CancellationToken cancellationToken = default)
@@ -248,7 +252,9 @@ namespace BERecepcion.Api.Controllers.Consulta
 
             return result.ToActionResult(this);
         }
+
         [HttpGet("GetPagedOrdenesBancariasAsync")]
+        [Authorize(Policy = PolicyConstants.RequireStatisticsBankOrder)]
 
         public async Task<IActionResult> GetPagedOrdenesBancariasAsync(
             [FromQuery] OrdenBancariaRequest request,

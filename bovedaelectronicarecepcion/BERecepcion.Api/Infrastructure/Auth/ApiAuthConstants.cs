@@ -23,11 +23,27 @@ namespace BERecepcion.Api.Infrastructure.Auth
 
         /// <summary>Claim estándar de email.</summary>
         public const string EmailClaim = "email";
+        // ─── AGREGAR ESTAS DOS ────────────────────────────────────────────────
 
+        /// <summary>Claim de Azure AD v1.0 / tokens de tenant externo.</summary>
+        public const string UniqueNameClaim = "unique_name";
+
+        /// <summary>
+        /// Claim al que ASP.NET Core mapea automáticamente el claim 'email' del JWT.
+        /// El JWT handler transforma los nombres de claim por defecto.
+        /// </summary>
+        public const string EmailSchemaClaim =
+            "http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress";
         /// <summary>
         /// Claim de rol de BD agregado por <see cref="UserClaimsTransformation"/> al principal.
         /// Se usa en las políticas de autorización registradas en Program.cs.
         /// </summary>
         public const string RoleBdClaim = "role_bd";
+
+        /// <summary>Claim de Azure AD que contiene el Object ID único del usuario en Azure AD (UserId global).</summary>
+        public const string OidClaim = "oid";
+
+        /// <summary>Claim de Azure AD que contiene el nombre completo del usuario.</summary>
+        public const string NameClaim = "name";
     }
 }

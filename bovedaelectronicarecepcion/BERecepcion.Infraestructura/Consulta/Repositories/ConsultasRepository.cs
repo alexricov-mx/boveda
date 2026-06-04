@@ -4,13 +4,13 @@ using BERecepcion.Core.Consulta.Interfaces.Repositories;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Facturas.Dto;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.Interfaces.Auth;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing.Printing;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -20,12 +20,15 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
     public class ConsultasRepository
         : BaseSQLServerSqlRepository, IConsultasRepository
     {
-        public ConsultasRepository(IDbConnectionFactory connectionFactory)
+        private readonly ICurrentUserService _currentUserService;
+        public ConsultasRepository(
+            IDbConnectionFactory connectionFactory
+            , ICurrentUserService currentUserService
+            )
             : base(connectionFactory)
         {
-
+            _currentUserService = currentUserService;
         }
-
 
         public async Task<DataResult<IEnumerable<ReportePaymentScheduleDto>>> GetListaPaymentScheduleAsync(DateTime start, DateTime end, string search, Guid userId, int pageSize, int pageNum = 1, bool esDescarga = false)
         {
@@ -171,7 +174,7 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
             DynamicParameters par = new();
             par.Add("@pagenum", request.PageNumber);
             par.Add("@pagesize", request.PageSize);
-            par.Add("@userId", request.UserId);
+            par.Add("@userId", _currentUserService.DbUserId);
             par.Add("@fechaInicial", request.FechaInicial);
             par.Add("@fechaFinal", request.FechaFinal);
             par.Add("@search", request.Search);
@@ -208,7 +211,7 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
             DynamicParameters par = new();
             par.Add("@pagenum", request.PageNumber);
             par.Add("@pagesize", request.PageSize);
-            par.Add("@userId", request.UserId);
+            par.Add("@userId", _currentUserService.DbUserId);
             par.Add("@fechaInicial", request.FechaInicial);
             par.Add("@fechaFinal", request.FechaFinal);
             par.Add("@search", request.Search);
@@ -231,7 +234,7 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
         }
 
         public async Task<PagedResult<SOEstimationDto>> GetEstimacionesBancariasAsync(
-            EstimacionBancariaRequest request, 
+            EstimacionBancariaRequest request,
             CancellationToken cancellationToken = default
             )
         {
@@ -240,7 +243,7 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
             using IDbConnection db = GetConnection();
 
             DynamicParameters par = new();
-            par.Add("UserID", request.UserId);
+            par.Add("@UserID", _currentUserService.DbUserId);
             par.Add("@start", request.FechaInicial);
             par.Add("@end", request.FechaFinal);
             par.Add("@search", request.Search);
@@ -251,7 +254,7 @@ namespace BERecepcion.Infraestructura.Consulta.Repositories
             par.Add("@esDescarga", request.EsDescarga);
 
             var multi = await db.QueryMultipleAsync(
-                sql: "SP_SOEstimation_bancario_tabla_seleccion", 
+                sql: "SP_SOEstimation_bancario_tabla_seleccion",
                 param: par, commandType: CommandType.StoredProcedure
                 );
 
