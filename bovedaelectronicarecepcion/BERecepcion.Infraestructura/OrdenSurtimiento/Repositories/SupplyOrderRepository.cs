@@ -7,6 +7,7 @@ using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Data;
@@ -317,54 +318,25 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
             }
         }
 
-        public async Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderAsync(
-            SupplyOrderPagedRequest request, 
-            CancellationToken cancellationToken
-            )
-        {
-            if (request.PageNumber < 1) request.PageNumber = 1;
-            if (request.PageSize < 1) request.PageSize = 10;
-
-            using IDbConnection db = GetConnection();
-
-            DynamicParameters par = new();
-            par.Add("@Token", request.Token);
-            par.Add("@pagenum", request.PageNumber);
-            par.Add("@search", request.Search);
-            par.Add("@pagesize", request.PageSize);
-
-            var multi = await db.QueryMultipleAsync(
-                sql: "SP_SupplyOrder_Interno_selecciona", 
-                param: par, 
-                commandType: CommandType.StoredProcedure
-                );
-
-            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
-            var items = (await multi.ReadAsync<SupplyOrderDto>()).ToList();
-
-            return new PagedResult<SupplyOrderDto>(
-                items: items,
-                totalItems: pager?.TotalItems ?? items.Count,
-                pageNumber: pager?.CurrentPage ?? request.PageNumber,
-                pageSize: pager?.PageSize ?? request.PageSize
-                );
-        }
 
         public async Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderByProveedorAsync(
-            ProvedorSupplyOrderPagedRequest request, 
+            string creditorNumber,
+            int pageSize,
+            int pageNumber,
+            string search,
             CancellationToken cancellationToken
             )
         {
-            if (request.PageNumber < 1) request.PageNumber = 1;
-            if (request.PageSize < 1) request.PageSize = 10;
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
 
             using IDbConnection db = GetConnection();
 
             DynamicParameters par = new();
-            par.Add("@CreditorNumber", request.CreditorNumber);
-            par.Add("@pagenum", request.PageNumber);
-            par.Add("@search", request.Search);
-            par.Add("@pagesize", request.PageSize);
+            par.Add("@CreditorNumber", creditorNumber);
+            par.Add("@pagenum", pageNumber);
+            par.Add("@search", search);
+            par.Add("@pagesize", pageSize);
 
             var multi = await db.QueryMultipleAsync(
                 sql: "SP_SupplyOrder_Proveedor_selecciona ", 
@@ -379,8 +351,44 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
             return new PagedResult<SupplyOrderDto>(
                 items: items,
                 totalItems: pager?.TotalItems ?? items.Count,
-                pageNumber: pager?.CurrentPage ?? request.PageNumber,
-                pageSize: pager?.PageSize ?? request.PageSize
+                pageNumber: pager?.CurrentPage ?? pageNumber,
+                pageSize: pager?.PageSize ?? pageSize
+                );
+        }
+
+        public async Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderAsync(
+            string token, 
+            int pageSize, 
+            int pageNumber, 
+            string search, 
+            CancellationToken cancellationToken
+            )
+        {
+            if (pageNumber < 1) pageNumber = 1;
+            if (pageSize < 1) pageSize = 10;
+
+            using IDbConnection db = GetConnection();
+
+            DynamicParameters par = new();
+            par.Add("@Token", token);
+            par.Add("@pagenum", pageNumber);
+            par.Add("@search", search);
+            par.Add("@pagesize", pageSize);
+
+            var multi = await db.QueryMultipleAsync(
+                sql: "SP_SupplyOrder_Interno_selecciona",
+                param: par,
+                commandType: CommandType.StoredProcedure
+                );
+
+            var pager = (await multi.ReadAsync<Pager>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<SupplyOrderDto>()).ToList();
+
+            return new PagedResult<SupplyOrderDto>(
+                items: items,
+                totalItems: pager?.TotalItems ?? items.Count,
+                pageNumber: pager?.CurrentPage ?? pageNumber,
+                pageSize: pager?.PageSize ?? pageSize
                 );
         }
         #endregion

@@ -50,6 +50,8 @@ namespace BERecepcion.Core.Admin.Interfaces.Repositories
         Task<UsersDto> GetUsuarioByESignId(int usuarioId);
 
         Task<DataResult<UsersDto>> GetUsuarioByIdEdit(Guid UserID);
+        Task<UsersDto?> GetUserByEmailAsync(string Email);
+
 
     }
 }

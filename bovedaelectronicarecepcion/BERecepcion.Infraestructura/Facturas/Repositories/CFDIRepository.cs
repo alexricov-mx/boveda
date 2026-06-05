@@ -46,12 +46,20 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
         private readonly ICFDIValidationRepository _cFDIValidationRepository;
         private bool processBitacora = false;
 
-        public CFDIRepository(string cnnString, IConfiguration configuration, IBitacoraRepository bitacoraRepository,
-            ISAPPIRepository sapPIRepository, IFacturaElectronicaRepository facturaElectronicaRepository,
-            IAdefasRepository adefasRepository, ISATRepository sATRepository, ICorreoRepository correoRepository,
-            IUsuariosRepository usuariosRepository, IAnaliticoPagoRepository analiticoPagoRepository,
-            IInvoiceRepository invoiceRepository,
-            ICFDIValidationRepository cFDIValidationRepository) : base(cnnString)
+        public CFDIRepository(
+            string cnnString
+            , IConfiguration configuration
+            , IBitacoraRepository bitacoraRepository
+            , ISAPPIRepository sapPIRepository
+            , IFacturaElectronicaRepository facturaElectronicaRepository
+            , IAdefasRepository adefasRepository
+            , ISATRepository sATRepository
+            , ICorreoRepository correoRepository
+            //, IUsuariosRepository usuariosRepository
+            , IAnaliticoPagoRepository analiticoPagoRepository
+            , IInvoiceRepository invoiceRepository
+            , ICFDIValidationRepository cFDIValidationRepository) 
+            : base(cnnString)
         {
             _configuration = configuration;
             _bitacoraRepository = bitacoraRepository;
@@ -61,7 +69,7 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
             _sapPIRepository = sapPIRepository;
             _sATRepository = sATRepository;
             _correoRepository = correoRepository;
-            _usuariosRepository = usuariosRepository;
+            //_usuariosRepository = usuariosRepository;
             _analiticoPagoRepository = analiticoPagoRepository;
             _invoiceRepository = invoiceRepository;
             _cFDIValidationRepository = cFDIValidationRepository;
@@ -1323,8 +1331,9 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
                         if (r != null)
                         {
                             ComprobanteDto dto = new ComprobanteDto();
-                            var usersList = _usuariosRepository.GetUsuariosByUserId(nc.UserId);
-                            var users = usersList.Result.Data;
+                            //var usersList = _usuariosRepository.GetUsuariosByUserId(nc.UserId);
+                            var usersList = new DataResult<IEnumerable<UsersDto>>();
+                            var users = usersList.Data;
                             dto.User = users.FirstOrDefault();
                             dto.esCopade = nc.EsCopade;
                             dto.esDocumental = nc.EsDocumental;
@@ -1643,7 +1652,8 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
                                 }
 
                                 List<ValidationError> validationErrors = await GetValidationErrorsByReception(errorCatalog, p.Reception, documento);
-                                var Users = await _usuariosRepository.GetUsuariosByUserId(p.UserId);
+                                //var Users = await _usuariosRepository.GetUsuariosByUserId(p.UserId);
+                                var Users = new DataResult<IEnumerable<UsersDto>>();
                                 UsersDto user = Users.Data.FirstOrDefault();
                                 try
                                 {

@@ -22,11 +22,17 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
         Task<DataResult<SupplyOrderDto>> SupplyOrderCorreo1Async(Guid SupplyOrderID, string SignerEmail);
         Task<DataResult<SupplyOrderDto>> SupplyOrderCorreo2Async(Guid SupplyOrderID, string SignerEmail);
         Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderAsync(
-            SupplyOrderPagedRequest request,
+            string token,
+            int pageSize,
+            int pageNumber,
+            string search,
             CancellationToken cancellationToken
             );
         Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderByProveedorAsync(
-            ProvedorSupplyOrderPagedRequest request,
+            string creditorNumber,
+            int pageSize,
+            int pageNumber,
+            string search,
             CancellationToken cancellationToken
             );
 

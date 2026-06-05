@@ -88,6 +88,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
             }
         }
         [HttpGet("GetSupplyOrderInternoAsync")]
+        [Authorize(Policy = PolicyConstants.RequireReceptionSignSupplyOrders)]
         public async Task<IActionResult> GetSupplyOrderInternoAsync(
             [FromQuery] SupplyOrderPagedRequest request,
             CancellationToken cancellationToken
@@ -97,7 +98,7 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
                 .GetPaginatedSupplyOrderAsync(request, cancellationToken);
             return result.ToActionResult(this);
         }
-        // GET: api/SupplyOrders/GetOSProveedorAsync
+
         [HttpGet("GetOSProveedorAsync")]
         [ProducesResponseType(typeof(IEnumerable<SupplyOrderDto>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -116,6 +117,8 @@ namespace BERecepcion.Api.Controllers.OrdenSurtimiento
         }
 
         [HttpGet("GetSupplyOrderProveedorAsync")]
+        [Authorize(Policy = PolicyConstants.RequireReceptionSignSupplyOrders)]
+
         public async Task<IActionResult> GetSupplyOrderProveedorAsync(
             [FromQuery] ProvedorSupplyOrderPagedRequest request,
             CancellationToken cancellationToken

@@ -1,32 +1,36 @@
-﻿using BERecepcion.Core.Dto;
-using BERecepcion.Core.Interfaces.Repositories;
+﻿using BERecepcion.Core.Admin.Dto;
+using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Dto;
+using BERecepcion.Core.Interfaces;
+using BERecepcion.Infraestructura.Repositories;
 using Dapper;
 using Microsoft.Extensions.Configuration;
 using Newtonsoft.Json;
 using RestSharp;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Text;
+using System.IO;
 using System.Threading.Tasks;
 using System.Xml;
-using Serilog;
-using BERecepcion.Infraestructura.Repositories;
-using BERecepcion.Core.Admin.Interfaces.Repositories;
-using BERecepcion.Core.Admin.Dto;
-using BERecepcion.Core.OrdenSurtimiento.Dto;
-using System.IO;
 
 namespace BERecepcion.Infraestructura.Admin.Repositories
 {
-    public class UsuariosRepository : BaseSQLServerSqlRepository, IUsuariosRepository
+    public class UsuariosRepository
+        : BaseSQLServerSqlRepository, IUsuariosRepository
     {
         private readonly IConfiguration _configuration;
         private readonly IBitacoraAdmonRepository _bitacoraAdmonRepository;
 
         public DataResult<UsersDto> itemResponse = new DataResult<UsersDto>();
         public DataResult<IEnumerable<UsersDto>> listResponse = new DataResult<IEnumerable<UsersDto>>();
-        public UsuariosRepository(string cnnString, IConfiguration configuration, IBitacoraAdmonRepository bitacoraAdmonRepository) : base(cnnString)
+        public UsuariosRepository(
+             IDbConnectionFactory connectionFactory,
+            IConfiguration configuration,
+            IBitacoraAdmonRepository bitacoraAdmonRepository
+            )
+            : base(connectionFactory)
         {
             _configuration = configuration;
             _bitacoraAdmonRepository = bitacoraAdmonRepository;
@@ -641,7 +645,7 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
                 using (IDbConnection db = GetConnection())
                 {
                     var result = await db.QueryFirstAsync<UsersDto>(sql: "SP_usuario_bloquea", param: par, commandType: CommandType.StoredProcedure);
-                    if(result == null)
+                    if (result == null)
                     {
                         itemResponse.Status = System.Net.HttpStatusCode.BadRequest;
                         itemResponse.Message = "Ocurrió un error inesperado, favor de intentar más tarde.";
@@ -659,7 +663,7 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
                 itemResponse.Message = ex.Message;
             }
             return itemResponse;
-            
+
         }
 
         public async Task<DataResult<UsuariosPemexInDto>> InsertaUsuarioAsync(UsuariosPemexInDto pemexInDto)
@@ -748,7 +752,7 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
             DynamicParameters par = new DynamicParameters();
             par.Add("@usuarioLogeado", proveedorInDto.usuarioLogeado);
             par.Add("@Company", proveedorInDto.Compania);
-            par.Add("@RFC", proveedorInDto.RFC); 
+            par.Add("@RFC", proveedorInDto.RFC);
             par.Add("@CreditorNumber", proveedorInDto.CreditorNumber);
             par.Add("@userName", proveedorInDto.userName == null ? "" : proveedorInDto.userName);
             par.Add("@DateInitialValid", Convert.ToDateTime(proveedorInDto.ValidoDesde));
@@ -771,7 +775,7 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
                         try
                         {
                             Guid UserId = await db.QueryFirstAsync<Guid>(sql: "SP_usuario_inserta_proveedor", param: par, tran, commandType: CommandType.StoredProcedure);
-                            
+
                             var dt = new DataTable("dbo.TypeUsrRefOrg");
                             dt.Columns.Add("UserID");
                             dt.Columns.Add("OrganismID");
@@ -1286,5 +1290,52 @@ namespace BERecepcion.Infraestructura.Admin.Repositories
                 return itemResponse;
             }
         }
+
+        public async Task<UsersDto?> GetUserByEmailAsync(string Email)
+        {
+
+            DynamicParameters par = new();
+            par.Add("@usuarioLogeado", string.Empty);
+            par.Add("@Email", Email.Trim().ToLowerInvariant());
+            using IDbConnection db = GetConnection();
+
+            var query = await db.QueryFirstOrDefaultAsync<UsersDto>(
+                sql: "SP_usuario_seleccion_email",
+                param: par,
+                commandType: CommandType.StoredProcedure
+                );
+
+            if (query is null) 
+            { 
+                return null;
+            }
+
+            UsersDto responseDto = new()
+            {
+                UserID = query.UserID,
+                UserName = query.UserName,
+                Name = query.Name,
+                UserType = query.UserType,
+                Token = query.Token,
+                ManagementCenter = query.ManagementCenter,
+                CreditorNumber = query.CreditorNumber,
+                RFC = query.RFC,
+                IsBlocked = query.IsBlocked,
+                IsDeleted = query.IsDeleted,
+                ProfileID = query.ProfileID,
+                Email = query.Email,
+                Company = query.Company,
+                PhoneNumber = query.PhoneNumber,
+                CreationDate = query.CreationDate,
+                DateInitialValid = query.DateInitialValid,
+                DateEndValid = query.DateEndValid,
+                UltimoAcceso = DateTime.Now,
+                CreditorRFC = query.CreditorRFC
+            };
+
+            return responseDto;
+        }
+
     }
 }
+

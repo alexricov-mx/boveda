@@ -18,8 +18,5 @@ public class SupplyOrderPagedRequestValidator
             .NotEmpty()
             .When(x => x.Search is not null)
             .WithMessage("El campo Search no puede estar vacío.");
-        RuleFor(x => x.Token)
-            .NotEmpty()
-            .WithMessage("El campo Token es obligatorio.");
     }
 }

@@ -41,7 +41,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IConsultasRepository, ConsultasRepository>();
         services.AddScoped<IReactivaProcesosRepository, ReactivaProcesosRepository>();
         services.AddScoped<IExpedienteElectronicoRepositoryAsync, ExpedienteElectronicoRepository>();
-
+        services.AddScoped<IUsuariosRepository, UsuariosRepository>();
 
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();

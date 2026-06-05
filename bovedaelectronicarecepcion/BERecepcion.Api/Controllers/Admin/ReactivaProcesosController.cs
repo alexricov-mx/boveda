@@ -1,10 +1,12 @@
 ﻿using BERecepcion.Api.Extensions;
 using BERecepcion.Api.Filters;
+using BERecepcion.Api.Infrastructure.Auth;
 using BERecepcion.Core.Admin.Dto;
 using BERecepcion.Core.Admin.Interfaces.Repositories;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.SAPPI.Interfaces.Repositories;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;

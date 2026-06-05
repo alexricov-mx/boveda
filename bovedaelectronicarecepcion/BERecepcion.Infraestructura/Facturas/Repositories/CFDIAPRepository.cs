@@ -46,11 +46,20 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
         private readonly ICFDIRepository _cFDIRepository;
         private bool processBitacora = false;
 
-        public CFDIAPRepository(string cnnString, IConfiguration configuration, IBitacoraRepository bitacoraRepository,
-            ISAPPIRepository sapPIRepository, IFacturaElectronicaRepository facturaElectronicaRepository,
-            IAdefasRepository adefasRepository, ISATRepository sATRepository, ICorreoRepository correoRepository,
-            IUsuariosRepository usuariosRepository, IAnaliticoPagoRepository analiticoPagoRepository,
-            ICFDIRepository cFDIRepository) : base(cnnString)
+        public CFDIAPRepository(
+            string cnnString
+            , IConfiguration configuration
+            , IBitacoraRepository bitacoraRepository
+            , ISAPPIRepository sapPIRepository
+            , IFacturaElectronicaRepository facturaElectronicaRepository
+            , IAdefasRepository adefasRepository
+            , ISATRepository sATRepository
+            , ICorreoRepository correoRepository
+            //, IUsuariosRepository usuariosRepository
+            , IAnaliticoPagoRepository analiticoPagoRepository
+            , ICFDIRepository cFDIRepository
+            ) 
+            : base(cnnString)
         {
             _configuration = configuration;
             _bitacoraRepository = bitacoraRepository;
@@ -60,7 +69,7 @@ namespace BERecepcion.Infraestructura.Facturas.Repositories
             _sapPIRepository = sapPIRepository;
             _sATRepository = sATRepository;
             _correoRepository = correoRepository;
-            _usuariosRepository = usuariosRepository;
+//            _usuariosRepository = usuariosRepository;
             _analiticoPagoRepository = analiticoPagoRepository;
             _cFDIRepository = cFDIRepository;
         }

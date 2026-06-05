@@ -8,9 +8,6 @@ public class ProvedorSupplyOrderPagedRequestValidator
 {
     public ProvedorSupplyOrderPagedRequestValidator()
     {
-        RuleFor(x => x.CreditorNumber)
-            .NotEmpty().WithMessage("El número de acreedor es obligatorio.");
-
         RuleFor(x => x.PageSize)
             .GreaterThan(0).WithMessage("El tamaño de página debe ser mayor que cero.");
 

@@ -394,7 +394,7 @@ try
     builder.Services.AddInfrastructure(builder.Configuration);
 
     builder.Services.AddTransient<IAdefasRepository>(x => new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])); builder.Services.AddTransient<IDesvioFirmasRepository>(x => new DesvioFirmasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]));
-    builder.Services.AddTransient<IUsuariosRepository>(x => new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
+    //builder.Services.AddTransient<IUsuariosRepository>(x => new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
 
     builder.Services.AddTransient<IOldUsuariosRepository>(x => new OldUsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])));
 
@@ -433,7 +433,7 @@ try
         new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-        new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+        //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
         new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
@@ -458,7 +458,7 @@ try
             new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-            new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+            //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
             new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
@@ -484,7 +484,7 @@ try
             new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-            new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+            //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
             new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
@@ -502,7 +502,7 @@ try
             new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-            new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+            //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
             new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new CFDIValidationCartaPorteRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
@@ -518,7 +518,7 @@ try
             new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-            new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+            //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
             new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
@@ -536,7 +536,7 @@ try
         new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
         new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-        new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+        //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
         new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
         new CFDIRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
             new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
@@ -545,7 +545,7 @@ try
             new AdefasRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new SATRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CorreoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
-            new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
+            //new UsuariosRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration, new BitacoraAdmonRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"])),
             new AnaliticoPagoRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new InvoiceRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"]),
             new CFDIValidationRepository(builder.Configuration["ConnectionStrings:SQLServerSQLDEV002"], builder.Configuration,
