@@ -39,4 +39,9 @@ public class OrdenSurtimiento : IOrdenSurtimiento
             UrisOrdenSurtimiento.GetPageByDateRange, _generals.User.UserID, fechaInicial?.ToString("yyyy-MM-dd"),
             fechaFinal?.ToString("yyyy-MM-dd"), search, pageNum, pageSize, "false"));
     }
+
+    public async Task<string> GetExpedient(string orderSAP)
+    {
+        
+    }
 }

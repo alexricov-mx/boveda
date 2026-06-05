@@ -108,12 +108,20 @@ function obtenerordensurtimientoTable(pageNum) {
             search: search,
             pageNum: pageNum
         }, onSuccess = (data) => {
+            data = data ? data : '';
             $("#ordensurtimiento-card").empty();
+            if (!data.trim()) {
+                emptyState("#ordensurtimiento-card", {
+                    title: "No se encontraron resultados.",
+                    type: "warning",
+                    icon: "fas fa-search"
+                });
+                return;
+            }
             $("#ordensurtimiento-card").append(data);
             darkMode(getCookie("dark-mode") == "true");
             $("#ExportExcelAll").show();
         }, onErrror = (error) => {
-            console.log(error);
             $("#ordenSurtimiento-card").empty();
             errorAlert(error.message);
         });

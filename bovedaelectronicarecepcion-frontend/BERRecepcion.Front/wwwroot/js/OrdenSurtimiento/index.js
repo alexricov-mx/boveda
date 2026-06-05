@@ -48,7 +48,6 @@ function OrdenSurtimientoCard(pageNum = 1, search = "") {
             $("#ordenSurtimiento-card").append(data);
             darkMode(getCookie("dark-mode") == "true");
         }, onErrror = (error) => {
-            console.log(error);
             $("#ordenSurtimiento-card").empty();
             errorAlert(error.message);
         });

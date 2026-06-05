@@ -43,6 +43,7 @@ function apiRequest(method, url, data, onSuccess, onError) {
         ajaxOptions.data = JSON.stringify(data);
     } else {
         ajaxOptions.data = data || {};
+        ajaxOptions.traditional = true;
     }
 
     $.ajax(ajaxOptions);

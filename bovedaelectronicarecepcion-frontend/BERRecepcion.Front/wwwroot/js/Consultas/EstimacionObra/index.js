@@ -38,13 +38,21 @@ var ConsultaEstimacionesTable = function (pageNum = 1, fechaInicial = null, fech
         pageNum: pageNum,
         search: search
     }, onSuccess = (data) => {
+        data = data ? data : '';
         $("#tabla-consulta").empty();
+        if (!data.trim()) {
+            emptyState("#tabla-consulta", {
+                title: "No se encontraron resultados.",
+                type: "warning",
+                icon: "fas fa-search"
+            });
+            $("#Excel").hide();
+            return;
+        }
+        $("#Excel").show();
         $("#tabla-consulta").append(data);
         darkMode(getCookie("dark-mode") == "true");
-        if (!_hasData)
-            $("#Excel").hide();
-        else
-            $("#Excel").show();
+        
     }, onErrror = (error) => {
         console.log(error);
         $("#ordenSurtimiento-card").empty();

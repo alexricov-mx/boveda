@@ -38,13 +38,20 @@ var OrdenSurtimientoConsultaTable = function (pageNum = 1, fechaInicial = null, 
         pageNum: pageNum,
         search: search
     }, onSuccess = (data) => {
+        data = data ? data : '';
         $("#os-consulta-table").empty();
+        if (!data.trim()) {
+            emptyState("#os-consulta-table", {
+                title: "No se encontraron resultados.",
+                type: "warning",
+                icon: "fas fa-search"
+            });
+            $("#Excel").hide();
+            return;
+        }
+        $("#Excel").show();
         $("#os-consulta-table").append(data);
         darkMode(getCookie("dark-mode") == "true");
-        if (!_hasData)
-            $("#Excel").hide();
-        else
-            $("#Excel").show();
     }, onErrror = (error) => {
         console.log(error);
         $("#ordenSurtimiento-card").empty();

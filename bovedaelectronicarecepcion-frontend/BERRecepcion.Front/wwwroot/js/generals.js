@@ -319,3 +319,33 @@ const toast = {
     error: (message) => { return toastr.error(message); },
     success: (message) => { return toastr.success(message); },
 }
+
+/**
+ * Renders an empty-state callout into a container.
+ * @param {string|jQuery} target
+ * @param {object}        [opts]
+ * @param {string}        [opts.message="No se han encontrado registros."]
+ * @param {string}        [opts.title]        - Optional bold heading
+ * @param {string}        [opts.type="info"]  - "info" | "success" | "warning" | "danger"
+ * @param {string}        [opts.icon="fas fa-inbox"] - FontAwesome class
+ */
+function emptyState(target, opts) {
+    var cfg = $.extend({
+        message: "No se han encontrado registros.",
+        title: null,
+        type: "info",
+        icon: "fas fa-inbox"
+    }, opts);
+
+    var $callout = $('<div>').addClass("callout callout-" + cfg.type).css({ textAlign: "center", padding: "1.5rem 2.5rem", border: "none", borderLeft: "none", boxShadow: "none" });
+
+    if (cfg.icon)
+        $callout.append($('<i>').addClass(cfg.icon).css({ fontSize: "3rem", display: "block", marginBottom: "0.75rem" }));
+
+    if (cfg.title)
+        $callout.append($('<strong>').text(cfg.title).css({ display: "block", marginBottom: "0.25rem" }));
+
+    $callout.append($('<p>').text(cfg.message));
+
+    $(target).html($callout);
+}

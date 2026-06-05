@@ -11,13 +11,16 @@
 		};
 		apiGet("ReactivaProcesos/GetReactivarProcesosBySAPOrder", Data, onSuccess = (data) => {
 			hideLoader();
-			if(!data) {
-				console.log("Regreso 404");
-				$("#detalle").html($('<div class="callout callout-info"><p>No se han encontrado registros.</p></div>'));
-				return
+			if (!data) {
+				emptyState("#detalle", {
+					title: "No se encontraron resultados.",
+					message: "Intenta buscar con otro número de SAP.",
+					type: "warning",
+					icon: "fas fa-search"
+				});
+				// emptyState("#detalle2");
+				return;
 			}
-			// if (!isNull(data.success) && !data.success)
-			// 	return errorAlert(data.message);
 			
 			$("#detalle").html(data);
 			$("#detalle2").html(data);

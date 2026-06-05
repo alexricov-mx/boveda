@@ -8,57 +8,53 @@
 }
 
 
-        @if (contieneOSs)
+@if (contieneOSs)
+{
+    <table class="table table-hover" id="ordensurtimiento-table" style="font-size:14px;">
+        <thead>
+        <tr>
+            <th class="text-center">PDF</th>
+            <th>OS</th>
+            <th>Contrato</th>
+            <th>Organismo</th>
+            <th>Fecha Recepcion</th>
+            <th>Tipo</th>
+            <th>Acreedor</th>
+            <th>Total</th>
+            <th>Moneda</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var item in Model.items)
         {
-            <table class="table table-hover" id="ordensurtimiento-table" style="font-size:14px;">
-                <thead>
-                    <tr>
-                        <th class="text-center">PDF</th>
-                        <th>OS</th>
-                        <th>Contrato</th>
-                        <th>Organismo</th>
-                        <th>Fecha Recepcion</th>
-                        <th>Tipo</th>
-                        <th>Acreedor</th>
-                        <th>Total</th>
-                        <th>Moneda</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @foreach (var item in Model.items)
-                    {
-
-                        <tr>
-                            <td scope="row" class="text-center">
-                                <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.SapOrder" data-sapOrder="@item.SapOrder" data-organismClave="@item.OrganismClave" data-functionarysigndate="@item.FunctionarySignDate"></i>
-                            </td>
-                            <td scope="row">@item.SapOrder</td>
-                            <td scope="row">@item.Contract</td>
-                            <td scope="row">@item.OrganismClave</td>
-                            <td scope="row">@item.ReceptionDate.ToString("dd/MM/yyyy hh:mm")</td>
-                            <td scope="row">@(item.DocumentType == "M" ? "Medicamentos" : "Obras")</td>
-                            <td scope="row">@item.CreditorNumber</td>
-                            <td scope="row">$@item.Total</td>
-                            <td scope="row">@item.Currency</td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-            <div class="row mt-2">
-                <div class="col-12">
-                    <partial name="_Pagination" model="@(new Pager(Model.totalItems, Model.pageNumber, Model.pageSize))" />
-                </div>
-            </div>
-            <script>
-                $(function () {
-                    DataTableInitialize("ordensurtimiento-table");
-                });
-            </script>
+            <tr>
+                <td scope="row" class="text-center">
+                    <i class="fas fa-file-pdf image-pdf pdf-red-color" data-id="@item.SapOrder"
+                       data-sapOrder="@item.SapOrder" data-organismClave="@item.OrganismClave"
+                       data-functionarysigndate="@item.FunctionarySignDate"></i>
+                </td>
+                <td scope="row">@item.SapOrder</td>
+                <td scope="row">@item.Contract</td>
+                <td scope="row">@item.OrganismClave</td>
+                <td scope="row">@item.ReceptionDate.ToString("dd/MM/yyyy hh:mm")</td>
+                <td scope="row">@(item.DocumentType == "M" ? "Medicamentos" : "Obras")</td>
+                <td scope="row">@item.CreditorNumber</td>
+                <td scope="row">$@item.Total</td>
+                <td scope="row">@item.Currency</td>
+            </tr>
         }
-        else
-        {
-            <div class="callout callout-info">
-                <p>No se encontraron estimaciones en el periodo especificado.</p>
-            </div>
-        }
+        </tbody>
+    </table>
+    <div class="row mt-2">
+        <div class="col-12">
+            <partial name="_Pagination" model="@(new Pager(Model.totalItems, Model.pageNumber, Model.pageSize))"/>
+        </div>
+    </div>
+    <script>
+        $(function () {
+            DataTableInitialize("ordensurtimiento-table");
+        });
+    </script>
+}
+        
     
