@@ -36,7 +36,7 @@
         });
     };
 
-    /**
+    /** par
     * Material Inputs
     */
     $('body').materializeInputs();

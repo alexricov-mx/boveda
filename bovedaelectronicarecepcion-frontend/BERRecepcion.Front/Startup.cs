@@ -20,6 +20,7 @@ using BERRecepcion.Front.Interfaces;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.EstimacionObra;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenBancaria;
 using BERRecepcion.Front.Interfaces.Services.BackEndApi.OrdenSurtimiento;
+using BERRecepcion.Front.Interfaces.Services.BackEndApi.Procesos;
 using BERRecepcion.Front.Modules.Authentication;
 using BERRecepcion.Front.Modules.Cookie;
 using BERRecepcion.Front.Modules.Directories;
@@ -28,6 +29,7 @@ using BERRecepcion.Front.Modules.RolesPermissions;
 using BERRecepcion.Front.Services.BackEndApi.EstimacionObra;
 using BERRecepcion.Front.Services.BackEndApi.OrdenBancaria;
 using BERRecepcion.Front.Services.BackEndApi.OrdenSurtimiento;
+using BERRecepcion.Front.Services.BackEndApi.Procesos;
 using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.DataProtection;
@@ -70,7 +72,7 @@ namespace BERRecepcion.Front
             services.AddScoped<IOrdenSurtimiento, OrdenSurtimiento>();
             services.AddScoped<IEstimacionObra, EstimacionObra>();
             services.AddScoped<IOrdenBancaria, OrdenBancaria>();
-
+            services.AddScoped<IProcesos, Procesos>();
             // ========================================
             // DATA PROTECTION: Persistencia de claves para autenticación
             // ========================================
@@ -264,6 +266,7 @@ namespace BERRecepcion.Front
                     .RequireAuthenticatedUser()
                     .Build();
                 options.Filters.Add(new AuthorizeFilter(policy));
+                options.Filters.Add<BERRecepcion.Front.Filters.ApiExceptionFilterAttribute>();
             }); //.AddFluentValidation(fluConfiguration => fluConfiguration.RegisterValidatorsFromAssemblyContaining<Startup>());
             // NOTA: Esto es diferente al Proxy porque BER necesita consultar roles en BD
             // services.AddAuthenticationExtensions(Configuration);

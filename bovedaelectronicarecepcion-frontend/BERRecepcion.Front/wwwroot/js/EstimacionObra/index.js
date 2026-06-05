@@ -19,10 +19,9 @@
         $.ajax({
             type: "GET",
             url: "DocumentoPDF/GetDocumentoPDF",
-            data: { SAPOrder: sapOrder, Organismo: organismo, DocumentoBEId: isNull(providersigndate) ? null : id },
+            data: {SAPOrder: sapOrder, Organismo: organismo, DocumentoBEId: isNull(providersigndate) ? null : id},
             success: function (data) {
-                if (!isNull(data.success) && !data.success)
-                    return infoAlert(data.message);
+                if (!isNull(data.success) && !data.success) return infoAlert(data.message);
                 showFile(data.file);
                 $("#" + id).removeAttr("disabled");
             },
@@ -32,16 +31,13 @@
 });
 
 function EstimacionObraTable(pageNum = 1) {
-    $.ajax({
-        type: "GET",
-        url: "EstimacionObra/GetEstimacionObraTable",
-        data: { pageNum: pageNum },
-        success: function (data) {
-            // if (!isNull(data.success) && !data.success)
-            //     return errorAlert(data.message);
-            $("#estimacion-card").empty();
-            $("#estimacion-card").append(data);
-            darkMode(getCookie("dark-mode") == "true");
-        }
+    apiGet("EstimacionObra/GetEstimacionObraTable", {pageNum: pageNum}, onSuccess = (data) => {
+        $("#estimacion-card").empty();
+        $("#estimacion-card").append(data);
+        darkMode(getCookie("dark-mode") == "true");
+    }, onErrror = (error) => {
+        console.log(error);
+        $("#ordenSurtimiento-card").empty();
+        errorAlert(error.message);
     });
 }

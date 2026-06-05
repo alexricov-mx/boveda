@@ -9,20 +9,22 @@
 		var Data = {
 			SAPOrder: $('#txtSapOrder').val(),
 		};
-
-		$.ajax({
-			type: "post",
-			datatype: 'json',
-			url: uri,
-			data: Data,
-			success: function (data) {
-				hideLoader();
-				if (!isNull(data.success) && !data.success) 
-					return errorAlert(data.message);
-				
-				$("#detalle").html(data);
-				$("#detalle2").html(data);                
+		apiGet("ReactivaProcesos/GetReactivarProcesosBySAPOrder", Data, onSuccess = (data) => {
+			hideLoader();
+			if(!data) {
+				console.log("Regreso 404");
+				$("#detalle").html($('<div class="callout callout-info"><p>No se han encontrado registros.</p></div>'));
+				return
 			}
+			// if (!isNull(data.success) && !data.success)
+			// 	return errorAlert(data.message);
+			
+			$("#detalle").html(data);
+			$("#detalle2").html(data);
+		}, onErrror = (error) => {
+			console.log(error);
+			$("#ordenSurtimiento-card").empty();
+			errorAlert(error.message);
 		});
 		e.stopImmediatePropagation();
 	});   

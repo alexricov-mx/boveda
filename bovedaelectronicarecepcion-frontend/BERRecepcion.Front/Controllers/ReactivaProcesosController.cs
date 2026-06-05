@@ -10,6 +10,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using BERRecepcion.Front.Interfaces.Services.BackEndApi.Procesos;
 
 namespace BERRecepcion.Front.Controllers
 {
@@ -20,51 +21,68 @@ namespace BERRecepcion.Front.Controllers
         private readonly ILogger<ReactivaProcesosController> _logger;
         protected readonly IRestUtility _utility;
         private readonly IGenerals _generals;
+        private readonly IProcesos _procesos;
 
-        public ReactivaProcesosController(ILogger<ReactivaProcesosController> logger, IRestUtility utility, IGenerals generals)
+        public ReactivaProcesosController(ILogger<ReactivaProcesosController> logger, IRestUtility utility,
+            IGenerals generals, IProcesos procesos)
         {
             _logger = logger;
             _utility = utility;
             _generals = generals;
+            _procesos = procesos;
         }
+
         [RoleFilter(Roles: "AdministrationValidations")]
         [UserTypeFilter("UserTypeS,UserTypeA")]
         public IActionResult Index()
         {
-           return View();
+            return View();
         }
 
-        public async Task<IActionResult> BuscaReactivarProcesos(string SAPOrder)
+        public async Task<IActionResult> GetReactivarProcesosBySAPOrder(string SAPOrder)
         {
-
-            try
+            var datosUnio = new UnionReactivarProcesosDto()
             {
-                var datos = await _utility.GetItem<DataResult<ReactivaProcesosDto>>("ReactivaProcesos/" + SAPOrder);              
-                var datos2 = await _utility.GetItem<DataResult<IEnumerable<ReactivaProcesosResponseDto>>>("ReactivaProcesos/GetReactivaProcesos/" + SAPOrder);
-
-                var datosUnio = new UnionReactivarProcesosDto()
-                {
-
-                    ReactivaProcesosFirma = datos.Data,
-                    ReactivaProcesosDatos = datos2.Data
-                };               
-                
-                return PartialView("_RPFirmas", datosUnio);
-            }
-            catch (Exception ext)
-            {
-                return Json(new { success = false, responseText = ext.Message });
-            }
-        
+            
+                ReactivaProcesosFirma = await _procesos.GetSAPSignatureDeliveryAsync(SAPOrder),
+                ReactivaProcesosDatos = await _procesos.GetReactivateProcessAsync(SAPOrder)
+            }; 
+            return PartialView("_RPFirmas", datosUnio);
         }
+        
+  
+        // public async Task<IActionResult> BuscaReactivarProcesos(string SAPOrder)
+        // {
+        //
+        //     try
+        //     {
+        //         var datos = await _utility.GetItem<DataResult<ReactivaProcesosDto>>("ReactivaProcesos/" + SAPOrder);              
+        //         var datos2 = await _utility.GetItem<DataResult<IEnumerable<ReactivaProcesosResponseDto>>>("ReactivaProcesos/GetReactivaProcesos/" + SAPOrder);
+        //
+        //         var datosUnio = new UnionReactivarProcesosDto()
+        //         {
+        //
+        //             ReactivaProcesosFirma = datos.Data,
+        //             ReactivaProcesosDatos = datos2.Data
+        //         };               
+        //         
+        //         return PartialView("_RPFirmas", datosUnio);
+        //     }
+        //     catch (Exception ext)
+        //     {
+        //         return Json(new { success = false, responseText = ext.Message });
+        //     }
+        //
+        // }
 
         public async Task<JsonResult> FirmarReactivarProcesos(ReactivaProcesosDto reactP)
         {
             try
             {
                 reactP.Usuario_Modificador = _generals.User.Token == null ? "" : _generals.User.Token;
-                
-                OSResponseItemDto osItem = new OSResponseItemDto() { 
+
+                OSResponseItemDto osItem = new OSResponseItemDto()
+                {
                     CONTRATO = reactP.Contract,
                     ORDEN_SAP = reactP.SAPOrderRP,
                     ORGANISMO = reactP.Clave,
@@ -79,7 +97,7 @@ namespace BERRecepcion.Front.Controllers
                 {
                     Data = reactP
                 };
-                
+
                 var datos = await _utility.Post<DataResult<ReactivaProcesosDto>>(data, "ReactivaProcesos");
 
                 if (datos.Data == null)
@@ -93,13 +111,8 @@ namespace BERRecepcion.Front.Controllers
             }
             catch (Exception exp)
             {
-                
                 return Json(new { success = false, responseText = exp.Message });
             }
-
         }
-
-
-        
     }
 }

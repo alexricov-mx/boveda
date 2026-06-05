@@ -241,32 +241,34 @@ namespace BERRecepcion.Front.Controllers
         [HttpGet]
         public async Task<IActionResult> GetOrdenSurtimiento(int pageNum = 1, string search = null)
         {
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
-                ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
-                ViewBag.Search = search;
-                return PartialView("_OrdenSurtimientoCard", await _ordenSurtimiento.GetPage(pageNum, pageSize, search));
+            int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
+            ViewBag.PDFCheckDisabled = Convert.ToBoolean(_configuration[PDFCheck]);
+            ViewBag.Search = search;
+            return PartialView("_OrdenSurtimientoCard", await _ordenSurtimiento.GetPage(pageNum, pageSize, search));
         }
-        
+
         [HttpGet]
         public async Task<IActionResult> GetOrdenSurtimientoPorFechas(DateTime? fechaInicial = null, DateTime? fechaFinal = null, int pageNum = 1, string[] search = null)
         {
-                int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
-                string _search = string.Empty;
-                fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
-                fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
-                if (search != null)
+            int pageSize = Convert.ToInt32(_configuration.GetSection("Paginacion:OrdenSurtimiento").Value);
+            string _search = string.Empty;
+            fechaInicial = fechaInicial == null ? Convert.ToDateTime(_configuration["infoAplicativo:FechaInicial"]) : fechaInicial;
+            fechaFinal = fechaFinal == null ? DateTime.Now : fechaFinal;
+            if (search != null)
+            {
+                List<string> cleanedSearchList = new List<string>();
+                foreach (var item in search)
                 {
-                    List<string> cleanedSearchList = new List<string>();
-                    foreach (var item in search)
-                    {
-                        string removed = _generals.RemoveSpecialCharacters(item);
-                        cleanedSearchList.Add(removed);
-                    }
-                    _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
+                    string removed = _generals.RemoveSpecialCharacters(item);
+                    cleanedSearchList.Add(removed);
                 }
-               
-                return PartialView("~/Views/Consultas/OrdenSurtimiento/_OrdenSurtimientoConsultaTable.cshtml", await _ordenSurtimiento.GetPageByDateRange( fechaInicial, fechaFinal, pageNum, pageSize, _search));
+                _search = Regex.Replace(string.Join(";", cleanedSearchList), " *, *", ",");
+            }
+
+            return PartialView("~/Views/Consultas/OrdenSurtimiento/_OrdenSurtimientoConsultaTable.cshtml",
+                await _ordenSurtimiento.GetPageByDateRange(fechaInicial, fechaFinal, pageNum, pageSize, _search));
         }
+
         #endregion Refactor
     }
 }

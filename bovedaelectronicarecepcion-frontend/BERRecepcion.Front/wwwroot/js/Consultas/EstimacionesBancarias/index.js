@@ -30,8 +30,7 @@
             for (let i = 0; i < search.length; i++)
                 search[i] = search[i].replaceAll(',', '_');
             location.href = "Consultas/DownloadExcelGetAllEstimacionesBancarias?filtro=" + search.toString().replaceAll(',', '__') + "&start=" + start + "&end=" + end;
-        }
-        else {
+        } else {
             return infoAlert(dataValid.message);
         }
         e.stopImmediatePropagation();
@@ -47,7 +46,7 @@
         $.ajax({
             type: "GET",
             url: "DocumentoPDF/GetDocumentoPDF",
-            data: { SAPOrder: sapOrder, Organismo: organismo, DocumentoBEId: isNull(functionarysigndate) ? null : id },
+            data: {SAPOrder: sapOrder, Organismo: organismo, DocumentoBEId: isNull(functionarysigndate) ? null : id},
             success: function (data) {
                 if (!isNull(data.success) && !data.success)
                     return infoAlert(data.message);
@@ -72,13 +71,13 @@
 });
 
 function validateData() {
-    var result = { isValid: true, mesage: "" };
+    var result = {isValid: true, mesage: ""};
 
     var start = $("#fecha-inicial").val();
     var end = $("#fecha-final").val();
     if (start != '' && start != undefined && end != '' && end != undefined) {
         if (end < start) {
-            return { isValid: false, message: "El rango de fechas es incorrecto, favor de verificar." };
+            return {isValid: false, message: "El rango de fechas es incorrecto, favor de verificar."};
         }
     }
 
@@ -102,37 +101,25 @@ function obtenerordensurtimientoTable(pageNum) {
     }
     var dataValid = validateData();
     if (dataValid.isValid) {
-        $.ajax({
-            type: "GET",
-            url: "OrdenBancaria/GetEstimacionesBancariasTable",
-            data: {
-                startDate: start??null,
-                endDate: end??null,
-                search: search,
-                pageNum: pageNum
-            },
-            success: function (data) {
-                // if (!isNull(data.success) && !data.success) {
-                //     return errorAlert(data.message);
-                // }
-                // else {
-                //     $("#ExportExcelAll").show();
-                // }
-                $("#ordensurtimiento-card").empty();
-                $("#ordensurtimiento-card").append(data);
-                darkMode(getCookie("dark-mode") == "true");
-            },
-            fail: function (xhr, status, error) {
-                console.log(xhr.responseText);
-                console.log(status);
-                console.log(error);
-            }
+        apiGet("OrdenBancaria/GetEstimacionesBancariasTable", {
+            startDate: start ?? null,
+            endDate: end ?? null,
+            search: search,
+            pageNum: pageNum
+        }, onSuccess = (data) => {
+            $("#ordensurtimiento-card").empty();
+            $("#ordensurtimiento-card").append(data);
+            darkMode(getCookie("dark-mode") == "true");
+        }, onErrror = (error) => {
+            console.log(error);
+            $("#ordenSurtimiento-card").empty();
+            errorAlert(error.message);
         });
-    }
-    else {
+    } else {
         return infoAlert(dataValid.message);
     }
 }
+
 function base64ToArrayBuffer(data) {
     var bString = window.atob(data);
     var bLength = bString.length;

@@ -32,23 +32,23 @@ function updateSearch() {
 }
 
 var OrdenSurtimientoConsultaTable = function (pageNum = 1, fechaInicial = null, fechaFinal = null, search = []) {
-    $.ajax({
-        type: "GET",
-        url: "OrdenSurtimiento/GetOrdenSurtimientoPorFechas",
-        data: { fechaInicial: fechaInicial, fechaFinal : fechaFinal, pageNum : pageNum, search: search },
-        success: function (data) {
-            // if (!isNull(data.success) && !data.success)
-            //     return errorAlert(data.message);
-            $("#os-consulta-table").empty();
-            $("#os-consulta-table").append(data);
-            darkMode(getCookie("dark-mode") == "true");
-            if (!_hasData)
-                $("#Excel").hide();
-            else
-                $("#Excel").show();
-        }
-    }).fail(function () {   
-        
+    apiGet("OrdenSurtimiento/GetOrdenSurtimientoPorFechas", {
+        fechaInicial: fechaInicial,
+        fechaFinal: fechaFinal,
+        pageNum: pageNum,
+        search: search
+    }, onSuccess = (data) => {
+        $("#os-consulta-table").empty();
+        $("#os-consulta-table").append(data);
+        darkMode(getCookie("dark-mode") == "true");
+        if (!_hasData)
+            $("#Excel").hide();
+        else
+            $("#Excel").show();
+    }, onErrror = (error) => {
+        console.log(error);
+        $("#ordenSurtimiento-card").empty();
+        errorAlert(error.message);
     });
 }
 //Buscar órdenes de surtimiento
@@ -75,6 +75,7 @@ function setAnimation(icon, isMouseOver) {
     else
         icon.addClass("fa-folder").removeClass("fa-folder-open");
 }
+
 //Ver expediente
 $(document).on("click", "i[name='btnExpediente']", function (e) {
     debugger;
@@ -93,7 +94,7 @@ $(document).on("click", "i[name='btnExpediente']", function (e) {
         '<input type="text" name="fechaFinal" value="' + $("#FechaFinal").val() + '"  />' +
         '<input type="text" name="search" value="' + search + '"  />' +
         '</form>');
-    
+
     $('body').append(form);
     form.submit().remove();
     e.stopImmediatePropagation();

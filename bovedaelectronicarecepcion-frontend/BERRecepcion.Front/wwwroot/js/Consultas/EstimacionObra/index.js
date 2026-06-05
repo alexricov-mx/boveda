@@ -32,21 +32,23 @@ function updateSearch() {
 }
 
 var ConsultaEstimacionesTable = function (pageNum = 1, fechaInicial = null, fechaFinal = null, search = []) {
-    $.ajax({
-        type: "GET",
-        url: "EstimacionObra/GetEstimacionObraPorFechas",
-        data: { startDate: fechaInicial??"", endDate: fechaFinal??"", pageNum: pageNum, search: search },
-        success: function (data) {
-            // if (!isNull(data.success) && !data.success)
-            //     return errorAlert(data.message);
-            $("#tabla-consulta").empty();
-            $("#tabla-consulta").append(data);
-            darkMode(getCookie("dark-mode") == "true");
-            if (!_hasData)
-                $("#Excel").hide();
-            else
-                $("#Excel").show();
-        }
+    apiGet("EstimacionObra/GetEstimacionObraPorFechas", {
+        startDate: fechaInicial ?? "",
+        endDate: fechaFinal ?? "",
+        pageNum: pageNum,
+        search: search
+    }, onSuccess = (data) => {
+        $("#tabla-consulta").empty();
+        $("#tabla-consulta").append(data);
+        darkMode(getCookie("dark-mode") == "true");
+        if (!_hasData)
+            $("#Excel").hide();
+        else
+            $("#Excel").show();
+    }, onErrror = (error) => {
+        console.log(error);
+        $("#ordenSurtimiento-card").empty();
+        errorAlert(error.message);
     });
 }
 //Buscar estimaciones
@@ -68,9 +70,9 @@ $(document).on("mouseover mouseout", "i[name='btnExpediente']", function (e) {
 });
 
 function setAnimation(icon, isMouseOver) {
-    if (isMouseOver) 
+    if (isMouseOver)
         icon.removeClass("fa-folder").addClass("fa-folder-open");
-     else 
+    else
         icon.addClass("fa-folder").removeClass("fa-folder-open");
 }
 
