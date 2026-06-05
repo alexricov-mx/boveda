@@ -6,6 +6,9 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net.Http;
+using System.Text.Json;
+using System.Threading.Tasks;
 
 namespace BERRecepcion.Front.Controllers
 {
@@ -16,24 +19,26 @@ namespace BERRecepcion.Front.Controllers
     public class DiagnosticoController : Controller
     {
         private readonly IConfiguration _configuration;
+        private readonly IHttpClientFactory _httpClientFactory;
 
-        public DiagnosticoController(IConfiguration configuration)
+        public DiagnosticoController(IConfiguration configuration, IHttpClientFactory httpClientFactory)
         {
             _configuration = configuration;
+            _httpClientFactory = httpClientFactory;
         }
 
         /// <summary>
         /// Página de diagnóstico accesible sin autenticación
         /// </summary>
         [HttpGet]
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
             try
             {
                 var diagnostico = new
                 {
                     Timestamp = DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss"),
-                    
+
                     // Información de Azure AD
                     AzureAD = new
                     {
@@ -44,7 +49,7 @@ namespace BERRecepcion.Front.Controllers
                         CallbackPath = _configuration["AzureAd:CallbackPath"],
                         ExpectedRedirectUri = $"{_configuration["AzureAd:WebAppURI"]?.TrimEnd('/')}{_configuration["AzureAd:CallbackPath"]}"
                     },
-                    
+
                     // Información de ambiente
                     Ambiente = new
                     {
@@ -53,19 +58,19 @@ namespace BERRecepcion.Front.Controllers
                         Ambiente = _configuration["infoAplicativo:Ambiente"],
                         ApiUrl = _configuration["ApiUrl"]
                     },
-                    
+
                     // Data Protection Keys
                     DataProtection = CheckDataProtectionKeys(),
-                    
+
                     // Logs disponibles
-                    Logs = CheckLogsFolder()
+                    Logs = await CheckLogsFolder()
                 };
 
                 ViewBag.Diagnostico = diagnostico;
-                
+
                 Log.Information("Acceso a página de diagnóstico desde {IP}", 
                     HttpContext.Connection.RemoteIpAddress?.ToString() ?? "Unknown");
-                
+
                 return View();
             }
             catch (Exception ex)
@@ -80,7 +85,7 @@ namespace BERRecepcion.Front.Controllers
         /// Endpoint JSON para consultas automáticas
         /// </summary>
         [HttpGet]
-        public IActionResult Status()
+        public async Task<IActionResult> Status()
         {
             try
             {
@@ -95,7 +100,7 @@ namespace BERRecepcion.Front.Controllers
                         redirectUri = $"{_configuration["AzureAd:WebAppURI"]?.TrimEnd('/')}{_configuration["AzureAd:CallbackPath"]}"
                     },
                     dataProtection = CheckDataProtectionKeys(),
-                    logs = CheckLogsFolder()
+                    logs = await CheckLogsFolder()
                 };
 
                 return Json(status);
@@ -243,36 +248,65 @@ namespace BERRecepcion.Front.Controllers
             };
         }
 
-        private object CheckLogsFolder()
+        private async Task<object> CheckLogsFolder()
         {
             try
             {
-                var logsPath = Path.Combine(AppContext.BaseDirectory, "logs");
-                
-                if (!Directory.Exists(logsPath))
+                var apiUrl = _configuration["ApiUrl"]?.TrimEnd('/');
+                var apiKey = _configuration["Seguridad:ApiKey"];
+                var requestUrl = $"{apiUrl}/logs/list";
+
+                var client = _httpClientFactory.CreateClient();
+                client.DefaultRequestHeaders.Add("ApiKey", apiKey);
+
+                var response = await client.GetAsync(requestUrl);
+
+                if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
                 {
                     return new
                     {
                         status = "NOT_FOUND",
-                        path = logsPath,
-                        exists = false
+                        path = requestUrl,
+                        exists = false,
+                        message = "El backend no encontró la carpeta de logs"
                     };
                 }
 
-                var logFiles = Directory.GetFiles(logsPath, "log-*.txt");
-                var latestFile = logFiles
-                    .Select(f => new FileInfo(f))
-                    .OrderByDescending(f => f.LastWriteTime)
-                    .FirstOrDefault();
+                if (!response.IsSuccessStatusCode)
+                {
+                    return new
+                    {
+                        status = "ERROR",
+                        error = $"El backend respondió con HTTP {(int)response.StatusCode}"
+                    };
+                }
+
+                var json = await response.Content.ReadAsStringAsync();
+                using var doc = JsonDocument.Parse(json);
+                var root = doc.RootElement;
+
+                var files = root.TryGetProperty("files", out var filesElement)
+                    ? filesElement.EnumerateArray().ToList()
+                    : new List<JsonElement>();
+
+                var latestFile = files.Count > 0 ? files[0] : (JsonElement?)null;
 
                 return new
                 {
                     status = "OK",
-                    path = logsPath,
+                    path = root.TryGetProperty("path", out var pathProp) ? pathProp.GetString() : null,
                     exists = true,
-                    filesCount = logFiles.Length,
-                    latestFile = latestFile?.Name,
-                    latestModified = latestFile?.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss")
+                    filesCount = files.Count,
+                    latestFile = latestFile?.TryGetProperty("fileName", out var nameProp) == true ? nameProp.GetString() : null,
+                    latestModified = latestFile?.TryGetProperty("lastModified", out var modProp) == true ? modProp.GetString() : null
+                };
+            }
+            catch (HttpRequestException ex)
+            {
+                return new
+                {
+                    status = "ERROR",
+                    error = $"No se pudo conectar al backend: {ex.Message}"
                 };
             }
             catch (Exception ex)

@@ -1,19 +1,16 @@
-﻿using Microsoft.Extensions.Configuration;
+﻿using BERRecepcion.Front.Interfaces;
+using BERRecepcion.Front.Models;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Microsoft.Identity.Web;
+using Newtonsoft.Json;
 using RestSharp;
+using Serilog;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
-using Newtonsoft;
-using BERRecepcion.Front.Interfaces;
-using Newtonsoft.Json;
-using BERRecepcion.Front.Models;
-using System.Net;
-using Serilog;
 using System.Net.Http;
-using System.Net.Security;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Identity.Web;
+using System.Threading.Tasks;
 
 namespace BERRecepcion.Front.Utilities
 {
@@ -23,10 +20,18 @@ namespace BERRecepcion.Front.Utilities
         private readonly RestClient _client;
         private readonly ITokenAcquisition _tokenAcquisition;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly ILogger _logger;
 
-        public RestUtility(IConfiguration configuration, ITokenAcquisition tokenAcquisition, IHttpContextAccessor httpContextAccessor = null)
+        public RestUtility(
+            IConfiguration configuration
+            , ITokenAcquisition tokenAcquisition
+            , ILogger logger
+            , IHttpContextAccessor httpContextAccessor = null
+
+            )
         {
             _configuration = configuration;
+            _logger = logger;
             _tokenAcquisition = tokenAcquisition;
             _httpContextAccessor = httpContextAccessor;
             // bloque de codigo temporal para ignorar el certificado vencido
@@ -41,7 +46,7 @@ namespace BERRecepcion.Front.Utilities
             };
             _client = new RestClient(options);
         }
-  
+
         /// <summary>
         /// Obtiene el JWT access token via MSAL (ITokenAcquisition).
         /// Maneja renovación silenciosa automática cuando el token expira.
@@ -54,6 +59,8 @@ namespace BERRecepcion.Front.Utilities
                 Log.Information($"Solicitando access token via MSAL para scope: {scopes[0]}");
                 var accessToken = await _tokenAcquisition.GetAccessTokenForUserAsync(scopes);
                 Log.Information($"✓ Access token obtenido via MSAL (longitud: {accessToken?.Length ?? 0})");
+                Log.Information($"Bearer token: {accessToken}");
+                _logger.Information($"Bearer token: {accessToken}");
                 return accessToken;
             }
             catch (MicrosoftIdentityWebChallengeUserException ex)
@@ -68,7 +75,7 @@ namespace BERRecepcion.Front.Utilities
                 return null;
             }
         }
-  
+
         /// <summary>
         /// Get: Obtener elemento
         /// </summary>
@@ -82,12 +89,12 @@ namespace BERRecepcion.Front.Utilities
                 Log.Information("========== RestUtility.GetItem INICIO ==========");
                 Log.Information($"Endpoint: {apiEndPoint}");
                 Log.Information($"Base URL: {_client.Options.BaseUrl}");
-                
+
                 var request = new RestRequest(apiEndPoint, Method.Get);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 Log.Information($"ApiKey: {_configuration.GetSection("Seguridad:ApiKey").Value?.Substring(0, 4)}****");
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -99,8 +106,8 @@ namespace BERRecepcion.Front.Utilities
                 {
                     Log.Warning("NO se pudo obtener token de Azure AD");
                 }
-                
-                if(parameters != null)
+
+                if (parameters != null)
                 {
                     Log.Information($"Parámetros: {parameters.Count()}");
                     foreach (var item in parameters)
@@ -109,40 +116,40 @@ namespace BERRecepcion.Front.Utilities
                         Log.Information($"  - {item.Name} = {item.Value}");
                     }
                 }
-                
+
                 Log.Information($"URL completa: {_client.Options.BaseUrl}{apiEndPoint}");
                 Log.Information("Ejecutando request...");
-                
+
                 var response = await _client.ExecuteAsync(request);
-                
+
                 Log.Information($"Respuesta recibida - StatusCode: {response.StatusCode} ({(int)response.StatusCode})");
                 Log.Information($"ResponseStatus: {response.ResponseStatus}");
                 Log.Information($"IsSuccessful: {response.IsSuccessful}");
-                
+
                 if (!string.IsNullOrEmpty(response.ErrorMessage))
                 {
                     Log.Error($"ErrorMessage: {response.ErrorMessage}");
                 }
-                
+
                 if (!string.IsNullOrEmpty(response.Content))
                 {
                     Log.Information($"Content Length: {response.Content.Length} bytes");
                     Log.Information($"Content (primeros 500 chars): {response.Content.Substring(0, Math.Min(500, response.Content.Length))}");
                 }
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var returnedItem = JsonConvert.DeserializeObject<T>(response.Content);
                     Log.Information("✓ Deserialización exitosa");
                     return returnedItem;
                 }
-                
+
                 // Error - no es 200
-                string errorInfo = $"Error: Acción:GET { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:GET {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
                 Log.Error($"ERROR: StatusCode != 200");
                 Log.Error($"ErrorInfo completo: {errorInfo}");
-                
-                var error = new ErrorModel { StatusCode = response.StatusCode, Message = response.ErrorMessage};
+
+                var error = new ErrorModel { StatusCode = response.StatusCode, Message = response.ErrorMessage };
                 throw new ApplicationException(errorInfo);
 
             }
@@ -171,33 +178,33 @@ namespace BERRecepcion.Front.Utilities
             {
                 var request = new RestRequest(apiEndPoint, Method.Get);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
                 {
                     request.AddHeader("Authorization", $"Bearer {accessToken}");
                 }
-                
+
                 if (parameters != null)
                     foreach (var item in parameters)
                     {
                         request.AddParameter(item.Name, item.Value);
                     }
                 var response = await _client.ExecuteAsync(request);
-                
+
                 if (response.StatusCode == System.Net.HttpStatusCode.OK)
                 {
                     var returnedItem = JsonConvert.DeserializeObject<IEnumerable<T>>(response.Content);
                     return returnedItem;
                 }
-                string errorInfo = $"Error: Acción:GET { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:GET {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
 
                 throw new ApplicationException(errorInfo);
             }
-            catch (Exception )
+            catch (Exception)
             {
-                throw ;
+                throw;
             }
         }
         /// <summary>
@@ -215,7 +222,7 @@ namespace BERRecepcion.Front.Utilities
                 request.AddParameter("application/json", dto, ParameterType.RequestBody);
 
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -229,19 +236,19 @@ namespace BERRecepcion.Front.Utilities
                     return returnedItem;
                 }
 
-                if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout || response.StatusCode==0)
+                if (response.StatusCode == System.Net.HttpStatusCode.RequestTimeout || response.StatusCode == 0)
                 {
                     throw new TimeoutException();
                 }
                 else
                 {
-                    string errorInfo = $"Error: Acción:POST { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                    string errorInfo = $"Error: Acción:POST {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
                     throw new ApplicationException(errorInfo);
                 }
             }
-            catch (Exception )
+            catch (Exception)
             {
-                throw ;
+                throw;
             }
         }
         /// <summary>
@@ -250,7 +257,7 @@ namespace BERRecepcion.Front.Utilities
         /// <typeparam name="T"></typeparam>
         /// <param name="apiEndPoint"></param>
         /// <returns></returns>
-        public async Task<T> Update<T>(T dto, Guid Id,  string apiEndPoint)
+        public async Task<T> Update<T>(T dto, Guid Id, string apiEndPoint)
         {
             try
             {
@@ -258,7 +265,7 @@ namespace BERRecepcion.Front.Utilities
                 //request.AddJsonBody(dto);
                 request.AddParameter("application/json", dto, ParameterType.RequestBody);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -271,13 +278,13 @@ namespace BERRecepcion.Front.Utilities
                     var returnedItem = JsonConvert.DeserializeObject<T>(response.Content);
                     return returnedItem;
                 }
-                string errorInfo = $"Error: Acción:UPDATE { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:UPDATE {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
 
                 throw new ApplicationException(errorInfo);
             }
-            catch (Exception )
+            catch (Exception)
             {
-                throw ;
+                throw;
             }
         }
         /// <summary>
@@ -294,7 +301,7 @@ namespace BERRecepcion.Front.Utilities
                 //request.AddJsonBody(dto);
                 request.AddParameter("application/json", dto, ParameterType.RequestBody);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -307,7 +314,7 @@ namespace BERRecepcion.Front.Utilities
                     var returnedItem = JsonConvert.DeserializeObject<DataResult<IEnumerable<T>>>(response.Content);
                     return returnedItem.Data;
                 }
-                string errorInfo = $"Error: Acción:POST { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:POST {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
 
                 throw new ApplicationException(errorInfo);
             }
@@ -328,7 +335,7 @@ namespace BERRecepcion.Front.Utilities
             {
                 var request = new RestRequest(string.Concat(apiEndPoint, "/", Id), Method.Delete);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -341,13 +348,13 @@ namespace BERRecepcion.Front.Utilities
                     var returnedItem = JsonConvert.DeserializeObject<T>(response.Content);
                     return returnedItem;
                 }
-                string errorInfo = $"Error: Acción:DELETE { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:DELETE {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
 
                 throw new ApplicationException(errorInfo);
             }
-            catch (Exception )
+            catch (Exception)
             {
-                throw ;
+                throw;
             }
         }
 
@@ -365,7 +372,7 @@ namespace BERRecepcion.Front.Utilities
                 //request.AddJsonBody(dto);
                 request.AddParameter("application/json", dto, ParameterType.RequestBody);
                 request.AddHeader("ApiKey", _configuration.GetSection("Seguridad:ApiKey").Value);
-                
+
                 // Agregar JWT token de Azure AD
                 var accessToken = await GetAccessTokenAsync();
                 if (!string.IsNullOrEmpty(accessToken))
@@ -378,7 +385,7 @@ namespace BERRecepcion.Front.Utilities
                     var returnedItem = JsonConvert.DeserializeObject<T>(response.Content);
                     return returnedItem;
                 }
-                string errorInfo = $"Error: Acción:DELETE { response.ResponseUri } | Info: { response.StatusCode }, {response.StatusDescription} | { response.Content }";
+                string errorInfo = $"Error: Acción:DELETE {response.ResponseUri} | Info: {response.StatusCode}, {response.StatusDescription} | {response.Content}";
 
                 throw new ApplicationException(errorInfo);
             }

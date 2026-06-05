@@ -253,6 +253,7 @@ namespace BERRecepcion.Front
                 };
             });
             services.AddDistributedMemoryCache();
+            services.AddHttpClient();
 
             services.AddSession(options =>
             {

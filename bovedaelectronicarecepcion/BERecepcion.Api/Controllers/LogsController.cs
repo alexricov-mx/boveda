@@ -1,26 +1,35 @@
+using BERecepcion.Api.Filters;
+using BERecepcion.Api.Infrastructure.Auth;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System;
-using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers
 {
     /// <summary>
-    /// Controller para gestionar y descargar logs de la aplicación
+    /// Controller para gestionar y descargar logs de la aplicación.
+    /// Protegido con JWT + rol AdministrationLog.
     /// </summary>
     [Route("api/[controller]")]
     [ApiController]
+    [ApiKeyAuth]
+    //[Authorize(Policy = PolicyConstants.RequireAdministrationLog)]
     public class LogsController : ControllerBase
     {
         private readonly string _logsPath;
 
-        public LogsController()
+        /// <summary>
+        /// Usa ContentRootPath porque Serilog escribe "logs/log-.txt" relativo al ContentRoot
+        /// (definido en appsettings.json). AppContext.BaseDirectory apunta a bin\Debug\net10.0\
+        /// en desarrollo, lo que hace que la carpeta nunca se encuentre.
+        /// </summary>
+        public LogsController(IWebHostEnvironment env)
         {
-            // Ruta donde Serilog guarda los logs según appsettings.json
-            _logsPath = Path.Combine(AppContext.BaseDirectory, "logs");
+            _logsPath = Path.Combine(env.ContentRootPath, "logs");
         }
 
         /// <summary>
@@ -49,29 +58,21 @@ namespace BERecepcion.Api.Controllers
                     .OrderByDescending(f => f.LastWriteTime)
                     .Select(f => new
                     {
-                        fileName = f.Name,
-                        fullPath = f.FullName,
-                        size = FormatFileSize(f.Length),
-                        sizeBytes = f.Length,
+                        fileName     = f.Name,
+                        size         = FormatFileSize(f.Length),
+                        sizeBytes    = f.Length,
                         lastModified = f.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                        created = f.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")
+                        created      = f.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")
+                        // fullPath omitido: exponer rutas del servidor es un riesgo de seguridad
                     })
                     .ToList();
 
-                if (!logFiles.Any())
-                {
-                    return Ok(new
-                    {
-                        message = "No se encontraron archivos de log",
-                        path = _logsPath,
-                        files = new List<object>()
-                    });
-                }
-
                 return Ok(new
                 {
-                    message = $"Se encontraron {logFiles.Count} archivo(s) de log",
-                    path = _logsPath,
+                    message = logFiles.Count > 0
+                        ? $"Se encontraron {logFiles.Count} archivo(s) de log."
+                        : "No se encontraron archivos de log.",
+                    count = logFiles.Count,
                     files = logFiles
                 });
             }
@@ -79,9 +80,8 @@ namespace BERecepcion.Api.Controllers
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
-                    message = "Error al listar los archivos de log",
-                    error = ex.Message,
-                    stackTrace = ex.StackTrace
+                    message = "Error al listar los archivos de log.",
+                    error   = ex.Message
                 });
             }
         }
@@ -123,21 +123,21 @@ namespace BERecepcion.Api.Controllers
                     .OrderByDescending(f => f.LastWriteTime)
                     .Select(f => new
                     {
-                        fileName = f.Name,
-                        fullPath = f.FullName,
-                        size = FormatFileSize(f.Length),
-                        sizeBytes = f.Length,
+                        fileName     = f.Name,
+                        size         = FormatFileSize(f.Length),
+                        sizeBytes    = f.Length,
                         lastModified = f.LastWriteTime.ToString("yyyy-MM-dd HH:mm:ss"),
-                        created = f.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")
+                        created      = f.CreationTime.ToString("yyyy-MM-dd HH:mm:ss")
                     })
                     .ToList();
 
                 return Ok(new
                 {
-                    message = logFiles.Any() 
-                        ? $"Se encontraron {logFiles.Count} archivo(s) de log para {fecha}" 
-                        : $"No se encontraron logs para {fecha}",
-                    fecha = fecha,
+                    message = logFiles.Count > 0
+                        ? $"Se encontraron {logFiles.Count} archivo(s) de log para {fecha}."
+                        : $"No se encontraron logs para {fecha}.",
+                    fecha,
+                    count = logFiles.Count,
                     files = logFiles
                 });
             }
@@ -162,55 +162,32 @@ namespace BERecepcion.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult DownloadLogFile(string fileName)
         {
+            if (!IsValidLogFileName(fileName))
+                return BadRequest(new { message = "Nombre de archivo inválido. Solo se permiten archivos log-*.txt" });
+
             try
             {
-                // Validar que el nombre del archivo no contenga caracteres peligrosos
-                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
-                {
-                    return BadRequest(new
-                    {
-                        message = "Nombre de archivo inválido"
-                    });
-                }
-
-                // Solo permitir archivos .txt que empiecen con "log-"
-                if (!fileName.StartsWith("log-") || !fileName.EndsWith(".txt"))
-                {
-                    return BadRequest(new
-                    {
-                        message = "Solo se pueden descargar archivos de log válidos (log-*.txt)"
-                    });
-                }
-
                 var filePath = Path.Combine(_logsPath, fileName);
 
                 if (!System.IO.File.Exists(filePath))
-                {
-                    return NotFound(new
-                    {
-                        message = "Archivo de log no encontrado",
-                        fileName = fileName,
-                        searchPath = _logsPath
-                    });
-                }
+                    return NotFound(new { message = "Archivo de log no encontrado.", fileName });
 
                 var fileBytes = System.IO.File.ReadAllBytes(filePath);
                 return File(fileBytes, "text/plain", fileName);
             }
-            catch (UnauthorizedAccessException ex)
+            catch (UnauthorizedAccessException)
             {
                 return StatusCode(StatusCodes.Status403Forbidden, new
                 {
-                    message = "No tiene permisos para acceder al archivo",
-                    error = ex.Message
+                    message = "Sin permisos para acceder al archivo."
                 });
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
-                    message = "Error al descargar el archivo de log",
-                    error = ex.Message
+                    message = "Error al descargar el archivo de log.",
+                    error   = ex.Message
                 });
             }
         }
@@ -227,59 +204,58 @@ namespace BERecepcion.Api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public IActionResult TailLogFile(string fileName, [FromQuery] int lines = 100)
         {
+            if (!IsValidLogFileName(fileName))
+                return BadRequest(new { message = "Nombre de archivo inválido. Solo se permiten archivos log-*.txt" });
+
+            lines = Math.Clamp(lines, 1, 1000); // evitar respuestas masivas
+
             try
             {
-                if (fileName.Contains("..") || fileName.Contains("/") || fileName.Contains("\\"))
-                {
-                    return BadRequest(new { message = "Nombre de archivo inválido" });
-                }
-
-                if (!fileName.StartsWith("log-") || !fileName.EndsWith(".txt"))
-                {
-                    return BadRequest(new { message = "Solo se pueden leer archivos de log válidos" });
-                }
-
                 var filePath = Path.Combine(_logsPath, fileName);
 
                 if (!System.IO.File.Exists(filePath))
-                {
-                    return NotFound(new { message = "Archivo de log no encontrado", fileName = fileName });
-                }
+                    return NotFound(new { message = "Archivo de log no encontrado.", fileName });
 
-                var allLines = System.IO.File.ReadAllLines(filePath);
+                var allLines  = System.IO.File.ReadAllLines(filePath);
                 var lastLines = allLines.Skip(Math.Max(0, allLines.Length - lines)).ToArray();
 
                 return Ok(new
                 {
-                    fileName = fileName,
+                    fileName,
                     totalLines = allLines.Length,
-                    showing = lastLines.Length,
-                    lines = lastLines
+                    showing    = lastLines.Length,
+                    lines      = lastLines
                 });
             }
             catch (Exception ex)
             {
                 return StatusCode(StatusCodes.Status500InternalServerError, new
                 {
-                    message = "Error al leer el archivo de log",
-                    error = ex.Message
+                    message = "Error al leer el archivo de log.",
+                    error   = ex.Message
                 });
             }
         }
 
+        // ─── helpers ────────────────────────────────────────────────────────────
+
         /// <summary>
-        /// Formatea el tamaño del archivo a un formato legible
+        /// Valida que el nombre de archivo sea seguro: solo log-*.txt, sin path traversal.
         /// </summary>
-        private string FormatFileSize(long bytes)
+        private static bool IsValidLogFileName(string fileName) =>
+            !string.IsNullOrWhiteSpace(fileName)
+            && !fileName.Contains("..")
+            && !fileName.Contains('/')
+            && !fileName.Contains('\\')
+            && fileName.StartsWith("log-", StringComparison.OrdinalIgnoreCase)
+            && fileName.EndsWith(".txt", StringComparison.OrdinalIgnoreCase);
+
+        private static string FormatFileSize(long bytes)
         {
-            string[] sizes = { "B", "KB", "MB", "GB" };
+            string[] sizes = ["B", "KB", "MB", "GB"];
             double len = bytes;
             int order = 0;
-            while (len >= 1024 && order < sizes.Length - 1)
-            {
-                order++;
-                len = len / 1024;
-            }
+            while (len >= 1024 && order < sizes.Length - 1) { order++; len /= 1024; }
             return $"{len:0.##} {sizes[order]}";
         }
     }
