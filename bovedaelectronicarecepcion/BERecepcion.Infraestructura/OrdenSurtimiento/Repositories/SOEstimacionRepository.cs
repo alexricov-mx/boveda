@@ -9,6 +9,7 @@ using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
 using Newtonsoft.Json.Linq;
+using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -526,45 +527,52 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
         }
 
         public async Task<PagedResult<SupplyOrderDto>> GetPagedOrdenesBancariasAsync(
-            OrdenBancariaRequest request, 
-            CancellationToken cancellationToken = default)
+            DateTime start, 
+            DateTime end, 
+            string search, 
+            string UserID, 
+            string claveOrganismo, 
+            string creditorNumber, 
+            int pageSize, 
+            int pageNum = 1, 
+            bool esDescarga = false, 
+            CancellationToken cancellationToken = default
+            )
         {
+            if (pageNum < 1) pageNum = 1;
+            if (pageSize < 1) pageSize = 5;
 
-                if (request.PageNumber < 1) request.PageNumber = 1;
-                if (request.PageSize < 1) request.PageSize = 5;
+            using IDbConnection db = GetConnection();
 
-                using IDbConnection db = GetConnection();
+            {
+                DynamicParameters par = new();
+                par.Add("@UserID", UserID);
+                par.Add("@start", start);
+                par.Add("@end", end);
+                par.Add("@search", search);
+                par.Add("@pagenum", pageNum);
+                par.Add("@pagesize", pageSize);
+                par.Add("@claveOrganismo", claveOrganismo);
+                par.Add("@creditorNumber", creditorNumber);
+                par.Add("@esDescarga", esDescarga);
 
-                {
-                    DynamicParameters par = new ();
-                    par.Add("@UserID", _currentUserService.DbUserId);
-                    par.Add("@start", request.FechaInicial);
-                    par.Add("@end", request.FechaFinal);
-                    par.Add("@search", request.Search);
-                    par.Add("@pagenum", request.PageNumber);
-                    par.Add("@pagesize", request.PageSize);
-                    par.Add("@claveOrganismo", request.ClaveOrganismo);
-                    par.Add("@creditorNumber", request.CreditorNumber);
-                    par.Add("@esDescarga", request.EsDescarga);
+                var result = await db.QueryMultipleAsync(
+                    sql: "SP_SupplyOrder_representante_tabla_seleccion",
+                    param: par,
+                    commandType: CommandType.StoredProcedure
+                    );
 
-                    var result = await db.QueryMultipleAsync(
-                        sql: "SP_SupplyOrder_representante_tabla_seleccion", 
-                        param: par, 
-                        commandType: CommandType.StoredProcedure
-                        );
+                var totalItems = (await result.ReadAsync<int>()).FirstOrDefault();
+                var items = (await result.ReadAsync<SupplyOrderDto>()).ToList();
+                var pager = new Pager(totalItems, pageNum, pageSize);
 
-                    var totalItems = (await result.ReadAsync<int>()).FirstOrDefault();
-                    var items = (await result.ReadAsync<SupplyOrderDto>()).ToList();
-                    var pager = new Pager(totalItems, request.PageNumber, request.PageSize);
-
-                    return new PagedResult<SupplyOrderDto>(
-                        items: items,
-                        totalItems: pager.TotalItems,
-                        pageNumber: pager.CurrentPage,
-                        pageSize: pager.PageSize
-                        );
-                }
-            
+                return new PagedResult<SupplyOrderDto>(
+                    items: items,
+                    totalItems: pager.TotalItems,
+                    pageNumber: pager.CurrentPage,
+                    pageSize: pager.PageSize
+                    );
+            }
         }
     }
 }

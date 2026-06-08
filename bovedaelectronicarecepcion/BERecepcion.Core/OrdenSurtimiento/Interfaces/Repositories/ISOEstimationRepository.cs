@@ -29,12 +29,32 @@ namespace BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories
         Task<Guid> GetEstimacionIdAsync(SOEstimationDto dto);
         Task<DataResult<SupplyOrderDto>> EstimacionCorreo1Async(Guid EstimacionID, string SignerEmail);
         Task<DataResult<SupplyOrderDto>> EstimacionCorreo2Async(Guid EstimacionID, string SignerEmail);
-        Task<DataResult<IEnumerable<SupplyOrderDto>>> GetListaOrdenesBancariasAsync(DateTime start, DateTime end, string search, string UserID, string claveOrganismo, string creditorNumber, int pageSize, int pageNum = 1, bool esDescarga = false);
+        Task<DataResult<IEnumerable<SupplyOrderDto>>> GetListaOrdenesBancariasAsync(
+            DateTime start, 
+            DateTime end, 
+            string search, 
+            string UserID, 
+            string claveOrganismo, 
+            string creditorNumber, 
+            int pageSize, 
+            int pageNum = 1, 
+            bool esDescarga = false
+            );
         Task<PagedResult<SOEstimationDto>> GetSOEProveedorPaginatorAsync(
             SOEstimationProveedorRequestDto request,
             CancellationToken cancellationToken = default
             );
-        Task<PagedResult<SupplyOrderDto>> GetPagedOrdenesBancariasAsync(OrdenBancariaRequest request, CancellationToken cancellationToken = default);
+        Task<PagedResult<SupplyOrderDto>> GetPagedOrdenesBancariasAsync(
+            DateTime start,
+            DateTime end,
+            string search,
+            string UserID,
+            string claveOrganismo,
+            string creditorNumber,
+            int pageSize,
+            int pageNum = 1,
+            bool esDescarga = false,
+            CancellationToken cancellationToken = default);
 
     }
 }

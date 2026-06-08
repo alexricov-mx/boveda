@@ -1,11 +1,14 @@
-﻿using BERecepcion.Core.Common.Results;
+﻿using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Consulta.Dto;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
+using BERecepcion.Core.Exceptions;
 using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.Interfaces.Auth;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Utils;
-using System.Collections.Generic;
+using System;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -13,13 +16,17 @@ using System.Threading.Tasks;
 namespace BERecepcion.Core.Services;
 
 public class ConsultaServiceAsync(
-    IConsultasRepository consultasRepository,
-    ISOEstimationRepository sOEstimationRepository
+    IConsultasRepository consultasRepository
+    , ISOEstimationRepository sOEstimationRepository
+    , IUsuariosRepository usuariosRepository
+    , ICurrentUserService currentUserService
     )
     : IConsultaServiceAsync
 {
     private readonly IConsultasRepository _consultasRepository = consultasRepository;
     private readonly ISOEstimationRepository _sOEstimationRepository = sOEstimationRepository;
+    private readonly IUsuariosRepository _usuariosRepository = usuariosRepository;
+    private readonly ICurrentUserService _currentUserService = currentUserService;
 
     public async Task<Result<PagedResult<SOEstimationDto>>> GetEstimacionesBancariasAsync(
         EstimacionBancariaRequest request,
@@ -109,11 +116,24 @@ public class ConsultaServiceAsync(
         CancellationToken cancellationToken = default
         )
     {
+        var user = await _usuariosRepository.GetUserByEmailAsync(_currentUserService.Email)
+            ?? throw new NotFoundException("Usuario no encontrado");
+
         if (!string.IsNullOrWhiteSpace(request.Search))
-            request.Search = Core.Utils.SearchText.GetWhereClause(request.Search, ["OrganismClave", "Contract", "saporder", "CreditorNumber"]);
+            request.Search = SearchText.GetWhereClause(request.Search, ["OrganismClave", "Contract", "saporder", "CreditorNumber"]);
 
         var result = await _sOEstimationRepository
-            .GetPagedOrdenesBancariasAsync(request, cancellationToken);
+            .GetPagedOrdenesBancariasAsync(
+                request.FechaInicial??DateTime.Now,
+                request.FechaFinal??DateTime.Now ,
+                request.Search,
+                user.UserID.ToString(),
+                request.ClaveOrganismo,
+                user.CreditorNumber,
+                request.PageSize,
+                request.PageNumber,
+                request.EsDescarga,
+                cancellationToken);
 
         //return Result.Success(result);
         return Result.Success(
@@ -132,8 +152,10 @@ public class ConsultaServiceAsync(
         if (!string.IsNullOrWhiteSpace(request.Search))
             request.Search = SearchText.GetWhereClause(request.Search,
                 ["SAPOrder", "Creditor", "DocumentType", "Currency", "Clave", "Contract"]);
+
         var result = await _consultasRepository
             .GetOrdenesSurtimientoAsync(request, cancellationToken);
+
         return Result.Success(
             new PagedResult<SupplyOrderDto>(
                 result.Items,

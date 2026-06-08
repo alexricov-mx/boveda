@@ -40,8 +40,8 @@ public class OrdenSurtimiento : IOrdenSurtimiento
             fechaFinal?.ToString("yyyy-MM-dd"), search, pageNum, pageSize, "false"));
     }
 
-    public async Task<string> GetExpedient(string orderSAP)
-    {
+    //public async Task<string> GetExpedient(string orderSAP)
+    //{
         
-    }
+    //}
 }
