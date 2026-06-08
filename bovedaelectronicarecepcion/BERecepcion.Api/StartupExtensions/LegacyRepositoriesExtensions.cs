@@ -63,7 +63,6 @@ public static class LegacyRepositoriesExtensions
         services.AddTransient<IESignRepository>(_ =>
             new ESignRepository(cs, configuration, new DocumentoFirmadoRepository(cs)));
 
-        services.AddTransient<ICopadeRepository>(_ => new CopadeRepository(cs));
         services.AddTransient<IReceptionAlmacenRepository>(_ => new ReceptionRepository(cs));
         services.AddTransient<IDocumentoFirmadoRepository>(_ => new DocumentoFirmadoRepository(cs));
         services.AddTransient<ISATRepository>(_ => new SATRepository(cs));

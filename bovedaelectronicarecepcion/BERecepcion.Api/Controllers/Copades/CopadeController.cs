@@ -1,5 +1,24 @@
-﻿using BERecepcion.Core.Dto;
+﻿using BERecepcion.Api.Extensions;
+using BERecepcion.Api.Filters;
+using BERecepcion.Api.HtmlHelpers;
+using BERecepcion.Api.Infrastructure.Auth;
+using BERecepcion.Core.Admin.Dto;
+using BERecepcion.Core.Admin.Interfaces.Repositories;
+using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Copades.Dto;
+using BERecepcion.Core.Copades.Dto;
+using BERecepcion.Core.Copades.Interfaces.Repositories;
+using BERecepcion.Core.Correos.Dto;
+using BERecepcion.Core.Correos.Interfaces.Repositories;
+using BERecepcion.Core.Dto;
 using BERecepcion.Core.eSignDto;
+using BERecepcion.Core.FirmaDocumentos.Interfaces.Repositories;
+using BERecepcion.Core.IntegracionEFirma;
+using BERecepcion.Core.Interfaces;
+using BERecepcion.Core.SAPPI.Dto;
+using BERecepcion.Core.SAPPI.Interfaces.Repositories;
+using iText.Html2pdf;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
@@ -7,26 +26,13 @@ using Microsoft.Extensions.Hosting;
 using Serilog;
 using System;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using BERecepcion.Api.HtmlHelpers;
-using iText.Html2pdf;
-using System.Globalization;
-using BERecepcion.Api.Filters;
-using BERecepcion.Core.Copades.Interfaces.Repositories;
-using BERecepcion.Core.Correos.Dto;
-using BERecepcion.Core.Correos.Interfaces.Repositories;
-using BERecepcion.Core.FirmaDocumentos.Interfaces.Repositories;
-using BERecepcion.Core.SAPPI.Dto;
-using BERecepcion.Core.SAPPI.Interfaces.Repositories;
-using BERecepcion.Core.Admin.Interfaces.Repositories;
-using BERecepcion.Core.Consulta.Copades.Dto;
-using BERecepcion.Core.Admin.Dto;
-using BERecepcion.Core.IntegracionEFirma;
-using BERecepcion.Api.Extensions;
 using System.Net;
+using System.Text;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BERecepcion.Api.Controllers.Copades
 {
@@ -45,10 +51,11 @@ namespace BERecepcion.Api.Controllers.Copades
         private readonly IESignRepository _eSignRepository;
         private readonly IBitacoraRepository _bitacoraRepository;
         private readonly IDocumentoFirmadoRepository _documentoFirmadoRepository;
+        private readonly ICopadeServiceAsync _copadeServiceAsync;
 
         public CopadeController(ICopadeRepository copadeRepository, ISAPPIRepository sAPPIRepository, IHostEnvironment env, IConfiguration configuration, IDocumentosRepository documentosRepository,
             ICorreoRepository correoRepository, IUsuariosRepository usuariosRepository, IESignRepository eSignRepository, IBitacoraRepository bitacoraRepository,
-            IDocumentoFirmadoRepository documentoFirmadoRepository)
+            IDocumentoFirmadoRepository documentoFirmadoRepository, ICopadeServiceAsync copadeServiceAsync)
         {
             _copadeRepository = copadeRepository;
             _sapPIRepository = sAPPIRepository;
@@ -60,6 +67,7 @@ namespace BERecepcion.Api.Controllers.Copades
             _eSignRepository = eSignRepository;
             _bitacoraRepository = bitacoraRepository;
             _documentoFirmadoRepository = documentoFirmadoRepository;
+            _copadeServiceAsync = copadeServiceAsync;
         }
 
         [HttpPost]
@@ -178,6 +186,17 @@ namespace BERecepcion.Api.Controllers.Copades
                 
                 throw;
             }
+        }
+
+        [HttpGet("GetPagedFiltroCopadesAsync")]
+        [Authorize(Policy = PolicyConstants.RequireReceptionSignCopade)]
+        public async Task<IActionResult> GetPagedFiltroCopadesAsync(
+            [FromQuery] CopadeFiltroRequest request,
+            CancellationToken cancellationToken = default)
+        {
+            var result = await _copadeServiceAsync.GetPagedFiltroCopadesAsync(
+                request, cancellationToken);
+            return result.ToActionResult(this);
         }
 
         private DateTime reformatDate(string originalDate)

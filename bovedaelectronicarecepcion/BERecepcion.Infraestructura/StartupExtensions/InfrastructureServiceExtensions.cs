@@ -1,5 +1,6 @@
 using BERecepcion.Core.Admin.Interfaces.Repositories;
 using BERecepcion.Core.Consulta.Interfaces.Repositories;
+using BERecepcion.Core.Copades.Interfaces.Repositories;
 using BERecepcion.Core.Interfaces;
 using BERecepcion.Core.Interfaces.Repositories;
 using BERecepcion.Core.Options;
@@ -7,6 +8,7 @@ using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Core.Services;
 using BERecepcion.Infraestructura.Admin.Repositories;
 using BERecepcion.Infraestructura.Consulta.Repositories;
+using BERecepcion.Infraestructura.Copades.Repositories;
 using BERecepcion.Infraestructura.OrdenSurtimiento.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Microsoft.Extensions.Configuration;
@@ -42,6 +44,7 @@ public static class InfrastructureServiceExtensions
         services.AddScoped<IReactivaProcesosRepository, ReactivaProcesosRepository>();
         services.AddScoped<IExpedienteElectronicoRepositoryAsync, ExpedienteElectronicoRepository>();
         services.AddScoped<IUsuariosRepository, UsuariosRepository>();
+        services.AddScoped<ICopadeRepository, CopadeRepository>();
 
         // 5. Services — lógica de negocio OrdenSurtimiento
         services.AddScoped<ISoEstimacionServiceAsync, SoEstimacionServiceAsync>();
@@ -51,6 +54,10 @@ public static class InfrastructureServiceExtensions
 
         // 6. Services — Módulo ExpedienteElectronico
         services.AddScoped<IExpedienteElectronicoServiceAsync, ExpedienteElectronicoServiceAsync>();
+
+        // 7. Services — Módulo Copades
+        services.AddScoped<ICopadeServiceAsync, CopadeServiceAsync>();
+
         return services;
     }
 }

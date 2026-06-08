@@ -1,19 +1,14 @@
 ﻿using BERecepcion.Core.Common.Results;
 using BERecepcion.Core.Dto;
 using BERecepcion.Core.Interfaces;
-using BERecepcion.Core.Models;
 using BERecepcion.Core.OrdenSurtimiento.Dto;
 using BERecepcion.Core.OrdenSurtimiento.Interfaces.Repositories;
 using BERecepcion.Infraestructura.Repositories;
 using Dapper;
-using Newtonsoft.Json.Linq;
-using Org.BouncyCastle.Asn1.Ocsp;
 using System;
 using System.Collections.Generic;
 using System.Data;
-using System.Drawing.Printing;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -27,7 +22,7 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
         }
 
         #region Ordenes de surtimiento
-       
+
         public async Task<DataResult<IEnumerable<SupplyOrderDto>>> GetOSInternoAsync(string Token, int pageSize, string search = null, int pageNum = 1)
         {
             DataResult<IEnumerable<SupplyOrderDto>> resultItem = new DataResult<IEnumerable<SupplyOrderDto>>()
@@ -105,23 +100,23 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                     //db.Open();
                     //using (var tran = db.BeginTransaction())
                     //{
-                        try
-                        {
-                            DynamicParameters par = new DynamicParameters();
-                            par.Add("@SupplyOrderID", SupplyOrderID);
-                            par.Add("@UserType", UserType);
-                            par.Add("@Ficha", Ficha);
-                            await db.QueryAsync(sql: "SP_SupplyOrder_firma", param: par, commandType: CommandType.StoredProcedure);
-                            //tran.Commit();
-                            resultItem.Message = "Se actualizaron los datos correctamente";
-                        }
-                        catch (Exception ext)
-                        {
-                            //tran.Rollback();
-                            resultItem.Message = ext.Message;
-                            resultItem.Status = System.Net.HttpStatusCode.BadRequest;
-                            return resultItem;
-                        }
+                    try
+                    {
+                        DynamicParameters par = new DynamicParameters();
+                        par.Add("@SupplyOrderID", SupplyOrderID);
+                        par.Add("@UserType", UserType);
+                        par.Add("@Ficha", Ficha);
+                        await db.QueryAsync(sql: "SP_SupplyOrder_firma", param: par, commandType: CommandType.StoredProcedure);
+                        //tran.Commit();
+                        resultItem.Message = "Se actualizaron los datos correctamente";
+                    }
+                    catch (Exception ext)
+                    {
+                        //tran.Rollback();
+                        resultItem.Message = ext.Message;
+                        resultItem.Status = System.Net.HttpStatusCode.BadRequest;
+                        return resultItem;
+                    }
                     //}
                     return resultItem;
                 }
@@ -147,23 +142,23 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
                     //db.Open();
                     //using (var tran = db.BeginTransaction())
                     //{
-                        try
-                        {
-                            DynamicParameters par = new DynamicParameters();
-                            par.Add("@SupplyOrderID", SupplyOrderID);
-                            par.Add("@UserType", UserType);
-                            par.Add("@SignerEmail", SignerEmail);
-                            await db.QueryAsync(sql: "SP_SupplyOrder_firma_correo", param: par, commandType: CommandType.StoredProcedure);
-                            //tran.Commit();
-                            resultItem.Message = "Se actualizaron los datos correctamente";
-                        }
-                        catch (Exception ext)
-                        {
-                            //tran.Rollback();
-                            resultItem.Message = ext.Message;
-                            resultItem.Status = System.Net.HttpStatusCode.BadRequest;
-                            return resultItem;
-                        }
+                    try
+                    {
+                        DynamicParameters par = new DynamicParameters();
+                        par.Add("@SupplyOrderID", SupplyOrderID);
+                        par.Add("@UserType", UserType);
+                        par.Add("@SignerEmail", SignerEmail);
+                        await db.QueryAsync(sql: "SP_SupplyOrder_firma_correo", param: par, commandType: CommandType.StoredProcedure);
+                        //tran.Commit();
+                        resultItem.Message = "Se actualizaron los datos correctamente";
+                    }
+                    catch (Exception ext)
+                    {
+                        //tran.Rollback();
+                        resultItem.Message = ext.Message;
+                        resultItem.Status = System.Net.HttpStatusCode.BadRequest;
+                        return resultItem;
+                    }
                     //}
                     return resultItem;
                 }
@@ -339,8 +334,8 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
             par.Add("@pagesize", pageSize);
 
             var multi = await db.QueryMultipleAsync(
-                sql: "SP_SupplyOrder_Proveedor_selecciona ", 
-                param: par, 
+                sql: "SP_SupplyOrder_Proveedor_selecciona ",
+                param: par,
                 commandType: CommandType.StoredProcedure
                 );
 
@@ -357,10 +352,10 @@ namespace BERecepcion.Infraestructura.OrdenSurtimiento.Repositories
         }
 
         public async Task<PagedResult<SupplyOrderDto>> GetListPaginatedSupplyOrderAsync(
-            string token, 
-            int pageSize, 
-            int pageNumber, 
-            string search, 
+            string token,
+            int pageSize,
+            int pageNumber,
+            string search,
             CancellationToken cancellationToken
             )
         {

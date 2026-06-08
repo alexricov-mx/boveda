@@ -1,4 +1,19 @@
-﻿using System;
+﻿using BERecepcion.Core.Admin.Dto;
+using BERecepcion.Core.Common.Results;
+using BERecepcion.Core.Consulta.Copades.Dto;
+using BERecepcion.Core.Copades.Interfaces.Repositories;
+using BERecepcion.Core.Dto;
+using BERecepcion.Core.eSignDto;
+using BERecepcion.Core.FirmaDocumentos.Dto;
+using BERecepcion.Core.Interfaces;
+using BERecepcion.Infraestructura.Repositories;
+using Dapper;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Configuration;
+using Newtonsoft.Json;
+using Org.BouncyCastle.Asn1.Ocsp;
+using RestSharp;
+using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Globalization;
@@ -6,27 +21,19 @@ using System.IO;
 using System.Linq;
 using System.Net;
 using System.Text;
+using System.Threading;
 using System.Threading.Tasks;
-using BERecepcion.Core.Admin.Dto;
-using BERecepcion.Core.Consulta.Copades.Dto;
-using BERecepcion.Core.Copades.Interfaces.Repositories;
-using BERecepcion.Core.Dto;
-using BERecepcion.Core.eSignDto;
-using BERecepcion.Core.FirmaDocumentos.Dto;
-using BERecepcion.Infraestructura.Repositories;
-using Dapper;
-using Microsoft.AspNetCore.Http;
-using Microsoft.Extensions.Configuration;
-using Newtonsoft.Json;
-using RestSharp;
 
 namespace BERecepcion.Infraestructura.Copades.Repositories
 {
-    public class CopadeRepository : BaseSQLServerSqlRepository, ICopadeRepository
+    public class CopadeRepository 
+        : BaseSQLServerSqlRepository, ICopadeRepository
     {
         private readonly IConfiguration _configuration;
 
-        public CopadeRepository(string cnnString) : base(cnnString)
+        public CopadeRepository(
+           IDbConnectionFactory connectionFactory
+            ) : base(connectionFactory)
         {
 
         }
@@ -67,6 +74,42 @@ namespace BERecepcion.Infraestructura.Copades.Repositories
                 return resultItem;
             }
         }
+        public async Task<PagedResult<CopadeDto>> GetPagedFiltroCopadesAsync(
+            string userID,
+            int pageSize,
+            int pageNum,
+            string search,
+            CancellationToken cancellationToken = default)
+        {
+            if (pageNum < 1) pageNum = 1;
+            if (pageSize < 1) pageSize = 5;
+
+            using IDbConnection db = GetConnection();
+
+            var par = new DynamicParameters();
+            par.Add("@UserID", userID);
+            par.Add("@search", search);
+            par.Add("@pagenum", pageNum);
+            par.Add("@pagesize", pageSize);
+
+            var multi = await db.QueryMultipleAsync(
+                sql: "SP_copade_filtro_seleccion",
+                param: par,
+                commandType: CommandType.StoredProcedure);
+
+            var totalItems = (await multi.ReadAsync<int>()).FirstOrDefault();
+            var items = (await multi.ReadAsync<CopadeDto>()).ToList();
+            var pager = new Pager(totalItems, pageNum, pageSize);
+
+
+
+            return new PagedResult<CopadeDto>(
+                items,
+                totalItems: pager.TotalItems,
+                pageNumber: pager.CurrentPage,
+                pageSize: pager.PageSize);
+        }
+
         public async Task<DataResult<CopadeDto>> CopadeFirmaAsync(Guid CopadeID, string Token)
         {
             DataResult<CopadeDto> resultItem = new DataResult<CopadeDto>()
